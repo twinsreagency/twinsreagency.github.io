@@ -44,11 +44,10 @@ EMAIL = "twinsreagency@gmail.com"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
-CSP = (
-    "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; "
-    "font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; "
-    "form-action 'self' mailto:; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
-)
+# La política de seguridad (CSP) se envía como cabecera HTTP desde .htaccess
+# (Apache) o _headers (Netlify / Cloudflare Pages). No se incluye como <meta>
+# en el HTML porque bloquearía styles.css y main.js al abrir las páginas desde
+# el disco (file://) o desde previsualizadores externos.
 
 # --------------------------------------------------------------------------
 # Iconos (trazo, 24x24, heredan el color del texto)
@@ -230,7 +229,6 @@ def head(ctx, title, description, noindex=False, extra=""):
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="{CSP}">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>{esc(full_title)}</title>
     <meta name="description" content="{esc(description)}">

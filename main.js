@@ -2,7 +2,7 @@
  * Twins Real Estate — comportamiento del sitio.
  *
  * Sin dependencias externas ni código en línea, para permitir una
- * Content-Security-Policy estricta (script-src 'self').
+ * Content-Security-Policy estricta (script-src 'self') en el servidor.
  * El idioma se toma del atributo lang de <html> (es, ca o en).
  */
 (function () {
@@ -16,7 +16,7 @@
      * formulario abre el cliente de correo del usuario con el mensaje
      * preparado para `fallbackEmail`.
      * Al configurar un endpoint externo, añada su dominio a la directiva
-     * `connect-src` de la política CSP (en _build.py, .htaccess y _headers).
+     * `connect-src` de la política CSP (en .htaccess y _headers).
      */
     var CONFIG = {
         endpoint: "",
