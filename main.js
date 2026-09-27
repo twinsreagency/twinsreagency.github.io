@@ -3,6 +3,7 @@
  *
  * Sin dependencias externas ni código en línea, para permitir una
  * Content-Security-Policy estricta (script-src 'self').
+ * El idioma se toma del atributo lang de <html> (es, ca o en).
  */
 (function () {
     "use strict";
@@ -15,7 +16,7 @@
      * formulario abre el cliente de correo del usuario con el mensaje
      * preparado para `fallbackEmail`.
      * Al configurar un endpoint externo, añada su dominio a la directiva
-     * `connect-src` de la política CSP (.htaccess y _headers).
+     * `connect-src` de la política CSP (en _build.py, .htaccess y _headers).
      */
     var CONFIG = {
         endpoint: "",
@@ -23,6 +24,75 @@
         minFillTimeMs: 3000,
         favoritesKey: "twins:favoritos"
     };
+
+    var MESSAGES = {
+        es: {
+            nombre: "Indique su nombre y apellidos.",
+            email: "Indique una dirección de correo electrónico válida.",
+            telefono: "Indique un teléfono válido o deje el campo vacío.",
+            mensaje: "El mensaje debe contener al menos 10 caracteres.",
+            privacidad: "Debe aceptar la política de privacidad para continuar.",
+            invalid: "Revise los campos indicados antes de enviar el formulario.",
+            blocked: "No ha sido posible enviar el formulario. Inténtelo de nuevo en unos segundos.",
+            mailOpened: "Se ha abierto su aplicación de correo con el mensaje preparado. Si no se abre, escríbanos directamente a {email}.",
+            sending: "Enviando su consulta…",
+            sent: "Gracias. Hemos recibido su consulta y le responderemos a la mayor brevedad.",
+            failed: "No ha sido posible enviar su consulta. Inténtelo de nuevo o escríbanos a {email}.",
+            prefill: "Deseo recibir más información sobre el inmueble con referencia {ref}.",
+            mailSubject: "Consulta web",
+            mailDefaultSubject: "Información general",
+            mailName: "Nombre",
+            mailEmail: "Correo electrónico",
+            mailPhone: "Teléfono",
+            mailReason: "Motivo",
+            mailRef: "Referencia del inmueble"
+        },
+        ca: {
+            nombre: "Indiqueu el vostre nom i cognoms.",
+            email: "Indiqueu una adreça de correu electrònic vàlida.",
+            telefono: "Indiqueu un telèfon vàlid o deixeu el camp buit.",
+            mensaje: "El missatge ha de contenir almenys 10 caràcters.",
+            privacidad: "Heu d’acceptar la política de privacitat per continuar.",
+            invalid: "Reviseu els camps indicats abans d’enviar el formulari.",
+            blocked: "No ha estat possible enviar el formulari. Torneu-ho a provar d’aquí a uns segons.",
+            mailOpened: "S’ha obert la vostra aplicació de correu amb el missatge preparat. Si no s’obre, escriviu-nos directament a {email}.",
+            sending: "S’està enviant la consulta…",
+            sent: "Gràcies. Hem rebut la vostra consulta i us respondrem com més aviat millor.",
+            failed: "No ha estat possible enviar la consulta. Torneu-ho a provar o escriviu-nos a {email}.",
+            prefill: "Voldria rebre més informació sobre l’immoble amb referència {ref}.",
+            mailSubject: "Consulta web",
+            mailDefaultSubject: "Informació general",
+            mailName: "Nom",
+            mailEmail: "Correu electrònic",
+            mailPhone: "Telèfon",
+            mailReason: "Motiu",
+            mailRef: "Referència de l’immoble"
+        },
+        en: {
+            nombre: "Please enter your full name.",
+            email: "Please enter a valid email address.",
+            telefono: "Please enter a valid phone number or leave the field blank.",
+            mensaje: "Your message must contain at least 10 characters.",
+            privacidad: "You must accept the privacy policy to continue.",
+            invalid: "Please review the highlighted fields before submitting the form.",
+            blocked: "The form could not be sent. Please try again in a few seconds.",
+            mailOpened: "Your email application has opened with the message ready to send. If it does not open, please write to us directly at {email}.",
+            sending: "Sending your enquiry…",
+            sent: "Thank you. We have received your enquiry and will reply as soon as possible.",
+            failed: "Your enquiry could not be sent. Please try again or write to us at {email}.",
+            prefill: "I would like to receive more information about the property with reference {ref}.",
+            mailSubject: "Website enquiry",
+            mailDefaultSubject: "General information",
+            mailName: "Name",
+            mailEmail: "Email",
+            mailPhone: "Phone",
+            mailReason: "Reason",
+            mailRef: "Property reference"
+        }
+    };
+
+    var LANG = MESSAGES[document.documentElement.lang] ? document.documentElement.lang : "es";
+    var T = MESSAGES[LANG];
 
     var PROPERTY_REF = /^TRE-\d{3}$/;
     var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -38,9 +108,16 @@
         return Array.prototype.slice.call((root || document).querySelectorAll(selector));
     }
 
+    function format(text, values) {
+        return text.replace(/\{(\w+)\}/g, function (match, key) {
+            return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : match;
+        });
+    }
+
     function storageGet(key) {
         try {
-            return JSON.parse(window.localStorage.getItem(key)) || [];
+            var value = JSON.parse(window.localStorage.getItem(key));
+            return Array.isArray(value) ? value : [];
         } catch (error) {
             return [];
         }
@@ -57,7 +134,7 @@
     /** Devuelve el valor del parámetro solo si pertenece a la lista permitida. */
     function allowedParam(params, name, allowed) {
         var value = params.get(name);
-        return value !== null && allowed.indexOf(value) !== -1 ? value : "";
+        return value !== null && value !== "" && allowed.indexOf(value) !== -1 ? value : "";
     }
 
     function optionValues(select) {
@@ -76,8 +153,7 @@
         var ticking = false;
 
         function update() {
-            var scrolled = window.scrollY > 40;
-            header.classList.toggle("is-scrolled", scrolled);
+            header.classList.toggle("is-scrolled", window.scrollY > 40);
             if (backToTop) backToTop.classList.toggle("is-visible", window.scrollY > 600);
             ticking = false;
         }
@@ -94,8 +170,8 @@
         if (backToTop) {
             backToTop.addEventListener("click", function () {
                 window.scrollTo({ top: 0, behavior: "smooth" });
-                var skipTarget = document.getElementById("contenido");
-                if (skipTarget) skipTarget.focus({ preventScroll: true });
+                var main = document.getElementById("contenido");
+                if (main) main.focus({ preventScroll: true });
             });
         }
     }
@@ -106,11 +182,13 @@
         var nav = document.getElementById("menu-principal");
         if (!toggle || !nav || !header) return;
 
-        var desktop = window.matchMedia("(min-width: 1025px)");
+        var desktop = window.matchMedia("(min-width: 1281px)");
+        var labelOpen = toggle.getAttribute("data-label-open");
+        var labelClose = toggle.getAttribute("data-label-close");
 
         function setOpen(open) {
             toggle.setAttribute("aria-expanded", String(open));
-            toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+            toggle.setAttribute("aria-label", open ? labelClose : labelOpen);
             nav.classList.toggle("is-open", open);
             header.classList.toggle("is-open", open);
             document.body.classList.toggle("nav-open", open);
@@ -170,7 +248,7 @@
         if (!buttons.length) return;
 
         var favorites = storageGet(CONFIG.favoritesKey).filter(function (ref) {
-            return PROPERTY_REF.test(ref);
+            return typeof ref === "string" && PROPERTY_REF.test(ref);
         });
 
         buttons.forEach(function (button) {
@@ -264,39 +342,37 @@
 
         var status = $(".form-status", form);
         var submit = $("button[type='submit']", form);
+        var subject = form.elements.asunto;
         var startedAt = Date.now();
         var params = new URLSearchParams(window.location.search);
 
-        var subject = form.elements.asunto;
-        if (subject) {
-            var presetSubject = allowedParam(params, "asunto", optionValues(subject));
-            if (presetSubject) subject.value = presetSubject;
-        }
+        var presetSubject = allowedParam(params, "asunto", optionValues(subject));
+        if (presetSubject) subject.value = presetSubject;
 
         var reference = params.get("ref");
         if (reference && PROPERTY_REF.test(reference)) {
             form.elements.referencia.value = reference;
-            if (subject && !subject.value) subject.value = "compra";
+            if (!subject.value) subject.value = "compra";
             if (!form.elements.mensaje.value) {
-                form.elements.mensaje.value = "Deseo recibir más información sobre el inmueble con referencia " + reference + ".";
+                form.elements.mensaje.value = format(T.prefill, { ref: reference });
             }
         }
 
         var rules = {
             nombre: function (value) {
-                return value.length >= 2 ? "" : "Indique su nombre y apellidos.";
+                return value.length >= 2 ? "" : T.nombre;
             },
             email: function (value) {
-                return EMAIL.test(value) ? "" : "Indique una dirección de correo electrónico válida.";
+                return EMAIL.test(value) ? "" : T.email;
             },
             telefono: function (value) {
-                return !value || PHONE.test(value) ? "" : "Indique un teléfono válido o deje el campo vacío.";
+                return !value || PHONE.test(value) ? "" : T.telefono;
             },
             mensaje: function (value) {
-                return value.length >= 10 ? "" : "El mensaje debe contener al menos 10 caracteres.";
+                return value.length >= 10 ? "" : T.mensaje;
             },
             privacidad: function (value, field) {
-                return field.checked ? "" : "Debe aceptar la política de privacidad para continuar.";
+                return field.checked ? "" : T.privacidad;
             }
         };
 
@@ -328,10 +404,11 @@
 
         function collect() {
             return {
+                idioma: LANG,
                 nombre: form.elements.nombre.value.trim(),
                 email: form.elements.email.value.trim(),
                 telefono: form.elements.telefono.value.trim(),
-                asunto: subject ? subject.options[subject.selectedIndex].text : "",
+                asunto: subject.value ? subject.options[subject.selectedIndex].text : "",
                 referencia: form.elements.referencia.value.trim(),
                 mensaje: form.elements.mensaje.value.trim()
             };
@@ -339,16 +416,16 @@
 
         function openMailClient(data) {
             var lines = [
-                "Nombre: " + data.nombre,
-                "Correo electrónico: " + data.email,
-                "Teléfono: " + (data.telefono || "—"),
-                "Motivo: " + (data.asunto || "—")
+                T.mailName + ": " + data.nombre,
+                T.mailEmail + ": " + data.email,
+                T.mailPhone + ": " + (data.telefono || "—"),
+                T.mailReason + ": " + (data.asunto || "—")
             ];
-            if (data.referencia) lines.push("Referencia del inmueble: " + data.referencia);
+            if (data.referencia) lines.push(T.mailRef + ": " + data.referencia);
             lines.push("", data.mensaje);
 
             window.location.href = "mailto:" + CONFIG.fallbackEmail +
-                "?subject=" + encodeURIComponent("Consulta web — " + (data.asunto || "Información general")) +
+                "?subject=" + encodeURIComponent(T.mailSubject + " — " + (data.asunto || T.mailDefaultSubject)) +
                 "&body=" + encodeURIComponent(lines.join("\n"));
         }
 
@@ -357,7 +434,7 @@
 
             var valid = Object.keys(rules).map(validateField).every(Boolean);
             if (!valid) {
-                setStatus("error", "Revise los campos indicados antes de enviar el formulario.");
+                setStatus("error", T.invalid);
                 var firstInvalid = $("[aria-invalid='true']", form);
                 if (firstInvalid) firstInvalid.focus();
                 return;
@@ -365,7 +442,7 @@
 
             /* Protección básica contra envíos automatizados. */
             if (form.elements.web.value || Date.now() - startedAt < CONFIG.minFillTimeMs) {
-                setStatus("error", "No ha sido posible enviar el formulario. Inténtelo de nuevo en unos segundos.");
+                setStatus("error", T.blocked);
                 return;
             }
 
@@ -373,12 +450,12 @@
 
             if (!CONFIG.endpoint) {
                 openMailClient(data);
-                setStatus("success", "Se ha abierto su aplicación de correo con el mensaje preparado. Si no se abre, escríbanos directamente a " + CONFIG.fallbackEmail + ".");
+                setStatus("success", format(T.mailOpened, { email: CONFIG.fallbackEmail }));
                 return;
             }
 
             submit.disabled = true;
-            setStatus("success", "Enviando su consulta…");
+            setStatus("success", T.sending);
 
             window.fetch(CONFIG.endpoint, {
                 method: "POST",
@@ -390,9 +467,9 @@
                 if (!response.ok) throw new Error("HTTP " + response.status);
                 form.reset();
                 startedAt = Date.now();
-                setStatus("success", "Gracias. Hemos recibido su consulta y le responderemos a la mayor brevedad.");
+                setStatus("success", T.sent);
             }).catch(function () {
-                setStatus("error", "No ha sido posible enviar su consulta. Inténtelo de nuevo o escríbanos a " + CONFIG.fallbackEmail + ".");
+                setStatus("error", format(T.failed, { email: CONFIG.fallbackEmail }));
             }).then(function () {
                 submit.disabled = false;
             });
