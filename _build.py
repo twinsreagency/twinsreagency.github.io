@@ -15,6 +15,7 @@ fichero solo contiene la estructura y los datos comunes. Después de modificar
 cualquier texto, vuelva a ejecutar el script. Los archivos que empiezan por
 «_» no se publican en GitHub Pages ni se sirven con la configuración .htaccess.
 """
+import hashlib
 import html
 import json
 import os
@@ -87,6 +88,8 @@ ICONS = {
     "instagram": '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
     "lightbulb": '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
     "sofa": '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 13a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 18v2M19 18v2"/>',
+    "sun": '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    "moon": '<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/>',
     "euro": '<path d="M17 6.5A7 7 0 1 0 17 17.5"/><path d="M4 10h9M4 14h9"/>',
 }
 
@@ -147,6 +150,13 @@ POSTS = [  # (slug, icono, fecha ISO, minutos de lectura)
 # --------------------------------------------------------------------------
 # Nombres de archivo y contexto de página
 # --------------------------------------------------------------------------
+def versioned(asset):
+    """Añade una huella del contenido para que el navegador no use copias antiguas en caché."""
+    with open(os.path.join(SITE_DIR, asset), "rb") as fh:
+        digest = hashlib.sha256(fh.read()).hexdigest()[:10]
+    return f"{asset}?v={digest}"
+
+
 def filename(lang, page):
     """Nombre del archivo de una página lógica («index.html», «blog/<clave>.html»…) en un idioma."""
     if page == "404.html":
@@ -233,7 +243,8 @@ def head(ctx, title, description, noindex=False, extra=""):
     <title>{esc(full_title)}</title>
     <meta name="description" content="{esc(description)}">
     <meta name="robots" content="{robots}">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="theme-color" content="#000000">
+    <meta name="color-scheme" content="dark light">
     <meta name="format-detection" content="telephone=no">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="{L['locale']}">
@@ -245,15 +256,16 @@ def head(ctx, title, description, noindex=False, extra=""):
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
-    <link rel="stylesheet" href="styles.css">
-    <script src="main.js" defer></script>{extra}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <script src="{versioned('theme.js')}"></script>
+    <link rel="stylesheet" href="{versioned('styles.css')}">
+    <script src="{versioned('main.js')}" defer></script>{extra}
 </head>"""
 
 
 def brand(ctx):
     return f"""<a class="brand" href="{ctx.page('index.html')}" aria-label="{esc(ctx.L['ui']['home_aria'])}">
-                <img src="logo-icon.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>"""
 
@@ -290,6 +302,7 @@ def site_header(ctx, active):
                 {lang_switch(ctx)}
                 <a class="btn btn--primary nav__cta" href="{ctx.page('contacto.html')}?asunto=visita#formulario">{ui['cta_nav']}</a>
             </nav>
+            <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_light'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="{esc(ui['menu_open'])}" data-label-open="{esc(ui['menu_open'])}" data-label-close="{esc(ui['menu_close'])}">
                 <span></span><span></span><span></span>
             </button>
@@ -359,7 +372,8 @@ def page_hero(ctx, title, text, crumbs, extra=""):
     trail.append(f'<li aria-current="page">{crumbs[-1][0]}</li>')
     text_html = f'\n            <p class="page-hero__text">{text}</p>' if text else ""
     return f"""
-    <section class="page-hero">
+    <section class="page-hero" data-scroll="view">
+        <div class="page-hero__panes" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="container">
             <nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
                 <ol>{''.join(trail)}</ol>
@@ -374,7 +388,8 @@ def cta(ctx, title, text, secondary=None):
     ui = ctx.L["ui"]
     secondary = secondary or (f"mailto:{EMAIL}", ui["cta_mail"])
     return f"""
-        <section class="cta" aria-labelledby="cta-title">
+        <section class="cta" aria-labelledby="cta-title" data-scroll="view">
+            <div class="cta__glow" aria-hidden="true"></div>
             <div class="container reveal">
                 <h2 class="cta__title" id="cta-title">{title}</h2>
                 <p class="cta__text">{text}</p>
@@ -417,7 +432,7 @@ def property_card(ctx, p):
     suffix = f' <small>{P["per_month"]}</small>' if p["op"] == "alquiler" else ""
     operation = P["rent"] if p["op"] == "alquiler" else P["sale"]
     return f"""
-                <article class="card property reveal" data-operacion="{p['op']}" data-tipo="{p['type']}" data-zona="{p['zone']}" data-precio="{p['price']}" data-dormitorios="{p['beds']}">
+                <article class="card property reveal tilt" data-operacion="{p['op']}" data-tipo="{p['type']}" data-zona="{p['zone']}" data-precio="{p['price']}" data-dormitorios="{p['beds']}">
                     <div class="property__media">
                         {icon(p['icon'])}
                         {badge_html}
@@ -441,11 +456,34 @@ def property_card(ctx, p):
 
 def feature_card(icon_name, title, text, extra="", attrs=""):
     return f"""
-                <article class="card feature reveal"{attrs}>
+                <article class="card feature reveal tilt"{attrs}>
                     <div class="feature__icon">{icon(icon_name)}</div>
                     <h3 class="feature__title">{title}</h3>
                     <p class="feature__text">{text}</p>{extra}
                 </article>"""
+
+
+def faces(names, extra=None):
+    extra = extra or {}
+    return "".join(f'<span class="face face--{n}">{extra.get(n, "")}</span>' for n in names)
+
+
+def model_3d():
+    """Modelo 3D decorativo del logotipo (torre y casa) construido con CSS."""
+    window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
+    walls = ["front", "back", "left", "right"]
+    return f"""
+                <div class="scene" aria-hidden="true">
+                    <div class="scene__float">
+                        <div class="model">
+                            <span class="orbit orbit--1"></span>
+                            <span class="orbit orbit--2"></span>
+                            <span class="floor"></span>
+                            <span class="box box--tower">{faces(walls + ["top"])}</span>
+                            <span class="box box--house">{faces(walls, {"front": window})}<span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span>
+                        </div>
+                    </div>
+                </div>"""
 
 
 def section_header(eyebrow, title, title_id, lead=None):
@@ -492,7 +530,7 @@ def post_card(ctx, slug, icon_name, date, minutes):
     post = ctx.L["posts"][slug]
     href = ctx.page(f"blog/{slug}.html")
     return f"""
-                <article class="card post-card reveal">
+                <article class="card post-card reveal tilt">
                     <div class="post-card__media">
                         {icon(icon_name)}
                         <span class="post-card__category">{post['category']}</span>
@@ -518,10 +556,7 @@ def build_index(L):
         f'\n                    <p class="feature__more"><a class="link-arrow" href="{ctx.page("servicios.html")}#{sid}">'
         f'{ui["more_info"]} {icon("arrow-right")}<span class="visually-hidden"> {ui["about"]} {L["services"][sid][0].lower()}</span></a></p>'
     ) for sid, ic in SERVICES[:4])
-    pillars = "".join(f'\n                        <li class="hero__pillar">{icon(ic)}{text}</li>'
-                      for ic, text in zip(PILLAR_ICONS, T["pillars"]))
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
-    paras = "".join(f"\n                        <p>{p}</p>" for p in T["about_paras"])
     ld = json.dumps({
         "@context": "https://schema.org",
         "@type": "RealEstateAgent",
@@ -533,21 +568,30 @@ def build_index(L):
         "knowsLanguage": [lang["lang"] for lang in LANGS],
     }, ensure_ascii=False)
 
+    callouts = "".join(
+        f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
+        for i, (ic, text) in enumerate(zip(PILLAR_ICONS, T["pillars"]), start=1))
+
     body = f"""
-        <section class="hero" aria-labelledby="hero-title">
-            <img class="hero__mark" src="logo-icon.png" alt="" width="151" height="200">
-            <div class="container">
-                <div class="hero__content">
-                    <p class="eyebrow">{T['eyebrow']}</p>
-                    <h1 class="hero__title" id="hero-title">{T['h1']}</h1>
-                    <p class="hero__text">{T['text']}</p>
-                    <div class="hero__actions">
-                        <a class="btn btn--primary" href="{ctx.page('propiedades.html')}">{T['btn_props']} {ARROW}</a>
-                        <a class="btn btn--outline-light" href="{ctx.page('contacto.html')}#formulario">{T['btn_advice']}</a>
+        <section class="hero3d" data-scroll="sticky" aria-labelledby="hero-title">
+            <div class="hero3d__sticky">
+                <div class="hero3d__glow" aria-hidden="true"></div>
+                <div class="container hero3d__grid">
+                    <div class="hero3d__copy">
+                        <p class="eyebrow">{T['eyebrow']}</p>
+                        <h1 class="hero3d__title" id="hero-title">{T['h1']}</h1>
+                        <p class="hero3d__text">{T['text']}</p>
+                        <div class="hero3d__actions">
+                            <a class="btn btn--primary" href="{ctx.page('propiedades.html')}">{T['btn_props']} {ARROW}</a>
+                            <a class="btn btn--glass" href="{ctx.page('contacto.html')}#formulario">{T['btn_advice']}</a>
+                        </div>
                     </div>
-                    <ul class="hero__pillars">{pillars}
-                    </ul>
+                    <div class="hero3d__stage">{model_3d()}
+                        <ul class="callouts">{callouts}
+                        </ul>
+                    </div>
                 </div>
+                <p class="scroll-hint" aria-hidden="true"><span>{ui['scroll_hint']}</span></p>
             </div>
         </section>
 
@@ -572,18 +616,28 @@ def build_index(L):
             </div>
         </section>
 
-        <section class="section section--alt" aria-labelledby="nosotros-title">
+        <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
+            <div class="statement__sticky">
+                <div class="container">
+                    <p class="eyebrow">{T['about_eyebrow']}</p>
+                    <h2 class="visually-hidden" id="nosotros-title">{T['about_title']}</h2>
+                    <p class="statement__text" data-words>{T['about_paras'][0]}</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--alt" aria-labelledby="confianza-title">
             <div class="container split">
-                <div class="split__visual reveal">
+                <div class="split__visual reveal tilt">
                     <div class="split__frame">
-                        <img src="logo-icon.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
                         <p class="split__quote">{T['quote']}</p>
                     </div>
                 </div>
                 <div class="reveal">
-                    <span class="eyebrow">{T['about_eyebrow']}</span>
-                    <h2 class="section-title" id="nosotros-title">{T['about_title']}</h2>
-                    <div class="prose-block">{paras}
+                    <h2 class="section-title" id="confianza-title">{T['about_title']}</h2>
+                    <div class="prose-block">
+                        <p>{T['about_paras'][1]}</p>
                     </div>
                     <ul class="check-list">{checks}
                     </ul>
@@ -594,7 +648,7 @@ def build_index(L):
 
         <section class="section" aria-labelledby="servicios-title">
             <div class="container">{section_header(T['services_eyebrow'], T['services_title'], 'servicios-title', T['services_lead'])}
-                <div class="grid grid--4">{services}
+                <div class="bento">{services}
                 </div>
                 <div class="section-footer">
                     <a class="btn btn--outline" href="{ctx.page('servicios.html')}">{T['services_all']} {ARROW}</a>
@@ -652,7 +706,7 @@ def build_about(L):
             <div class="container split">
                 <div class="split__visual reveal">
                     <div class="split__frame">
-                        <img src="logo-icon.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
                         <p class="split__quote">{L['index']['slogan']}</p>
                     </div>
                 </div>
@@ -691,7 +745,7 @@ def build_services(L):
         '\n                    <ul class="feature__list">' + "".join(f"<li>{i}</li>" for i in L["services"][sid][2]) + "</ul>",
         f' id="{sid}"') for sid, ic in SERVICES)
     steps = "".join(f"""
-                <article class="card step reveal">
+                <article class="card step reveal tilt">
                     <h3 class="feature__title">{title}</h3>
                     <p class="feature__text">{text}</p>
                 </article>""" for title, text in T["steps"])

@@ -56,6 +56,9 @@ C = {
         "article_notice": "Aquest article té caràcter merament informatiu i no constitueix assessorament jurídic, fiscal ni financer. La normativa pot variar segons la comunitat autònoma; consulteu el vostre cas amb un professional.",
         "updated": "Darrera actualització: {}",
         "updated_date": "27 de setembre de 2026",
+        "theme_to_light": "Canvia al tema clar",
+        "theme_to_dark": "Canvia al tema fosc",
+        "scroll_hint": "Llisqueu per descobrir",
         "commitments_title": "Els nostres compromisos",
     },
 
@@ -519,7 +522,7 @@ C = {
 <h2>1. Utilitzem galetes?</h2>
 <p>Aquest lloc web <strong>no utilitza galetes</strong> pròpies ni de tercers amb finalitats analítiques, publicitàries o de seguiment. Per aquest motiu, no es mostra cap avís de consentiment de galetes.</p>
 <h2>2. Emmagatzematge local</h2>
-<p>Si marqueu un immoble com a preferit, el vostre navegador desa únicament la referència d’aquell immoble mitjançant la tecnologia d’emmagatzematge local (<em>localStorage</em>). Aquesta informació no inclou dades personals, no s’envia a cap servidor i roman exclusivament al vostre dispositiu.</p>
+<p>Si marqueu un immoble com a preferit, el vostre navegador desa únicament la referència d’aquell immoble mitjançant la tecnologia d’emmagatzematge local (<em>localStorage</em>). Aquesta informació no inclou dades personals, no s’envia a cap servidor i roman exclusivament al vostre dispositiu. De la mateixa manera, si canvieu el tema visual del lloc (fosc o crema), només es desa aquesta preferència.</p>
 <p>Es tracta d’un emmagatzematge tècnic necessari per prestar una funcionalitat sol·licitada expressament per vós, de manera que està exempt del deure de consentiment d’acord amb l’article 22.2 de la LSSI-CE. El podeu eliminar en qualsevol moment des de la configuració del navegador.</p>
 <div class="table-scroll">
 <table>
@@ -528,6 +531,7 @@ C = {
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Emmagatzematge local (propi)</td><td>Recordar els immobles marcats com a preferits</td><td>Fins que l’usuari l’elimini</td></tr>
+<tr><td>twins:tema</td><td>Emmagatzematge local (propi)</td><td>Recordar el tema escollit (fosc o crema)</td><td>Fins que l’usuari l’elimini</td></tr>
 </tbody>
 </table>
 </div>

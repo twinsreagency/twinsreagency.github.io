@@ -57,6 +57,9 @@ C = {
         "article_notice": "This article is for information purposes only and does not constitute legal, tax or financial advice. Regulations may vary between Spanish regions; please consult a professional about your specific case.",
         "updated": "Last updated: {}",
         "updated_date": "27 September 2026",
+        "theme_to_light": "Switch to light theme",
+        "theme_to_dark": "Switch to dark theme",
+        "scroll_hint": "Scroll to explore",
         "commitments_title": "Our commitments",
     },
 
@@ -520,7 +523,7 @@ C = {
 <h2>1. Do we use cookies?</h2>
 <p>This website <strong>does not use</strong> first-party or third-party <strong>cookies</strong> for analytics, advertising or tracking purposes. For this reason, no cookie consent banner is displayed.</p>
 <h2>2. Local storage</h2>
-<p>If you mark a property as a favourite, your browser stores only the reference of that property using local storage technology (<em>localStorage</em>). This information contains no personal data, is not sent to any server and remains exclusively on your device.</p>
+<p>If you mark a property as a favourite, your browser stores only the reference of that property using local storage technology (<em>localStorage</em>). This information contains no personal data, is not sent to any server and remains exclusively on your device. Likewise, if you change the website’s visual theme (dark or cream), only that preference is stored.</p>
 <p>This is technical storage necessary to provide a feature you have expressly requested, and is therefore exempt from the consent requirement under Article 22.2 of the LSSI-CE. You can delete it at any time from your browser settings.</p>
 <div class="table-scroll">
 <table>
@@ -529,6 +532,7 @@ C = {
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Local storage (first-party)</td><td>Remembering properties marked as favourites</td><td>Until deleted by the user</td></tr>
+<tr><td>twins:tema</td><td>Local storage (first-party)</td><td>Remembering the chosen theme (dark or cream)</td><td>Until deleted by the user</td></tr>
 </tbody>
 </table>
 </div>

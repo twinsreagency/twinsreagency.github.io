@@ -22,7 +22,8 @@
         endpoint: "",
         fallbackEmail: "twinsreagency@gmail.com",
         minFillTimeMs: 3000,
-        favoritesKey: "twins:favoritos"
+        favoritesKey: "twins:favoritos",
+        themeKey: "twins:tema"
     };
 
     var MESSAGES = {
@@ -93,6 +94,9 @@
 
     var LANG = MESSAGES[document.documentElement.lang] ? document.documentElement.lang : "es";
     var T = MESSAGES[LANG];
+
+    var REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var FINE_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     var PROPERTY_REF = /^TRE-\d{3}$/;
     var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -182,7 +186,7 @@
         var nav = document.getElementById("menu-principal");
         if (!toggle || !nav || !header) return;
 
-        var desktop = window.matchMedia("(min-width: 1281px)");
+        var desktop = window.matchMedia("(min-width: 1101px)");
         var labelOpen = toggle.getAttribute("data-label-open");
         var labelClose = toggle.getAttribute("data-label-close");
 
@@ -239,6 +243,198 @@
         });
 
         document.documentElement.classList.add("js-reveal");
+    }
+
+    /* Tema oscuro / crema ----------------------------------------------- */
+
+    function initTheme() {
+        var root = document.documentElement;
+        var toggle = $(".theme-toggle");
+        var meta = $("meta[name='theme-color']");
+
+        function apply(theme) {
+            root.setAttribute("data-theme", theme);
+            if (meta) meta.setAttribute("content", theme === "light" ? "#f2ede4" : "#000000");
+            if (toggle) {
+                var label = toggle.getAttribute(theme === "light" ? "data-label-dark" : "data-label-light");
+                toggle.setAttribute("aria-label", label);
+                toggle.setAttribute("title", label);
+            }
+        }
+
+        apply(root.getAttribute("data-theme") === "light" ? "light" : "dark");
+        if (!toggle) return;
+
+        toggle.addEventListener("click", function (event) {
+            var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+            try {
+                window.localStorage.setItem(CONFIG.themeKey, next);
+            } catch (error) {
+                /* Almacenamiento no disponible: el cambio dura solo esta visita. */
+            }
+
+            if (!document.startViewTransition || REDUCED_MOTION) {
+                apply(next);
+                return;
+            }
+
+            var rect = toggle.getBoundingClientRect();
+            var x = event.clientX || rect.left + rect.width / 2;
+            var y = event.clientY || rect.top + rect.height / 2;
+            root.style.setProperty("--vt-x", x + "px");
+            root.style.setProperty("--vt-y", y + "px");
+            var transition = document.startViewTransition(function () {
+                apply(next);
+            });
+            /* Si el navegador cancela la animación, el tema se aplica igualmente. */
+            transition.ready.catch(function () {
+                apply(next);
+            });
+            transition.finished.catch(function () {});
+        });
+    }
+
+    /* Escenas ligadas al desplazamiento ------------------------------------ */
+
+    /**
+     * Actualiza la variable CSS --p (de 0 a 1) en cada elemento [data-scroll]:
+     * - data-scroll="sticky": progreso mientras la sección fija recorre su altura.
+     * - data-scroll="view": progreso desde que entra hasta que sale de la pantalla.
+     * Solo se recalculan las escenas visibles, en un único requestAnimationFrame.
+     */
+    function initScrollScenes() {
+        var scenes = $$("[data-scroll]");
+        if (!scenes.length) return;
+
+        var visible = [];
+        var ticking = false;
+
+        function clamp(value) {
+            return Math.min(1, Math.max(0, value));
+        }
+
+        function update() {
+            var viewport = window.innerHeight;
+            visible.forEach(function (scene) {
+                var rect = scene.getBoundingClientRect();
+                var progress = scene.getAttribute("data-scroll") === "sticky"
+                    ? clamp(-rect.top / Math.max(1, rect.height - viewport))
+                    : clamp((viewport - rect.top) / (viewport + rect.height));
+                scene.style.setProperty("--p", progress.toFixed(4));
+                scene.classList.toggle("is-advanced", progress > 0.45);
+            });
+            ticking = false;
+        }
+
+        function requestUpdate() {
+            if (!ticking) {
+                window.requestAnimationFrame(update);
+                ticking = true;
+            }
+        }
+
+        if ("IntersectionObserver" in window) {
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var index = visible.indexOf(entry.target);
+                    if (entry.isIntersecting && index === -1) visible.push(entry.target);
+                    if (!entry.isIntersecting && index !== -1) visible.splice(index, 1);
+                });
+                requestUpdate();
+            }, { rootMargin: "10% 0px" });
+            scenes.forEach(function (scene) {
+                observer.observe(scene);
+            });
+        } else {
+            visible = scenes;
+        }
+
+        window.addEventListener("scroll", requestUpdate, { passive: true });
+        window.addEventListener("resize", requestUpdate);
+        requestUpdate();
+
+        if (!REDUCED_MOTION) document.documentElement.classList.add("js-scroll");
+    }
+
+    /** Divide los textos [data-words] en palabras para iluminarlas al desplazar. */
+    function initWordReveal() {
+        $$("[data-words]").forEach(function (node) {
+            var words = node.textContent.trim().split(/\s+/);
+            node.textContent = "";
+            words.forEach(function (word, index) {
+                var span = document.createElement("span");
+                span.className = "w";
+                span.textContent = word;
+                span.style.setProperty("--i", String(index));
+                node.appendChild(span);
+                if (index < words.length - 1) node.appendChild(document.createTextNode(" "));
+            });
+            node.style.setProperty("--n", String(words.length));
+        });
+    }
+
+    /** Inclinación 3D y reflejo de luz de las tarjetas según la posición del cursor. */
+    function initTilt() {
+        if (!FINE_POINTER || REDUCED_MOTION) return;
+
+        $$(".tilt").forEach(function (card) {
+            var frame = 0;
+
+            card.addEventListener("pointerenter", function () {
+                card.classList.add("is-tilting");
+            });
+
+            card.addEventListener("pointermove", function (event) {
+                if (frame) return;
+                frame = window.requestAnimationFrame(function () {
+                    var rect = card.getBoundingClientRect();
+                    var x = (event.clientX - rect.left) / rect.width;
+                    var y = (event.clientY - rect.top) / rect.height;
+                    card.style.setProperty("--tx", ((x - 0.5) * 7).toFixed(2) + "deg");
+                    card.style.setProperty("--ty", ((0.5 - y) * 7).toFixed(2) + "deg");
+                    card.style.setProperty("--gx", (x * 100).toFixed(1) + "%");
+                    card.style.setProperty("--gy", (y * 100).toFixed(1) + "%");
+                    frame = 0;
+                });
+            });
+
+            card.addEventListener("pointerleave", function () {
+                card.classList.remove("is-tilting");
+                card.style.setProperty("--tx", "0deg");
+                card.style.setProperty("--ty", "0deg");
+            });
+        });
+    }
+
+    /** El modelo 3D de la portada reacciona suavemente al movimiento del ratón. */
+    function initHeroPointer() {
+        var hero = $(".hero3d");
+        if (!hero || !FINE_POINTER || REDUCED_MOTION) return;
+
+        var target = { x: 0, y: 0 };
+        var current = { x: 0, y: 0 };
+        var running = false;
+
+        function step() {
+            current.x += (target.x - current.x) * 0.08;
+            current.y += (target.y - current.y) * 0.08;
+            hero.style.setProperty("--mx", current.x.toFixed(3));
+            hero.style.setProperty("--my", current.y.toFixed(3));
+            if (Math.abs(target.x - current.x) > 0.001 || Math.abs(target.y - current.y) > 0.001) {
+                window.requestAnimationFrame(step);
+            } else {
+                running = false;
+            }
+        }
+
+        window.addEventListener("pointermove", function (event) {
+            target.x = (event.clientX / window.innerWidth - 0.5) * 2;
+            target.y = (event.clientY / window.innerHeight - 0.5) * 2;
+            if (!running) {
+                running = true;
+                window.requestAnimationFrame(step);
+            }
+        }, { passive: true });
     }
 
     /* Favoritos ---------------------------------------------------------- */
@@ -486,9 +682,14 @@
 
     /* Arranque ----------------------------------------------------------- */
 
+    initTheme();
     initHeader();
     initNavigation();
+    initWordReveal();
+    initScrollScenes();
     initReveal();
+    initTilt();
+    initHeroPointer();
     initFavorites();
     initPropertyFilter();
     initContactForm();

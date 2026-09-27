@@ -56,6 +56,9 @@ C = {
         "article_notice": "Este artículo tiene carácter meramente informativo y no constituye asesoramiento jurídico, fiscal ni financiero. La normativa puede variar según la comunidad autónoma; consulte su caso con un profesional.",
         "updated": "Última actualización: {}",
         "updated_date": "27 de septiembre de 2026",
+        "theme_to_light": "Cambiar a tema claro",
+        "theme_to_dark": "Cambiar a tema oscuro",
+        "scroll_hint": "Deslice para descubrir",
         "commitments_title": "Nuestros compromisos",
     },
 
@@ -519,7 +522,7 @@ C = {
 <h2>1. ¿Utilizamos cookies?</h2>
 <p>Este sitio web <strong>no utiliza cookies</strong> propias ni de terceros con fines analíticos, publicitarios o de seguimiento. Por este motivo, no se muestra un aviso de consentimiento de cookies.</p>
 <h2>2. Almacenamiento local</h2>
-<p>Si usted marca un inmueble como favorito, su navegador guarda únicamente la referencia de ese inmueble mediante la tecnología de almacenamiento local (<em>localStorage</em>). Esta información no incluye datos personales, no se envía a ningún servidor y permanece exclusivamente en su dispositivo.</p>
+<p>Si usted marca un inmueble como favorito, su navegador guarda únicamente la referencia de ese inmueble mediante la tecnología de almacenamiento local (<em>localStorage</em>). Esta información no incluye datos personales, no se envía a ningún servidor y permanece exclusivamente en su dispositivo. Del mismo modo, si cambia el tema visual del sitio (oscuro o crema), se guarda únicamente esa preferencia.</p>
 <p>Se trata de un almacenamiento técnico necesario para prestar una funcionalidad solicitada expresamente por usted, por lo que está exento del deber de consentimiento conforme al artículo 22.2 de la LSSI-CE. Puede eliminarlo en cualquier momento desde la configuración de su navegador.</p>
 <div class="table-scroll">
 <table>
@@ -528,6 +531,7 @@ C = {
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Almacenamiento local (propio)</td><td>Recordar los inmuebles marcados como favoritos</td><td>Hasta que el usuario lo elimine</td></tr>
+<tr><td>twins:tema</td><td>Almacenamiento local (propio)</td><td>Recordar el tema elegido (oscuro o crema)</td><td>Hasta que el usuario lo elimine</td></tr>
 </tbody>
 </table>
 </div>

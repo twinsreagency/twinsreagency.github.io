@@ -7,7 +7,8 @@
     <title>Política de galetes | Twins Real Estate</title>
     <meta name="description" content="Política de galetes de Twins Real Estate: informació sobre les tecnologies d’emmagatzematge utilitzades en aquest lloc web.">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="theme-color" content="#000000">
+    <meta name="color-scheme" content="dark light">
     <meta name="format-detection" content="telephone=no">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ca_ES">
@@ -19,9 +20,10 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
-    <link rel="stylesheet" href="styles.css">
-    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <script src="theme.js?v=cac458486b"></script>
+    <link rel="stylesheet" href="styles.css?v=86ee0c146a">
+    <script src="main.js?v=e406896706" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#contenido">Salta al contingut principal</a>
@@ -29,7 +31,7 @@
     <header class="site-header">
         <div class="container">
             <a class="brand" href="ca-inici.html" aria-label="Twins Real Estate, anar a la pàgina d’inici">
-                <img src="logo-icon.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
             <nav class="nav" id="menu-principal" aria-label="Navegació principal">
@@ -44,6 +46,7 @@
                 <ul class="lang-switch" aria-label="Idioma"><li><a href="es-cookies.html" hreflang="es" lang="es" aria-label="Español">ES</a></li><li><a href="ca-galetes.html" hreflang="ca" lang="ca" aria-label="Català" aria-current="true">CA</a></li><li><a href="en-cookies.html" hreflang="en" lang="en" aria-label="English">EN</a></li></ul>
                 <a class="btn btn--primary nav__cta" href="ca-contacte.html?asunto=visita#formulario">Demaneu cita</a>
             </nav>
+            <button class="theme-toggle" type="button" aria-label="Canvia al tema clar" data-label-light="Canvia al tema clar" data-label-dark="Canvia al tema fosc"><svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg></button>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Obre el menú" data-label-open="Obre el menú" data-label-close="Tanca el menú">
                 <span></span><span></span><span></span>
             </button>
@@ -51,7 +54,8 @@
     </header>
 
     <main id="contenido" tabindex="-1">
-    <section class="page-hero">
+    <section class="page-hero" data-scroll="view">
+        <div class="page-hero__panes" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="container">
             <nav class="breadcrumb" aria-label="Ruta de navegació">
                 <ol><li><a href="ca-inici.html">Inici</a></li><li aria-current="page">Política de galetes</li></ol>
@@ -67,7 +71,7 @@
 <h2>1. Utilitzem galetes?</h2>
 <p>Aquest lloc web <strong>no utilitza galetes</strong> pròpies ni de tercers amb finalitats analítiques, publicitàries o de seguiment. Per aquest motiu, no es mostra cap avís de consentiment de galetes.</p>
 <h2>2. Emmagatzematge local</h2>
-<p>Si marqueu un immoble com a preferit, el vostre navegador desa únicament la referència d’aquell immoble mitjançant la tecnologia d’emmagatzematge local (<em>localStorage</em>). Aquesta informació no inclou dades personals, no s’envia a cap servidor i roman exclusivament al vostre dispositiu.</p>
+<p>Si marqueu un immoble com a preferit, el vostre navegador desa únicament la referència d’aquell immoble mitjançant la tecnologia d’emmagatzematge local (<em>localStorage</em>). Aquesta informació no inclou dades personals, no s’envia a cap servidor i roman exclusivament al vostre dispositiu. De la mateixa manera, si canvieu el tema visual del lloc (fosc o crema), només es desa aquesta preferència.</p>
 <p>Es tracta d’un emmagatzematge tècnic necessari per prestar una funcionalitat sol·licitada expressament per vós, de manera que està exempt del deure de consentiment d’acord amb l’article 22.2 de la LSSI-CE. El podeu eliminar en qualsevol moment des de la configuració del navegador.</p>
 <div class="table-scroll">
 <table>
@@ -76,6 +80,7 @@
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Emmagatzematge local (propi)</td><td>Recordar els immobles marcats com a preferits</td><td>Fins que l’usuari l’elimini</td></tr>
+<tr><td>twins:tema</td><td>Emmagatzematge local (propi)</td><td>Recordar el tema escollit (fosc o crema)</td><td>Fins que l’usuari l’elimini</td></tr>
 </tbody>
 </table>
 </div>
@@ -95,7 +100,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a class="brand" href="ca-inici.html" aria-label="Twins Real Estate, anar a la pàgina d’inici">
-                <img src="logo-icon.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
                     <p>Agència immobiliària especialitzada en compravenda, lloguer i inversió. Assessorament proper, rigorós i transparent en cada operació.</p>

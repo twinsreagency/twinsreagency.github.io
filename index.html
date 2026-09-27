@@ -7,7 +7,8 @@
     <title>Twins Real Estate | Agencia inmobiliaria</title>
     <meta name="description" content="Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento personalizado, información verificada y acompañamiento hasta la firma ante notario.">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="theme-color" content="#000000">
+    <meta name="color-scheme" content="dark light">
     <meta name="format-detection" content="telephone=no">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="es_ES">
@@ -19,9 +20,10 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
-    <link rel="stylesheet" href="styles.css">
-    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <script src="theme.js?v=cac458486b"></script>
+    <link rel="stylesheet" href="styles.css?v=86ee0c146a">
+    <script src="main.js?v=e406896706" defer></script>
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "name": "Twins Real Estate", "slogan": "Porque cada nueva etapa merece un lugar al que llamar hogar.", "email": "twinsreagency@gmail.com", "sameAs": ["https://www.instagram.com/twins.real.estate.agency/"], "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"], "knowsLanguage": ["es", "ca", "en"]}</script>
 </head>
 <body>
@@ -30,7 +32,7 @@
     <header class="site-header">
         <div class="container">
             <a class="brand" href="index.html" aria-label="Twins Real Estate, ir a la página de inicio">
-                <img src="logo-icon.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
             <nav class="nav" id="menu-principal" aria-label="Navegación principal">
@@ -45,6 +47,7 @@
                 <ul class="lang-switch" aria-label="Idioma"><li><a href="index.html" hreflang="es" lang="es" aria-label="Español" aria-current="true">ES</a></li><li><a href="ca-inici.html" hreflang="ca" lang="ca" aria-label="Català">CA</a></li><li><a href="en-home.html" hreflang="en" lang="en" aria-label="English">EN</a></li></ul>
                 <a class="btn btn--primary nav__cta" href="es-contacto.html?asunto=visita#formulario">Solicitar cita</a>
             </nav>
+            <button class="theme-toggle" type="button" aria-label="Cambiar a tema claro" data-label-light="Cambiar a tema claro" data-label-dark="Cambiar a tema oscuro"><svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg></button>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menú" data-label-open="Abrir menú" data-label-close="Cerrar menú">
                 <span></span><span></span><span></span>
             </button>
@@ -52,23 +55,39 @@
     </header>
 
     <main id="contenido" tabindex="-1">
-        <section class="hero" aria-labelledby="hero-title">
-            <img class="hero__mark" src="logo-icon.png" alt="" width="151" height="200">
-            <div class="container">
-                <div class="hero__content">
-                    <p class="eyebrow">Agencia inmobiliaria</p>
-                    <h1 class="hero__title" id="hero-title">Porque cada nueva etapa merece un lugar al que llamar <em>hogar</em>.</h1>
-                    <p class="hero__text">Acompañamos a particulares, familias e inversores en la compra, la venta y el alquiler de inmuebles, con un asesoramiento cercano, riguroso y transparente en cada fase de la operación.</p>
-                    <div class="hero__actions">
-                        <a class="btn btn--primary" href="es-inmuebles.html">Ver inmuebles <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-                        <a class="btn btn--outline-light" href="es-contacto.html#formulario">Solicitar asesoramiento</a>
+        <section class="hero3d" data-scroll="sticky" aria-labelledby="hero-title">
+            <div class="hero3d__sticky">
+                <div class="hero3d__glow" aria-hidden="true"></div>
+                <div class="container hero3d__grid">
+                    <div class="hero3d__copy">
+                        <p class="eyebrow">Agencia inmobiliaria</p>
+                        <h1 class="hero3d__title" id="hero-title">Porque cada nueva etapa merece un lugar al que llamar <em>hogar</em>.</h1>
+                        <p class="hero3d__text">Acompañamos a particulares, familias e inversores en la compra, la venta y el alquiler de inmuebles, con un asesoramiento cercano, riguroso y transparente en cada fase de la operación.</p>
+                        <div class="hero3d__actions">
+                            <a class="btn btn--primary" href="es-inmuebles.html">Ver inmuebles <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                            <a class="btn btn--glass" href="es-contacto.html#formulario">Solicitar asesoramiento</a>
+                        </div>
                     </div>
-                    <ul class="hero__pillars">
-                        <li class="hero__pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Operaciones con seguridad jurídica</li>
-                        <li class="hero__pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Honorarios claros desde el inicio</li>
-                        <li class="hero__pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>Atención personalizada</li>
-                    </ul>
+                    <div class="hero3d__stage">
+                <div class="scene" aria-hidden="true">
+                    <div class="scene__float">
+                        <div class="model">
+                            <span class="orbit orbit--1"></span>
+                            <span class="orbit orbit--2"></span>
+                            <span class="floor"></span>
+                            <span class="box box--tower"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span></span>
+                            <span class="box box--house"><span class="face face--front"><span class="window"><i></i><i></i><i></i><i></i></span></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span>
+                        </div>
+                    </div>
                 </div>
+                        <ul class="callouts">
+                    <li class="callout callout--1"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Operaciones con seguridad jurídica</span></li>
+                    <li class="callout callout--2"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Honorarios claros desde el inicio</span></li>
+                    <li class="callout callout--3"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7"/><path d="M21.5 20a6.5 6.5 0 0 0-4-6"/></svg><span>Atención personalizada</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="scroll-hint" aria-hidden="true"><span>Deslice para descubrir</span></p>
             </div>
         </section>
 
@@ -112,7 +131,7 @@
                     <div class="divider"></div>
                 </header>
                 <div class="grid grid--3">
-                <article class="card property reveal" data-operacion="venta" data-tipo="casa" data-zona="norte" data-precio="485000" data-dormitorios="4">
+                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="norte" data-precio="485000" data-dormitorios="4">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
                         <span class="property__badge">Destacado</span>
@@ -132,7 +151,7 @@
                         <a class="link-arrow property__cta" href="es-contacto.html?ref=TRE-001#formulario">Solicitar información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Casa moderna con vistas al lago</span></a>
                     </div>
                 </article>
-                <article class="card property reveal" data-operacion="venta" data-tipo="atico" data-zona="centro" data-precio="320000" data-dormitorios="3">
+                <article class="card property reveal tilt" data-operacion="venta" data-tipo="atico" data-zona="centro" data-precio="320000" data-dormitorios="3">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V8l8-5 8 5v13"/><path d="M4 12h16"/><path d="M9 16h2M13 16h2"/><path d="M9 21v-2h6v2"/></svg>
                         <span class="property__badge">Novedad</span>
@@ -152,7 +171,7 @@
                         <a class="link-arrow property__cta" href="es-contacto.html?ref=TRE-002#formulario">Solicitar información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Ático en el casco antiguo</span></a>
                     </div>
                 </article>
-                <article class="card property reveal" data-operacion="alquiler" data-tipo="piso" data-zona="sur" data-precio="1350" data-dormitorios="2">
+                <article class="card property reveal tilt" data-operacion="alquiler" data-tipo="piso" data-zona="sur" data-precio="1350" data-dormitorios="2">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/></svg>
                         
@@ -172,7 +191,7 @@
                         <a class="link-arrow property__cta" href="es-contacto.html?ref=TRE-003#formulario">Solicitar información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Piso luminoso con terraza</span></a>
                     </div>
                 </article>
-                <article class="card property reveal" data-operacion="venta" data-tipo="casa" data-zona="este" data-precio="1200000" data-dormitorios="5">
+                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="este" data-precio="1200000" data-dormitorios="5">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12 12 4l10 8"/><path d="M4 10.5V20h16v-9.5"/><path d="M2 20h20"/><rect x="7" y="13" width="4" height="4"/><path d="M14 20v-5h3v5"/></svg>
                         <span class="property__badge">Exclusiva</span>
@@ -192,7 +211,7 @@
                         <a class="link-arrow property__cta" href="es-contacto.html?ref=TRE-004#formulario">Solicitar información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Villa contemporánea con piscina</span></a>
                     </div>
                 </article>
-                <article class="card property reveal" data-operacion="venta" data-tipo="piso" data-zona="oeste" data-precio="195000" data-dormitorios="1">
+                <article class="card property reveal tilt" data-operacion="venta" data-tipo="piso" data-zona="oeste" data-precio="195000" data-dormitorios="1">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 10h18"/><path d="M9 4v6M15 4v6"/><path d="M7 15h4v6"/></svg>
                         
@@ -212,7 +231,7 @@
                         <a class="link-arrow property__cta" href="es-contacto.html?ref=TRE-005#formulario">Solicitar información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Loft en el distrito creativo</span></a>
                     </div>
                 </article>
-                <article class="card property reveal" data-operacion="venta" data-tipo="casa" data-zona="periferia" data-precio="410000" data-dormitorios="3">
+                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="periferia" data-precio="410000" data-dormitorios="3">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21v-6"/><path d="M12 3 6 11h3l-4 5h14l-4-5h3z"/></svg>
                         <span class="property__badge">Precio rebajado</span>
@@ -239,19 +258,27 @@
             </div>
         </section>
 
-        <section class="section section--alt" aria-labelledby="nosotros-title">
+        <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
+            <div class="statement__sticky">
+                <div class="container">
+                    <p class="eyebrow">Quiénes somos</p>
+                    <h2 class="visually-hidden" id="nosotros-title">Más que una inmobiliaria, un aliado de confianza</h2>
+                    <p class="statement__text" data-words>Twins Real Estate nace con un propósito claro: que comprar, vender o alquilar una vivienda sea un proceso seguro, comprensible y sin sorpresas. Por ello, gestionamos cada operación de forma personalizada y con la máxima transparencia.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--alt" aria-labelledby="confianza-title">
             <div class="container split">
-                <div class="split__visual reveal">
+                <div class="split__visual reveal tilt">
                     <div class="split__frame">
-                        <img src="logo-icon.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
                         <p class="split__quote">Sin compromiso, con toda la confianza.</p>
                     </div>
                 </div>
                 <div class="reveal">
-                    <span class="eyebrow">Quiénes somos</span>
-                    <h2 class="section-title" id="nosotros-title">Más que una inmobiliaria, un aliado de confianza</h2>
+                    <h2 class="section-title" id="confianza-title">Más que una inmobiliaria, un aliado de confianza</h2>
                     <div class="prose-block">
-                        <p>Twins Real Estate nace con un propósito claro: que comprar, vender o alquilar una vivienda sea un proceso seguro, comprensible y sin sorpresas. Por ello, gestionamos cada operación de forma personalizada y con la máxima transparencia.</p>
                         <p>Analizamos cada inmueble antes de comercializarlo, verificamos su situación registral y asesoramos a nuestros clientes con datos objetivos del mercado, para que cada decisión se tome con información completa.</p>
                     </div>
                     <ul class="check-list">
@@ -274,26 +301,26 @@
                     <p class="section-lead">Un servicio completo para propietarios, compradores, inquilinos e inversores, con el mismo nivel de exigencia en cada gestión.</p>
                     <div class="divider"></div>
                 </header>
-                <div class="grid grid--4">
-                <article class="card feature reveal">
+                <div class="bento">
+                <article class="card feature reveal tilt">
                     <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg></div>
                     <h3 class="feature__title">Compraventa de inmuebles</h3>
                     <p class="feature__text">Le acompañamos en la venta o la adquisición de su inmueble, desde la valoración inicial hasta la firma de la escritura.</p>
                     <p class="feature__more"><a class="link-arrow" href="es-servicios.html#compraventa">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre compraventa de inmuebles</span></a></p>
                 </article>
-                <article class="card feature reveal">
+                <article class="card feature reveal tilt">
                     <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
                     <h3 class="feature__title">Alquiler de viviendas</h3>
                     <p class="feature__text">Seleccionamos al inquilino adecuado mediante un proceso riguroso y formalizamos un contrato conforme a la Ley de Arrendamientos Urbanos.</p>
                     <p class="feature__more"><a class="link-arrow" href="es-servicios.html#alquiler">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre alquiler de viviendas</span></a></p>
                 </article>
-                <article class="card feature reveal">
+                <article class="card feature reveal tilt">
                     <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/></svg></div>
                     <h3 class="feature__title">Gestión integral de alquileres</h3>
                     <p class="feature__text">Administramos su inmueble para que obtenga rentabilidad sin tener que ocuparse del día a día.</p>
                     <p class="feature__more"><a class="link-arrow" href="es-servicios.html#gestion-alquileres">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre gestión integral de alquileres</span></a></p>
                 </article>
-                <article class="card feature reveal">
+                <article class="card feature reveal tilt">
                     <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></div>
                     <h3 class="feature__title">Asesoramiento para inversión</h3>
                     <p class="feature__text">Identificamos oportunidades y analizamos su rentabilidad con criterios objetivos y adaptados a su perfil.</p>
@@ -342,7 +369,8 @@
             </div>
         </section>
 
-        <section class="cta" aria-labelledby="cta-title">
+        <section class="cta" aria-labelledby="cta-title" data-scroll="view">
+            <div class="cta__glow" aria-hidden="true"></div>
             <div class="container reveal">
                 <h2 class="cta__title" id="cta-title">¿Desea vender, comprar o alquilar un inmueble?</h2>
                 <p class="cta__text">Solicite una primera reunión sin compromiso. Analizaremos su caso y le propondremos la estrategia más adecuada a sus objetivos.</p>
@@ -360,7 +388,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a class="brand" href="index.html" aria-label="Twins Real Estate, ir a la página de inicio">
-                <img src="logo-icon.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
                     <p>Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento cercano, riguroso y transparente en cada operación.</p>
