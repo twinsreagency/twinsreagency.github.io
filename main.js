@@ -262,11 +262,11 @@
             }
         }
 
-        apply(root.getAttribute("data-theme") === "light" ? "light" : "dark");
+        apply(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
         if (!toggle) return;
 
         toggle.addEventListener("click", function (event) {
-            var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+            var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
             try {
                 window.localStorage.setItem(CONFIG.themeKey, next);
             } catch (error) {

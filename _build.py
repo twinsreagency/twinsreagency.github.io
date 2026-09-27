@@ -243,8 +243,8 @@ def head(ctx, title, description, noindex=False, extra=""):
     <title>{esc(full_title)}</title>
     <meta name="description" content="{esc(description)}">
     <meta name="robots" content="{robots}">
-    <meta name="theme-color" content="#000000">
-    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#f2ede4">
+    <meta name="color-scheme" content="light dark">
     <meta name="format-detection" content="telephone=no">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="{L['locale']}">
@@ -302,7 +302,7 @@ def site_header(ctx, active):
                 {lang_switch(ctx)}
                 <a class="btn btn--primary nav__cta" href="{ctx.page('contacto.html')}?asunto=visita#formulario">{ui['cta_nav']}</a>
             </nav>
-            <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_light'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
+            <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_dark'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="{esc(ui['menu_open'])}" data-label-open="{esc(ui['menu_open'])}" data-label-close="{esc(ui['menu_close'])}">
                 <span></span><span></span><span></span>
             </button>
@@ -363,7 +363,7 @@ def site_footer(ctx):
 """
 
 
-def page_hero(ctx, title, text, crumbs, extra=""):
+def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
     """crumbs: lista de (texto, página) tras «Inicio»; el último es la página actual."""
     ui = ctx.L["ui"]
     trail = [f'<li><a href="{ctx.page("index.html")}">{ui["home"]}</a></li>']
@@ -374,7 +374,7 @@ def page_hero(ctx, title, text, crumbs, extra=""):
     return f"""
     <section class="page-hero" data-scroll="view">
         <div class="page-hero__panes" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="container">
+        <div class="container">{object_3d(obj)}
             <nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
                 <ol>{''.join(trail)}</ol>
             </nav>{extra}
@@ -484,6 +484,29 @@ def model_3d():
                         </div>
                     </div>
                 </div>"""
+
+
+def object_3d(kind):
+    """Objeto 3D decorativo para la cabecera de las páginas interiores."""
+    walls = ["front", "back", "left", "right"]
+    if kind == "house":
+        window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
+        inner = (f'<span class="box box--house">{faces(walls, {"front": window})}'
+                 '<span class="gable gable--front"></span><span class="gable gable--back"></span>'
+                 '<span class="slope slope--left"></span><span class="slope slope--right"></span></span>')
+    elif kind == "cube":
+        inner = (f'<span class="box box--cube">{faces(walls + ["top", "bottom"])}</span>'
+                 f'<span class="box box--core">{faces(walls + ["top", "bottom"])}</span>')
+    elif kind == "twins":
+        inner = (f'<span class="box box--tower">{faces(walls + ["top"])}</span>'
+                 f'<span class="box box--tower-b">{faces(walls + ["top"])}</span>')
+    elif kind == "pages":
+        inner = '<span class="sheet sheet--1"></span><span class="sheet sheet--2"></span><span class="sheet sheet--3"></span>'
+    else:  # rings
+        inner = '<span class="ring ring--1"></span><span class="ring ring--2"></span><span class="ring ring--3"></span>'
+    core = '<span class="obj3d__core"></span>' if kind == "rings" else ""
+    return (f'\n            <div class="obj3d obj3d--{kind}" aria-hidden="true"><span class="obj3d__glow"></span>{core}'
+            f'<div class="obj3d__tilt"><div class="obj3d__spin">{inner}</div></div></div>')
 
 
 def section_header(eyebrow, title, title_id, lead=None):
@@ -664,7 +687,7 @@ def build_properties(L):
     ctx = Ctx(L, "propiedades.html")
     T, S = L["propiedades"], L["search"]
     cards = "".join(property_card(ctx, p) for p in PROPERTIES)
-    body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["propiedades.html"], "propiedades.html")]) + f"""
+    body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["propiedades.html"], "propiedades.html")], obj="house") + f"""
         <section class="filters" aria-labelledby="filtros-title">
             <div class="container">
                 <div class="search__panel reveal">
@@ -701,7 +724,7 @@ def build_about(L):
     T = L["nosotros"]
     values = "".join(feature_card(ic, title, text) for ic, (title, text) in zip(VALUE_ICONS, T["values"]))
     paras = "".join(f"\n                        <p>{p}</p>" for p in T["paras"])
-    body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["nosotros.html"], "nosotros.html")]) + f"""
+    body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["nosotros.html"], "nosotros.html")], obj="twins") + f"""
         <section class="section" aria-labelledby="historia-title">
             <div class="container split">
                 <div class="split__visual reveal">
@@ -754,7 +777,7 @@ def build_services(L):
                     <summary>{q}</summary>
                     <p class="faq__answer">{a}</p>
                 </details>""" for q, a in T["faqs"])
-    body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["servicios.html"], "servicios.html")]) + f"""
+    body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["servicios.html"], "servicios.html")], obj="cube") + f"""
         <section class="section" aria-labelledby="servicios-title">
             <div class="container">
                 <h2 class="visually-hidden" id="servicios-title">{T['list_title']}</h2>
@@ -787,7 +810,7 @@ def build_blog(L):
     featured = L["posts"][slug]
     href = ctx.page(f"blog/{slug}.html")
     cards = "".join(post_card(ctx, *p) for p in POSTS[1:])
-    body = page_hero(ctx, T["h1"], T["text"], [(ui["nav"]["blog.html"], "blog.html")]) + f"""
+    body = page_hero(ctx, T["h1"], T["text"], [(ui["nav"]["blog.html"], "blog.html")], obj="pages") + f"""
         <section class="section" aria-labelledby="articulos-title">
             <div class="container">
                 <h2 class="visually-hidden" id="articulos-title">{T['list_title']}</h2>
@@ -826,7 +849,7 @@ def build_blog(L):
             "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
         }, ensure_ascii=False)
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
-        body = page_hero(ctx, post["title"], "", [(ui["nav"]["blog.html"], "blog.html"), (post["title"], "")], meta) + f"""
+        body = page_hero(ctx, post["title"], "", [(ui["nav"]["blog.html"], "blog.html"), (post["title"], "")], meta, obj="pages") + f"""
         <article class="article">
             <div class="container">
                 <div class="prose">{post['body']}
@@ -986,7 +1009,7 @@ def build_404(L):
     T = L["error404"]
     body = f"""
         <section class="error-page">
-            <div>
+            <div>{object_3d("rings")}
                 <p class="error-page__code">404</p>
                 <h1>{T['h1']}</h1>
                 <p>{T['text']}</p>

@@ -10,7 +10,8 @@
    ========================================================================== */
 
 /* 1. Tokens ---------------------------------------------------------------- */
-/* Tema oscuro (predeterminado). theme.js fija data-theme en <html> antes de pintar. */
+/* Valores base: tema oscuro. El tema crema (predeterminado) los redefine abajo.
+   theme.js fija data-theme en <html> antes de pintar; sin JavaScript se ve el crema. */
 :root {
     --bg: #000000;
     --bg-2: #0b0b0d;
@@ -71,8 +72,8 @@
     color-scheme: dark;
 }
 
-/* Tema claro: el crema del logotipo */
-:root[data-theme="light"] {
+/* Tema crema (predeterminado): el tono del logotipo. Se desactiva con data-theme="dark". */
+:root:not([data-theme="dark"]) {
     --bg: #f2ede4;
     --bg-2: #e9e1d3;
     --bg-3: #fbf8f3;
@@ -217,11 +218,11 @@ h4 {
 
 /* Logotipo: versión clara u oscura según el tema */
 .logo--on-light,
-:root[data-theme="light"] .logo--on-dark {
+:root:not([data-theme="dark"]) .logo--on-dark {
     display: none;
 }
 
-:root[data-theme="light"] .logo--on-light {
+:root:not([data-theme="dark"]) .logo--on-light {
     display: block;
 }
 
@@ -309,7 +310,7 @@ h4 {
 }
 
 .btn--primary {
-    background: var(--gold-grad);
+    background: var(--gold-grad) border-box;          /* el degradado cubre también el borde */
     color: #120e08;
     box-shadow: 0 8px 30px -8px var(--gold-glow);
 }
@@ -756,12 +757,12 @@ h4 {
 }
 
 .theme-toggle .icon-moon,
-:root[data-theme="light"] .theme-toggle .icon-sun {
+:root:not([data-theme="dark"]) .theme-toggle .icon-sun {
     opacity: 0;
     transform: rotate(-90deg) scale(0.5);
 }
 
-:root[data-theme="light"] .theme-toggle .icon-moon {
+:root:not([data-theme="dark"]) .theme-toggle .icon-moon {
     opacity: 1;
     transform: none;
 }
@@ -1151,6 +1152,7 @@ h4 {
 .face--left { --fw: var(--d); --fh: var(--h); transform: rotateY(-90deg) translateZ(calc(var(--w) / 2)); }
 .face--right { --fw: var(--d); --fh: var(--h); transform: rotateY(90deg) translateZ(calc(var(--w) / 2)); }
 .face--top { --fw: var(--w); --fh: var(--d); transform: rotateX(90deg) translateZ(calc(var(--h) / 2)); }
+.face--bottom { --fw: var(--w); --fh: var(--d); transform: rotateX(-90deg) translateZ(calc(var(--h) / 2)); }
 
 .gable {
     --fw: var(--w);
@@ -1318,6 +1320,182 @@ h4 {
 .js-scroll .statement__text .w {
     opacity: clamp(0.14, calc(var(--p) * (var(--n) + 6) * 1.25 - var(--i)), 1);
     transition: opacity 0.2s linear;
+}
+
+/* Objetos 3D de las páginas interiores ------------------------------------ */
+.obj3d {
+    --u: 30px;
+    --lift: 0px;
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 250px;
+    margin: -2.5rem auto 1rem;
+    perspective: 900px;
+}
+
+.obj3d__glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(199, 169, 125, 0.32), transparent 65%);
+}
+
+.obj3d__tilt {
+    transform-style: preserve-3d;
+    transform: translateY(var(--lift)) rotateX(calc(-22deg + var(--p, 0) * 28deg));
+}
+
+.obj3d__spin {
+    transform-style: preserve-3d;
+    animation: obj-spin 24s linear infinite;
+}
+
+@keyframes obj-spin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
+
+/* Casa */
+.obj3d--house { --lift: calc(var(--u) * 1.45); }
+.obj3d .box--house { --x: 0px; --z: 0px; }
+
+/* Torres gemelas */
+.obj3d--twins { --lift: calc(var(--u) * 2.2); }
+.obj3d .box--tower { --h: calc(var(--u) * 4.4); --x: calc(var(--u) * -0.85); --z: calc(var(--u) * -0.3); }
+
+.box--tower-b {
+    --w: calc(var(--u) * 1.25);
+    --d: calc(var(--u) * 1.25);
+    --h: calc(var(--u) * 3.2);
+    --x: calc(var(--u) * 0.85);
+    --z: calc(var(--u) * 0.3);
+    --edge: var(--edge-house);
+    --tint: rgba(var(--ink), 0.06);
+}
+
+/* Cubo de cristal con núcleo dorado */
+.obj3d--cube { --lift: calc(var(--u) * 1.5); }
+
+.box--cube {
+    --w: calc(var(--u) * 3);
+    --d: calc(var(--u) * 3);
+    --h: calc(var(--u) * 3);
+    --x: 0px;
+    --z: 0px;
+    --edge: var(--edge-tower);
+    --tint: rgba(199, 169, 125, 0.08);
+}
+
+.box--core {
+    --w: calc(var(--u) * 1.2);
+    --d: calc(var(--u) * 1.2);
+    --h: calc(var(--u) * 1.2);
+    --edge: var(--gold);
+    --tint: rgba(199, 169, 125, 0.5);
+    transform: translate3d(0, calc(var(--u) * -1.5), 0) rotateX(45deg) rotateZ(45deg);
+}
+
+.box--core .face {
+    box-shadow: 0 0 calc(var(--u) * 0.8) rgba(241, 220, 180, 0.55);
+}
+
+/* Hojas en capas */
+.sheet {
+    position: absolute;
+    left: calc(var(--u) * -1.6);
+    top: calc(var(--u) * -2);
+    width: calc(var(--u) * 3.2);
+    height: calc(var(--u) * 4);
+    border: 1px solid var(--edge-tower);
+    border-radius: 6px;
+    background:
+        repeating-linear-gradient(180deg, transparent 0 calc(var(--u) * 0.42), rgba(var(--ink), 0.16) calc(var(--u) * 0.42) calc(var(--u) * 0.42 + 1px))
+            calc(var(--u) * 0.45) calc(var(--u) * 0.9) / calc(100% - var(--u) * 0.9) calc(100% - var(--u) * 1.5) no-repeat,
+        linear-gradient(160deg, var(--surface-1), var(--surface-2));
+    box-shadow: 0 0 calc(var(--u) * 0.6) rgba(199, 169, 125, 0.18);
+}
+
+.sheet--1 { transform: translateZ(calc(var(--u) * -0.9)) rotateZ(-9deg); }
+.sheet--2 { transform: translateZ(0) rotateZ(2deg); }
+.sheet--3 { transform: translateZ(calc(var(--u) * 0.9)) rotateZ(11deg); border-color: var(--gold); }
+
+/* Giroscopio de anillos */
+.obj3d__core {
+    position: absolute;
+    width: calc(var(--u) * 1.5);
+    height: calc(var(--u) * 1.5);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff6e4, var(--gold) 45%, #7a5c33 100%);
+    box-shadow: 0 0 calc(var(--u) * 1.4) rgba(241, 220, 180, 0.7);
+}
+
+.obj3d--rings .obj3d__spin {
+    animation: none;
+}
+
+.ring {
+    position: absolute;
+    left: calc(var(--u) * -2.7);
+    top: calc(var(--u) * -2.7);
+    width: calc(var(--u) * 5.4);
+    height: calc(var(--u) * 5.4);
+    border: 1.5px solid var(--edge-tower);
+    border-radius: 50%;
+}
+
+.ring::after {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 12px 3px rgba(241, 220, 180, 0.7);
+}
+
+.ring--1 { animation: ring-1 9s linear infinite; }
+
+.ring--2 {
+    left: calc(var(--u) * -2.3);
+    top: calc(var(--u) * -2.3);
+    width: calc(var(--u) * 4.6);
+    height: calc(var(--u) * 4.6);
+    border-color: var(--edge-house);
+    animation: ring-2 12s linear infinite;
+}
+
+.ring--3 {
+    left: calc(var(--u) * -3.1);
+    top: calc(var(--u) * -3.1);
+    width: calc(var(--u) * 6.2);
+    height: calc(var(--u) * 6.2);
+    border-style: dashed;
+    border-color: rgba(var(--ink), 0.25);
+    animation: ring-3 16s linear infinite;
+}
+
+@keyframes ring-1 {
+    from { transform: rotateX(72deg) rotateZ(0deg); }
+    to { transform: rotateX(72deg) rotateZ(360deg); }
+}
+
+@keyframes ring-2 {
+    from { transform: rotateY(68deg) rotateZ(0deg); }
+    to { transform: rotateY(68deg) rotateZ(-360deg); }
+}
+
+@keyframes ring-3 {
+    from { transform: rotateX(30deg) rotateY(-40deg) rotateZ(0deg); }
+    to { transform: rotateX(30deg) rotateY(-40deg) rotateZ(360deg); }
+}
+
+.error-page .obj3d {
+    margin: 0 auto 1.5rem;
 }
 
 /* 7. Secciones ------------------------------------------------------------- */
@@ -2695,6 +2873,12 @@ h4 {
     .page-hero__panes span:nth-child(2) {
         width: 150px;
         height: 200px;
+    }
+
+    .obj3d {
+        --u: 22px;
+        height: 190px;
+        margin-top: -2.5rem;
     }
 
     .form-card {
