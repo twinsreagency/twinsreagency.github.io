@@ -503,10 +503,19 @@ def faces(names, extra=None):
     return "".join(f'<span class="face face--{n}">{extra.get(n, "")}</span>' for n in names)
 
 
+WALLS = ["front", "back", "left", "right"]
+
+
+def house_box():
+    """Casa con ventana y tejado a dos aguas (usada en la portada y en «Inmuebles»)."""
+    window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
+    return (f'<span class="box box--house">{faces(WALLS, {"front": window})}'
+            '<span class="gable gable--front"></span><span class="gable gable--back"></span>'
+            '<span class="slope slope--left"></span><span class="slope slope--right"></span></span>')
+
+
 def model_3d():
     """Modelo 3D decorativo del logotipo (torre y casa) construido con CSS."""
-    window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
-    walls = ["front", "back", "left", "right"]
     return f"""
                 <div class="scene" aria-hidden="true">
                     <div class="scene__float">
@@ -514,8 +523,8 @@ def model_3d():
                             <span class="orbit orbit--1"></span>
                             <span class="orbit orbit--2"></span>
                             <span class="floor"></span>
-                            <span class="box box--tower">{faces(walls + ["top"])}</span>
-                            <span class="box box--house">{faces(walls, {"front": window})}<span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span>
+                            <span class="box box--tower">{faces(WALLS + ["top"])}</span>
+                            {house_box()}
                         </div>
                     </div>
                 </div>"""
@@ -523,18 +532,14 @@ def model_3d():
 
 def object_3d(kind):
     """Objeto 3D decorativo para la cabecera de las páginas interiores."""
-    walls = ["front", "back", "left", "right"]
     if kind == "house":
-        window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
-        inner = (f'<span class="box box--house">{faces(walls, {"front": window})}'
-                 '<span class="gable gable--front"></span><span class="gable gable--back"></span>'
-                 '<span class="slope slope--left"></span><span class="slope slope--right"></span></span>')
+        inner = house_box()
     elif kind == "cube":
-        inner = (f'<span class="box box--cube">{faces(walls + ["top", "bottom"])}</span>'
-                 f'<span class="box box--core">{faces(walls + ["top", "bottom"])}</span>')
+        inner = (f'<span class="box box--cube">{faces(WALLS + ["top", "bottom"])}</span>'
+                 f'<span class="box box--core">{faces(WALLS + ["top", "bottom"])}</span>')
     elif kind == "twins":
-        inner = (f'<span class="box box--tower">{faces(walls + ["top"])}</span>'
-                 f'<span class="box box--tower-b">{faces(walls + ["top"])}</span>')
+        inner = (f'<span class="box box--tower">{faces(WALLS + ["top"])}</span>'
+                 f'<span class="box box--tower-b">{faces(WALLS + ["top"])}</span>')
     elif kind == "pages":
         inner = '<span class="sheet sheet--1"></span><span class="sheet sheet--2"></span><span class="sheet sheet--3"></span>'
     else:  # rings
