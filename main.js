@@ -213,9 +213,17 @@
             }
         });
 
-        desktop.addEventListener("change", function (event) {
+        function onBreakpoint(event) {
             if (event.matches) setOpen(false);
-        });
+        }
+
+        /* Safari < 14 solo admite addListener; sin esta comprobación, el error
+           detendría el resto del script (filtros, formulario, favoritos). */
+        if (desktop.addEventListener) {
+            desktop.addEventListener("change", onBreakpoint);
+        } else if (desktop.addListener) {
+            desktop.addListener(onBreakpoint);
+        }
     }
 
     /* Aparición progresiva de secciones ---------------------------------- */
