@@ -653,7 +653,7 @@ def build_index(L):
             <div class="statement__sticky">
                 <div class="container">
                     <p class="eyebrow">{T['about_eyebrow']}</p>
-                    <h2 class="visually-hidden" id="nosotros-title">{T['about_title']}</h2>
+                    <h2 class="visually-hidden" id="nosotros-title">{T['about_eyebrow']}</h2>
                     <p class="statement__text" data-words>{T['about_paras'][0]}</p>
                 </div>
             </div>
@@ -1004,6 +1004,8 @@ def build_legal(L):
     for filename, page in L["legal"].items():
         ctx = Ctx(L, filename)
         content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)))
+        # Las tablas con desplazamiento horizontal deben poder desplazarse con el teclado.
+        content = content.replace('<div class="table-scroll">', '<div class="table-scroll" tabindex="0">')
         body = page_hero(ctx, page["title"], ui["updated"].format(ui["updated_date"]), [(page["title"], filename)]) + f"""
         <article class="article">
             <div class="container">
