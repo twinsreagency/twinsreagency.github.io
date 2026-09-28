@@ -224,8 +224,6 @@ C = {
         "empty_title": "No hay inmuebles con estos criterios",
         "empty_text": "Modifique los filtros o indíquenos qué busca: le informaremos de las opciones disponibles, incluidas las que todavía no se han publicado.",
         "empty_btn": "Comuníquenos su búsqueda",
-        "cta_title": "¿No encuentra lo que busca?",
-        "cta_text": "Cuéntenos qué tipo de inmueble necesita y le avisaremos en cuanto dispongamos de una opción adecuada a su perfil.",
     },
 
     "nosotros": {

@@ -905,7 +905,7 @@ def build_properties(L):
                 </div>
             </div>
         </section>
-{alert_section(ctx)}{sell_section(ctx, alt=False)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+{alert_section(ctx)}{sell_section(ctx, alt=False)}"""
     write(ctx, T["title"], T["description"], "propiedades.html", body)
 
 

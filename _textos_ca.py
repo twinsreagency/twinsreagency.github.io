@@ -222,8 +222,6 @@ C = {
         "empty_title": "No hi ha immobles amb aquests criteris",
         "empty_text": "Modifiqueu els filtres o indiqueu-nos què busqueu: us informarem de les opcions disponibles, incloses les que encara no s’han publicat.",
         "empty_btn": "Comuniqueu-nos la vostra cerca",
-        "cta_title": "No trobeu el que busqueu?",
-        "cta_text": "Expliqueu-nos quin tipus d’immoble necessiteu i us avisarem tan aviat com disposem d’una opció adequada al vostre perfil.",
     },
 
     "nosotros": {

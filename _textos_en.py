@@ -223,8 +223,6 @@ C = {
         "empty_title": "No properties match these criteria",
         "empty_text": "Adjust the filters or tell us what you are looking for: we will let you know about available options, including those not yet published.",
         "empty_btn": "Tell us what you need",
-        "cta_title": "Can’t find what you are looking for?",
-        "cta_text": "Tell us what type of property you need and we will let you know as soon as a suitable option becomes available.",
     },
 
     "nosotros": {
