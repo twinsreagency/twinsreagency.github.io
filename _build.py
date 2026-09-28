@@ -214,6 +214,13 @@ def esc(text):
     return html.escape(text, quote=True)
 
 
+def json_ld(data):
+    """Bloque de datos estructurados. Se escapa «<» para que ningún texto pueda cerrar
+    la etiqueta <script> ni abrir otra (p. ej. un «</script>» en un título)."""
+    text = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    return f'\n    <script type="application/ld+json">{text}</script>'
+
+
 def price(L, value):
     if L["code"] == "en":
         return f"€{value:,}"
@@ -590,7 +597,7 @@ def build_index(L):
         f'{ui["more_info"]} {icon("arrow-right")}<span class="visually-hidden"> {ui["about"]} {L["services"][sid][0].lower()}</span></a></p>'
     ) for sid, ic in SERVICES[:4])
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
-    ld = json.dumps({
+    ld = json_ld({
         "@context": "https://schema.org",
         "@type": "RealEstateAgent",
         "name": "Twins Real Estate",
@@ -599,7 +606,7 @@ def build_index(L):
         "sameAs": [INSTAGRAM_URL],
         "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
         "knowsLanguage": [lang["lang"] for lang in LANGS],
-    }, ensure_ascii=False)
+    })
 
     callouts = "".join(
         f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
@@ -690,7 +697,7 @@ def build_index(L):
         </section>
 {commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "index.html", body,
-          extra_head=f'\n    <script type="application/ld+json">{ld}</script>')
+          extra_head=ld)
 
 
 def build_properties(L):
@@ -848,7 +855,7 @@ def build_blog(L):
         post = L["posts"][slug]
         related = [p for i, p in enumerate(POSTS) if i != index][:3]
         related_html = "".join(post_card(ctx, *p) for p in related)
-        ld = json.dumps({
+        ld = json_ld({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             "headline": post["title"],
@@ -857,7 +864,7 @@ def build_blog(L):
             "inLanguage": L["lang"],
             "author": {"@type": "Organization", "name": "Twins Real Estate"},
             "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
-        }, ensure_ascii=False)
+        })
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
         body = page_hero(ctx, post["title"], "", [(ui["nav"]["blog.html"], "blog.html"), (post["title"], "")], meta, obj="pages") + f"""
         <article class="article">
@@ -879,7 +886,7 @@ def build_blog(L):
             </div>
         </section>"""
         write(ctx, post["title"], post["excerpt"], "blog.html", body,
-              extra_head=f'\n    <script type="application/ld+json">{ld}</script>')
+              extra_head=ld)
 
 
 def build_contact(L):
