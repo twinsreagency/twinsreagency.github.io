@@ -115,7 +115,8 @@ PAGES = ["index.html", "propiedades.html", "servicios.html", "nosotros.html", "b
 
 SEARCH_VALUES = {
     "operacion": ["venta", "alquiler"],
-    "tipo": ["piso", "atico", "casa", "terreno", "oficina", "local"],
+    "tipo": ["piso", "atico", "duplex", "casa", "rustica", "estudio",   # viviendas
+             "oficina", "local", "garaje", "trastero", "terreno", "edificio"],
     "zona": ["centro", "norte", "sur", "este", "oeste", "periferia"],
     "precio": ["200000", "400000", "700000", "1000000"],
     "dormitorios": ["1", "2", "3", "4", "5"],
@@ -126,7 +127,7 @@ PROPERTIES = [
     dict(ref="TRE-002", op="venta", type="atico", zone="centro", price=320000, beds=3, baths=2, area=180, icon="penthouse"),
     dict(ref="TRE-003", op="alquiler", type="piso", zone="sur", price=1350, beds=2, baths=2, area=95, icon="building"),
     dict(ref="TRE-004", op="venta", type="casa", zone="este", price=1200000, beds=5, baths=4, area=550, icon="villa"),
-    dict(ref="TRE-005", op="venta", type="piso", zone="oeste", price=195000, beds=1, baths=1, area=75, icon="loft"),
+    dict(ref="TRE-005", op="venta", type="estudio", zone="oeste", price=195000, beds=1, baths=1, area=75, icon="loft"),
     dict(ref="TRE-006", op="venta", type="casa", zone="periferia", price=410000, beds=3, baths=2, area=240, icon="tree"),
     dict(ref="TRE-007", op="venta", type="piso", zone="centro", price=650000, beds=3, baths=3, area=210, icon="building"),
     dict(ref="TRE-008", op="alquiler", type="casa", zone="norte", price=2900, beds=4, baths=3, area=280, icon="home"),

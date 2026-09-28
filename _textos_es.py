@@ -76,7 +76,8 @@ C = {
         },
         "options": {
             "operacion": ["Compra", "Alquiler"],
-            "tipo": ["Piso o apartamento", "Ático", "Casa o chalet", "Terreno", "Oficina", "Local comercial"],
+            "tipo": ["Piso o apartamento", "Ático", "Dúplex", "Casa o chalet", "Casa rústica", "Estudio o loft",
+                     "Oficina", "Local o nave", "Garaje", "Trastero", "Terreno", "Edificio"],
             "zona": ["Centro", "Zona Norte", "Zona Sur", "Zona Este", "Zona Oeste", "Periferia y entorno rural"],
             "precio": ["Hasta 200.000 €", "Hasta 400.000 €", "Hasta 700.000 €", "Hasta 1.000.000 €"],
             "dormitorios": ["1 o más", "2 o más", "3 o más", "4 o más", "5 o más"],

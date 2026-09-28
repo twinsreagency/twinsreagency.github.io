@@ -76,7 +76,8 @@ C = {
         },
         "options": {
             "operacion": ["Compra", "Lloguer"],
-            "tipo": ["Pis o apartament", "Àtic", "Casa o xalet", "Terreny", "Oficina", "Local comercial"],
+            "tipo": ["Pis o apartament", "Àtic", "Dúplex", "Casa o xalet", "Casa rústica", "Estudi o loft",
+                     "Oficina", "Local o nau", "Garatge", "Traster", "Terreny", "Edifici"],
             "zona": ["Centre", "Zona Nord", "Zona Sud", "Zona Est", "Zona Oest", "Perifèria i entorn rural"],
             "precio": ["Fins a 200.000 €", "Fins a 400.000 €", "Fins a 700.000 €", "Fins a 1.000.000 €"],
             "dormitorios": ["1 o més", "2 o més", "3 o més", "4 o més", "5 o més"],

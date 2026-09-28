@@ -77,7 +77,8 @@ C = {
         },
         "options": {
             "operacion": ["To buy", "To rent"],
-            "tipo": ["Flat or apartment", "Penthouse", "House or villa", "Plot of land", "Office", "Commercial premises"],
+            "tipo": ["Flat or apartment", "Penthouse", "Duplex", "House or villa", "Country house", "Studio or loft",
+                     "Office", "Commercial premises or warehouse", "Garage", "Storage room", "Plot of land", "Building"],
             "zona": ["City centre", "North", "South", "East", "West", "Outskirts and countryside"],
             "precio": ["Up to €200,000", "Up to €400,000", "Up to €700,000", "Up to €1,000,000"],
             "dormitorios": ["1 or more", "2 or more", "3 or more", "4 or more", "5 or more"],
