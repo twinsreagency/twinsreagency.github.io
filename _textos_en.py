@@ -76,7 +76,7 @@ C = {
             "dormitorios": ("Bedrooms", "Any"),
         },
         "options": {
-            "operacion": ["For sale", "For rent"],
+            "operacion": ["To buy", "To rent"],
             "tipo": ["Flat or apartment", "Penthouse", "House or villa", "Plot of land", "Office", "Commercial premises"],
             "zona": ["City centre", "North", "South", "East", "West", "Outskirts and countryside"],
             "precio": ["Up to €200,000", "Up to €400,000", "Up to €700,000", "Up to €1,000,000"],
