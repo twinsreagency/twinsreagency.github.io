@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
     <script src="theme.js?v=fd1966f6e2"></script>
-    <link rel="stylesheet" href="styles.css?v=85fccb38a2">
-    <script src="main.js?v=d982432d51" defer></script>
+    <link rel="stylesheet" href="styles.css?v=59ac19c6a6">
+    <script src="main.js?v=707b9a4b27" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#contenido">Salta al contingut principal</a>
@@ -85,11 +85,11 @@
                     </div>
                     <div class="field">
                         <label for="filtro-tipo">Tipus d’immoble</label>
-                        <select id="filtro-tipo" name="tipo"><option value="">Tots</option><option value="piso">Pis o apartament</option><option value="atico">Àtic</option><option value="casa">Casa o xalet</option><option value="terreno">Terreny</option><option value="oficina">Oficina</option><option value="local">Local comercial</option></select>
+                        <select id="filtro-tipo" name="tipo"><option value="">Tots</option><option value="piso">Pis o apartament</option><option value="atico">Àtic</option><option value="duplex">Dúplex</option><option value="casa">Casa o xalet</option><option value="rustica">Casa rústica</option><option value="estudio">Estudi o loft</option><option value="oficina">Oficina</option><option value="local">Local o nau</option><option value="garaje">Garatge</option><option value="trastero">Traster</option><option value="terreno">Terreny</option><option value="edificio">Edifici</option></select>
                     </div>
                     <div class="field">
-                        <label for="filtro-zona">Zona</label>
-                        <select id="filtro-zona" name="zona"><option value="">Totes</option><option value="centro">Centre</option><option value="norte">Zona Nord</option><option value="sur">Zona Sud</option><option value="este">Zona Est</option><option value="oeste">Zona Oest</option><option value="periferia">Perifèria i entorn rural</option></select>
+                        <label for="filtro-zona">Localitat</label>
+                        <select id="filtro-zona" name="zona"><option value="">Totes</option><option value="centro">Centre</option><option value="periferia">Perifèria i entorn rural</option><option value="este">Zona Est</option><option value="norte">Zona Nord</option><option value="oeste">Zona Oest</option><option value="sur">Zona Sud</option></select>
                     </div>
                     <div class="field">
                         <label for="filtro-precio">Preu màxim</label>
@@ -101,6 +101,7 @@
                     </div>
                         <button class="btn btn--outline" type="reset">Restableix</button>
                     </form>
+                    <p class="filters__hint">No hi apareix la vostra localitat? <a class="link-arrow" href="#alerta">Creeu una alerta de cerca <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
                 </div>
             </div>
         </section>
@@ -193,7 +194,7 @@
                         <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-004#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Vil·la contemporània amb piscina</span></a>
                     </div>
                 </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="piso" data-zona="oeste" data-precio="195000" data-dormitorios="1">
+                <article class="card property reveal tilt" data-operacion="venta" data-tipo="estudio" data-zona="oeste" data-precio="195000" data-dormitorios="1">
                     <div class="property__media">
                         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 10h18"/><path d="M9 4v6M15 4v6"/><path d="M7 15h4v6"/></svg>
                         
@@ -297,7 +298,117 @@
                 <div class="empty-state" id="sin-resultados" hidden>
                     <h2>No hi ha immobles amb aquests criteris</h2>
                     <p>Modifiqueu els filtres o indiqueu-nos què busqueu: us informarem de les opcions disponibles, incloses les que encara no s’han publicat.</p>
-                    <a class="btn btn--primary" href="ca-contacte.html#formulario">Comuniqueu-nos la vostra cerca <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    <a class="btn btn--primary" href="#alerta">Comuniqueu-nos la vostra cerca <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--alt" id="alerta" aria-labelledby="alerta-title">
+            <div class="container split alert">
+                <div class="reveal">
+                    <span class="eyebrow">Alerta de cerca</span>
+                    <h2 class="section-title" id="alerta-title">No trobeu immobles a la vostra localitat?</h2>
+                    <div class="prose-block">
+                        <p>Indiqueu-nos on i quin tipus d’immoble necessiteu. Si encara no disposem de cap oferta que hi encaixi, ens posarem a buscar-la per vosaltres i us avisarem tan aviat com trobem una opció adequada.</p>
+                    </div>
+                    <ul class="check-list">
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Cerca personalitzada i sense cost</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Avís prioritari abans de publicar noves ofertes</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Les vostres dades només s’utilitzen per gestionar aquesta cerca</li>
+                    </ul>
+                </div>
+
+                <div class="card form-card reveal">
+                    <h3 class="form-card__title">Creeu la vostra alerta</h3>
+                    <p class="form-card__lead">Els camps marcats amb * són obligatoris.</p>
+                    <form class="lead-form" id="formulario-alerta" action="mailto:twinsreagency@gmail.com" method="post" enctype="text/plain" novalidate data-mail-subject="Alerta de cerca" data-subject-field="localidad">
+                        <div class="form-grid">
+                            <div class="field field--full">
+                                <label for="alerta-localidad">Localitat on busqueu *</label>
+                                <input id="alerta-localidad" name="localidad" type="text" list="alerta-localidades" autocomplete="address-level2" maxlength="80" required placeholder="Per exemple, Santa Margarida de Montbui" aria-describedby="alerta-error-localidad">
+                                <datalist id="alerta-localidades"></datalist>
+                                <p class="field__error" id="alerta-error-localidad" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-operacion">Operació</label>
+                                <select id="alerta-operacion" name="operacion"><option value="">Totes</option><option value="venta">Compra</option><option value="alquiler">Lloguer</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-tipo">Tipus d’immoble</label>
+                                <select id="alerta-tipo" name="tipo"><option value="">Tots</option><option value="piso">Pis o apartament</option><option value="atico">Àtic</option><option value="duplex">Dúplex</option><option value="casa">Casa o xalet</option><option value="rustica">Casa rústica</option><option value="estudio">Estudi o loft</option><option value="oficina">Oficina</option><option value="local">Local o nau</option><option value="garaje">Garatge</option><option value="trastero">Traster</option><option value="terreno">Terreny</option><option value="edificio">Edifici</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-precio">Preu màxim</label>
+                                <select id="alerta-precio" name="precio"><option value="">Sense límit</option><option value="200000">Fins a 200.000 €</option><option value="400000">Fins a 400.000 €</option><option value="700000">Fins a 700.000 €</option><option value="1000000">Fins a 1.000.000 €</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-dormitorios">Dormitoris</label>
+                                <select id="alerta-dormitorios" name="dormitorios"><option value="">Indiferent</option><option value="1">1 o més</option><option value="2">2 o més</option><option value="3">3 o més</option><option value="4">4 o més</option><option value="5">5 o més</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-nombre">Nom i cognoms *</label>
+                                <input id="alerta-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required aria-describedby="alerta-error-nombre">
+                                <p class="field__error" id="alerta-error-nombre" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-email">Correu electrònic *</label>
+                                <input id="alerta-email" name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="alerta-error-email">
+                                <p class="field__error" id="alerta-error-email" aria-live="polite"></p>
+                            </div>
+                            <div class="field field--full">
+                                <label for="alerta-telefono">Telèfon</label>
+                                <input id="alerta-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" aria-describedby="alerta-error-telefono">
+                                <p class="field__error" id="alerta-error-telefono" aria-live="polite"></p>
+                            </div>
+                            <div class="field field--full">
+                                <label for="alerta-comentarios">Què més necessiteu?</label>
+                                <textarea id="alerta-comentarios" name="comentarios" maxlength="1000" placeholder="Superfície, planta, terrassa, garatge, terminis…"></textarea>
+                            </div>
+                            <div class="field field--hp" aria-hidden="true">
+                                <label for="alerta-web">No ompliu aquest camp</label>
+                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="field field--full">
+                                <label class="checkbox" for="alerta-privacidad">
+                                    <input id="alerta-privacidad" name="privacidad" type="checkbox" required aria-describedby="alerta-error-privacidad">
+                                    <span>He llegit i accepto la <a href="ca-privacitat.html">política de privacitat</a>. *</span>
+                                </label>
+                                <p class="field__error" id="alerta-error-privacidad" aria-live="polite"></p>
+                            </div>
+                        </div>
+                        <p class="form-legal"><strong>Informació bàsica sobre protecció de dades.</strong> Responsable: Twins Real Estate. Finalitat: atendre la vostra consulta i, si escau, trametre-us la informació sol·licitada. Legitimació: el vostre consentiment. Destinataris: no se cediran dades a tercers, llevat d’obligació legal. Drets: accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, tal com es detalla a la <a href="ca-privacitat.html">política de privacitat</a>.</p>
+                        <div class="form-actions">
+                            <button class="btn btn--primary btn--block" type="submit">Crear l’alerta <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                        </div>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="section sell" aria-labelledby="vender-title" data-scroll="view">
+            <div class="container split">
+                <div class="split__visual reveal tilt">
+                    <div class="split__frame sell__frame">
+            <div class="obj3d obj3d--sale" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="floor"></span><span class="box box--house"><span class="face face--front"><span class="window"><i></i><i></i><i></i><i></i></span></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span><span class="sign"><span class="sign__post"></span><span class="sign__board"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg></span></span></div></div></div>
+                        <p class="split__quote">Us acompanyem des de la valoració fins a la signatura.</p>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <span class="eyebrow">Propietaris</span>
+                    <h2 class="section-title" id="vender-title">Teniu un immoble que voleu vendre?</h2>
+                    <div class="prose-block">
+                        <p>Si esteu pensant a vendre el vostre habitatge, local o terreny, poseu-vos en contacte amb nosaltres. Estudiarem el vostre immoble amb detall, us proposarem un preu de sortida realista i ens ocuparem de tot el procés fins a la signatura davant notari.</p>
+                    </div>
+                    <ul class="check-list">
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Valoració professional i sense compromís</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Difusió acurada davant compradors qualificats</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Acompanyament en la negociació, les arres i l’escriptura</li>
+                    </ul>
+                    <div class="sell__actions">
+                        <a class="btn btn--primary" href="ca-contacte.html?asunto=venta#formulario">Sol·liciteu una valoració <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                        <a class="btn btn--outline" href="mailto:twinsreagency@gmail.com">Escriviu-nos per correu</a>
+                    </div>
                 </div>
             </div>
         </section>

@@ -121,6 +121,35 @@ test("el formulario se rellena con la referencia del inmueble solo si es válida
     await close();
 });
 
+test("la alerta de búsqueda recoge los criterios del filtro y valida la localidad", async () => {
+    const { page, close } = await open("es-inmuebles.html");
+    await page.selectOption("#filtro-tipo", "casa");
+    await page.selectOption("#filtro-zona", "norte");
+    assert.equal(await page.inputValue("#alerta-tipo"), "casa");
+    assert.equal(await page.inputValue("#alerta-localidad"), "Zona Norte");
+
+    /* Lo que escribe el visitante no se sobrescribe al cambiar el filtro. */
+    await page.fill("#alerta-localidad", "Santa Margarida de Montbui");
+    await page.selectOption("#filtro-zona", "sur");
+    assert.equal(await page.inputValue("#alerta-localidad"), "Santa Margarida de Montbui");
+
+    await page.fill("#alerta-localidad", "");
+    await page.click("#formulario-alerta button[type='submit']");
+    for (const id of ["alerta-localidad", "alerta-nombre", "alerta-email", "alerta-privacidad"]) {
+        assert.equal(await page.getAttribute("#" + id, "aria-invalid"), "true", id);
+    }
+    assert.notEqual((await page.textContent("#alerta-error-localidad")).trim(), "");
+    assert.equal(await page.evaluate(() => document.activeElement.id), "alerta-localidad");
+    await close();
+});
+
+test("sin resultados, el aviso lleva a la alerta de búsqueda", async () => {
+    const { page, close } = await open("es-inmuebles.html", { search: "?dormitorios=5&operacion=alquiler" });
+    assert.equal(await page.isVisible("#sin-resultados"), true);
+    assert.equal(await page.getAttribute("#sin-resultados a.btn", "href"), "#alerta");
+    await close();
+});
+
 test("el menú móvil se abre, se cierra con Escape y devuelve el foco", async () => {
     const { page, close } = await open("index.html", { width: 375 });
     const toggle = page.locator(".nav-toggle");

@@ -70,14 +70,14 @@ C = {
         "fields": {
             "operacion": ("Operación", "Todas"),
             "tipo": ("Tipo de inmueble", "Todos"),
-            "zona": ("Zona", "Todas"),
+            "zona": ("Localidad", "Todas"),
             "precio": ("Precio máximo", "Sin límite"),
             "dormitorios": ("Dormitorios", "Indiferente"),
         },
         "options": {
             "operacion": ["Compra", "Alquiler"],
-            "tipo": ["Piso o apartamento", "Ático", "Casa o chalet", "Terreno", "Oficina", "Local comercial"],
-            "zona": ["Centro", "Zona Norte", "Zona Sur", "Zona Este", "Zona Oeste", "Periferia y entorno rural"],
+            "tipo": ["Piso o apartamento", "Ático", "Dúplex", "Casa o chalet", "Casa rústica", "Estudio o loft",
+                     "Oficina", "Local o nave", "Garaje", "Trastero", "Terreno", "Edificio"],
             "precio": ["Hasta 200.000 €", "Hasta 400.000 €", "Hasta 700.000 €", "Hasta 1.000.000 €"],
             "dormitorios": ["1 o más", "2 o más", "3 o más", "4 o más", "5 o más"],
         },
@@ -141,6 +141,40 @@ C = {
                                     "Revisión de contratos", "Estimación de impuestos y gastos de la operación"]),
     },
     "footer_services": ["Compraventa", "Alquiler de viviendas", "Gestión de alquileres", "Inversión inmobiliaria", "Valoración de inmuebles"],
+
+    # Nombres traducidos de las localidades o zonas de los inmuebles de ejemplo.
+    # Las localidades reales (Igualada, Montbui…) se definen una sola vez en TOWNS (_build.py).
+    "places": {"centro": "Centro", "norte": "Zona Norte", "sur": "Zona Sur", "este": "Zona Este",
+               "oeste": "Zona Oeste", "periferia": "Periferia y entorno rural"},
+
+    "alert": {
+        "eyebrow": "Alerta de búsqueda",
+        "title": "¿No encuentra inmuebles en su localidad?",
+        "text": "Indíquenos dónde y qué tipo de inmueble necesita. Si todavía no disponemos de ninguna oferta que encaje, nos pondremos a buscarla por usted y le avisaremos en cuanto encontremos una opción adecuada.",
+        "checks": ["Búsqueda personalizada y sin coste",
+                   "Aviso prioritario antes de publicar nuevas ofertas",
+                   "Sus datos solo se utilizan para gestionar esta búsqueda"],
+        "form_title": "Cree su alerta",
+        "localidad": "Localidad en la que busca *",
+        "localidad_placeholder": "Por ejemplo, Santa Margarida de Montbui",
+        "comentarios": "¿Qué más necesita?",
+        "comentarios_placeholder": "Superficie, planta, terraza, garaje, plazos…",
+        "submit": "Crear alerta",
+        "mail_subject": "Alerta de búsqueda",
+        "filter_hint": "¿No aparece su localidad?",
+        "filter_link": "Cree una alerta de búsqueda",
+    },
+
+    "sell": {
+        "eyebrow": "Propietarios",
+        "title": "¿Tiene un inmueble que desea vender?",
+        "text": "Si está pensando en vender su vivienda, local o terreno, contacte con nosotros. Estudiaremos su inmueble con detalle, le propondremos un precio de salida realista y nos ocuparemos de todo el proceso hasta la firma ante notario.",
+        "checks": ["Valoración profesional y sin compromiso",
+                   "Difusión cuidada ante compradores cualificados",
+                   "Acompañamiento en la negociación, las arras y la escritura"],
+        "btn": "Solicitar una valoración",
+        "badge": "Le acompañamos desde la valoración hasta la firma.",
+    },
 
     "index": {
         "title": "Twins Real Estate | Agencia inmobiliaria",

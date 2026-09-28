@@ -70,14 +70,14 @@ C = {
         "fields": {
             "operacion": ("Operació", "Totes"),
             "tipo": ("Tipus d’immoble", "Tots"),
-            "zona": ("Zona", "Totes"),
+            "zona": ("Localitat", "Totes"),
             "precio": ("Preu màxim", "Sense límit"),
             "dormitorios": ("Dormitoris", "Indiferent"),
         },
         "options": {
             "operacion": ["Compra", "Lloguer"],
-            "tipo": ["Pis o apartament", "Àtic", "Casa o xalet", "Terreny", "Oficina", "Local comercial"],
-            "zona": ["Centre", "Zona Nord", "Zona Sud", "Zona Est", "Zona Oest", "Perifèria i entorn rural"],
+            "tipo": ["Pis o apartament", "Àtic", "Dúplex", "Casa o xalet", "Casa rústica", "Estudi o loft",
+                     "Oficina", "Local o nau", "Garatge", "Traster", "Terreny", "Edifici"],
             "precio": ["Fins a 200.000 €", "Fins a 400.000 €", "Fins a 700.000 €", "Fins a 1.000.000 €"],
             "dormitorios": ["1 o més", "2 o més", "3 o més", "4 o més", "5 o més"],
         },
@@ -141,6 +141,38 @@ C = {
                                     "Revisió de contractes", "Estimació d’impostos i despeses de l’operació"]),
     },
     "footer_services": ["Compravenda", "Lloguer d’habitatges", "Gestió de lloguers", "Inversió immobiliària", "Valoració d’immobles"],
+
+    "places": {"centro": "Centre", "norte": "Zona Nord", "sur": "Zona Sud", "este": "Zona Est",
+               "oeste": "Zona Oest", "periferia": "Perifèria i entorn rural"},
+
+    "alert": {
+        "eyebrow": "Alerta de cerca",
+        "title": "No trobeu immobles a la vostra localitat?",
+        "text": "Indiqueu-nos on i quin tipus d’immoble necessiteu. Si encara no disposem de cap oferta que hi encaixi, ens posarem a buscar-la per vosaltres i us avisarem tan aviat com trobem una opció adequada.",
+        "checks": ["Cerca personalitzada i sense cost",
+                   "Avís prioritari abans de publicar noves ofertes",
+                   "Les vostres dades només s’utilitzen per gestionar aquesta cerca"],
+        "form_title": "Creeu la vostra alerta",
+        "localidad": "Localitat on busqueu *",
+        "localidad_placeholder": "Per exemple, Santa Margarida de Montbui",
+        "comentarios": "Què més necessiteu?",
+        "comentarios_placeholder": "Superfície, planta, terrassa, garatge, terminis…",
+        "submit": "Crear l’alerta",
+        "mail_subject": "Alerta de cerca",
+        "filter_hint": "No hi apareix la vostra localitat?",
+        "filter_link": "Creeu una alerta de cerca",
+    },
+
+    "sell": {
+        "eyebrow": "Propietaris",
+        "title": "Teniu un immoble que voleu vendre?",
+        "text": "Si esteu pensant a vendre el vostre habitatge, local o terreny, poseu-vos en contacte amb nosaltres. Estudiarem el vostre immoble amb detall, us proposarem un preu de sortida realista i ens ocuparem de tot el procés fins a la signatura davant notari.",
+        "checks": ["Valoració professional i sense compromís",
+                   "Difusió acurada davant compradors qualificats",
+                   "Acompanyament en la negociació, les arres i l’escriptura"],
+        "btn": "Sol·liciteu una valoració",
+        "badge": "Us acompanyem des de la valoració fins a la signatura.",
+    },
 
     "index": {
         "title": "Twins Real Estate | Agència immobiliària",

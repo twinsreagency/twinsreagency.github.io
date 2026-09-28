@@ -71,14 +71,14 @@ C = {
         "fields": {
             "operacion": ("Transaction", "All"),
             "tipo": ("Property type", "All"),
-            "zona": ("Area", "All"),
+            "zona": ("Town", "All"),
             "precio": ("Maximum price", "No limit"),
             "dormitorios": ("Bedrooms", "Any"),
         },
         "options": {
             "operacion": ["To buy", "To rent"],
-            "tipo": ["Flat or apartment", "Penthouse", "House or villa", "Plot of land", "Office", "Commercial premises"],
-            "zona": ["City centre", "North", "South", "East", "West", "Outskirts and countryside"],
+            "tipo": ["Flat or apartment", "Penthouse", "Duplex", "House or villa", "Country house", "Studio or loft",
+                     "Office", "Commercial premises or warehouse", "Garage", "Storage room", "Plot of land", "Building"],
             "precio": ["Up to €200,000", "Up to €400,000", "Up to €700,000", "Up to €1,000,000"],
             "dormitorios": ["1 or more", "2 or more", "3 or more", "4 or more", "5 or more"],
         },
@@ -142,6 +142,38 @@ C = {
                                     "Contract review", "Estimate of taxes and transaction costs"]),
     },
     "footer_services": ["Sales and purchases", "Residential lettings", "Rental management", "Property investment", "Property valuation"],
+
+    "places": {"centro": "City centre", "norte": "North", "sur": "South", "este": "East",
+               "oeste": "West", "periferia": "Outskirts and countryside"},
+
+    "alert": {
+        "eyebrow": "Property alert",
+        "title": "Can’t find a property in your town?",
+        "text": "Tell us where you are looking and what kind of property you need. If we do not yet have a listing that fits, we will start searching for you and let you know as soon as we find a suitable option.",
+        "checks": ["A personalised search, free of charge",
+                   "Priority notice before new listings are published",
+                   "Your details are only used to manage this search"],
+        "form_title": "Create your alert",
+        "localidad": "Town you are looking in *",
+        "localidad_placeholder": "For example, Santa Margarida de Montbui",
+        "comentarios": "Anything else you need?",
+        "comentarios_placeholder": "Floor area, floor level, terrace, parking, timescale…",
+        "submit": "Create alert",
+        "mail_subject": "Property alert",
+        "filter_hint": "Can’t see your town?",
+        "filter_link": "Create a property alert",
+    },
+
+    "sell": {
+        "eyebrow": "Homeowners",
+        "title": "Do you have a property to sell?",
+        "text": "If you are thinking of selling your home, commercial premises or land, please get in touch. We will study your property in detail, propose a realistic asking price and take care of the entire process through to signing before a notary.",
+        "checks": ["Professional, no-obligation valuation",
+                   "Careful marketing to qualified buyers",
+                   "Support with negotiation, the deposit contract and the deed"],
+        "btn": "Request a valuation",
+        "badge": "With you from the valuation through to the signing.",
+    },
 
     "index": {
         "title": "Twins Real Estate | Real estate agency",
