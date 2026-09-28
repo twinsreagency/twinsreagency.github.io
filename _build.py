@@ -670,7 +670,7 @@ def build_index(L):
             <div class="container split">
                 <div class="split__visual reveal tilt">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
                         <p class="split__quote">{T['quote']}</p>
                     </div>
                 </div>
@@ -746,7 +746,7 @@ def build_about(L):
             <div class="container split">
                 <div class="split__visual reveal">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
                         <p class="split__quote">{L['index']['slogan']}</p>
                     </div>
                 </div>

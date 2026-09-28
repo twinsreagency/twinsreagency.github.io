@@ -8,3 +8,13 @@
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
+
+# styles.css, main.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
+# (ver versioned() en _build.py): cada cambio genera una dirección nueva, así que
+# el navegador puede guardarlos en caché indefinidamente.
+/styles.css
+  Cache-Control: public, max-age=31536000, immutable
+/main.js
+  Cache-Control: public, max-age=31536000, immutable
+/theme.js
+  Cache-Control: public, max-age=31536000, immutable
