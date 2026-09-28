@@ -28,6 +28,7 @@
 
     var MESSAGES = {
         es: {
+            localidad: "Indique la localidad en la que busca.",
             nombre: "Indique su nombre y apellidos.",
             email: "Indique una dirección de correo electrónico válida.",
             telefono: "Indique un teléfono válido o deje el campo vacío.",
@@ -41,14 +42,10 @@
             failed: "No ha sido posible enviar su consulta. Inténtelo de nuevo o escríbanos a {email}.",
             prefill: "Deseo recibir más información sobre el inmueble con referencia {ref}.",
             mailSubject: "Consulta web",
-            mailDefaultSubject: "Información general",
-            mailName: "Nombre",
-            mailEmail: "Correo electrónico",
-            mailPhone: "Teléfono",
-            mailReason: "Motivo",
-            mailRef: "Referencia del inmueble"
+            mailDefaultSubject: "Información general"
         },
         ca: {
+            localidad: "Indiqueu la localitat on busqueu.",
             nombre: "Indiqueu el vostre nom i cognoms.",
             email: "Indiqueu una adreça de correu electrònic vàlida.",
             telefono: "Indiqueu un telèfon vàlid o deixeu el camp buit.",
@@ -62,14 +59,10 @@
             failed: "No ha estat possible enviar la consulta. Torneu-ho a provar o escriviu-nos a {email}.",
             prefill: "Voldria rebre més informació sobre l’immoble amb referència {ref}.",
             mailSubject: "Consulta web",
-            mailDefaultSubject: "Informació general",
-            mailName: "Nom",
-            mailEmail: "Correu electrònic",
-            mailPhone: "Telèfon",
-            mailReason: "Motiu",
-            mailRef: "Referència de l’immoble"
+            mailDefaultSubject: "Informació general"
         },
         en: {
+            localidad: "Please enter the town you are looking in.",
             nombre: "Please enter your full name.",
             email: "Please enter a valid email address.",
             telefono: "Please enter a valid phone number or leave the field blank.",
@@ -83,12 +76,7 @@
             failed: "Your enquiry could not be sent. Please try again or write to us at {email}.",
             prefill: "I would like to receive more information about the property with reference {ref}.",
             mailSubject: "Website enquiry",
-            mailDefaultSubject: "General information",
-            mailName: "Name",
-            mailEmail: "Email",
-            mailPhone: "Phone",
-            mailReason: "Reason",
-            mailRef: "Property reference"
+            mailDefaultSubject: "General information"
         }
     };
 
@@ -484,6 +472,28 @@
         var empty = document.getElementById("sin-resultados");
         var fields = ["operacion", "tipo", "zona", "precio", "dormitorios"];
         var params = new URLSearchParams(window.location.search);
+        var alertForm = document.getElementById("formulario-alerta");
+        var townEdited = false;
+
+        if (alertForm) {
+            alertForm.elements.localidad.addEventListener("input", function () {
+                townEdited = true;
+            });
+        }
+
+        /** Traslada los criterios del filtro a la alerta de búsqueda, para no repetirlos. */
+        function syncAlert() {
+            if (!alertForm) return;
+            fields.forEach(function (name) {
+                var select = form.elements[name];
+                if (!select) return;
+                if (name === "zona") {
+                    if (!townEdited) alertForm.elements.localidad.value = select.value ? select.options[select.selectedIndex].text : "";
+                } else if (alertForm.elements[name]) {
+                    alertForm.elements[name].value = select.value;
+                }
+            });
+        }
 
         fields.forEach(function (name) {
             var select = form.elements[name];
@@ -519,6 +529,7 @@
 
             if (count) count.textContent = String(visible);
             if (empty) empty.hidden = visible !== 0;
+            syncAlert();
 
             var search = query.toString();
             window.history.replaceState(null, "", window.location.pathname + (search ? "?" + search : ""));
@@ -538,16 +549,14 @@
         apply();
     }
 
-    /* Formulario de contacto --------------------------------------------- */
+    /* Formularios de contacto y de alerta de búsqueda --------------------- */
 
-    function initContactForm() {
+    /** Rellena el formulario de contacto con el motivo y la referencia de la URL. */
+    function initContactPreset() {
         var form = document.getElementById("formulario-contacto");
         if (!form) return;
 
-        var status = $(".form-status", form);
-        var submit = $("button[type='submit']", form);
         var subject = form.elements.asunto;
-        var startedAt = Date.now();
         var params = new URLSearchParams(window.location.search);
 
         var presetSubject = allowedParam(params, "asunto", optionValues(subject));
@@ -561,35 +570,60 @@
                 form.elements.mensaje.value = format(T.prefill, { ref: reference });
             }
         }
+    }
 
-        var rules = {
-            nombre: function (value) {
-                return value.length >= 2 ? "" : T.nombre;
-            },
-            email: function (value) {
-                return EMAIL.test(value) ? "" : T.email;
-            },
-            telefono: function (value) {
-                return !value || PHONE.test(value) ? "" : T.telefono;
-            },
-            mensaje: function (value) {
-                return value.length >= 10 ? "" : T.mensaje;
-            },
-            privacidad: function (value, field) {
-                return field.checked ? "" : T.privacidad;
-            }
-        };
+    /** Reglas de validación por nombre de campo; solo se aplican a los campos presentes. */
+    var RULES = {
+        localidad: function (value) {
+            return value.length >= 2 ? "" : T.localidad;
+        },
+        nombre: function (value) {
+            return value.length >= 2 ? "" : T.nombre;
+        },
+        email: function (value) {
+            return EMAIL.test(value) ? "" : T.email;
+        },
+        telefono: function (value) {
+            return !value || PHONE.test(value) ? "" : T.telefono;
+        },
+        mensaje: function (value) {
+            return value.length >= 10 ? "" : T.mensaje;
+        },
+        privacidad: function (value, field) {
+            return field.checked ? "" : T.privacidad;
+        }
+    };
+
+    /** Texto de la etiqueta de un campo, sin el asterisco de obligatorio. */
+    function labelText(form, field) {
+        var label = field.id ? $("label[for='" + field.id + "']", form) : null;
+        return label ? label.textContent.replace(/\s*\*\s*$/, "").trim() : field.name;
+    }
+
+    /**
+     * Validación y envío de un formulario .lead-form. Los datos se envían por
+     * POST (JSON) a CONFIG.endpoint o, si no hay, se prepara un correo con
+     * todos los campos rellenados. data-mail-subject y data-subject-field
+     * definen el asunto del correo.
+     */
+    function initLeadForm(form) {
+        var status = $(".form-status", form);
+        var submit = $("button[type='submit']", form);
+        var startedAt = Date.now();
+        var rules = Object.keys(RULES).filter(function (name) {
+            return Boolean(form.elements[name]);
+        });
 
         function validateField(name) {
             var field = form.elements[name];
-            var error = document.getElementById("error-" + name);
-            var message = rules[name](field.value.trim(), field);
+            var error = document.getElementById(field.getAttribute("aria-describedby"));
+            var message = RULES[name](field.value.trim(), field);
             field.setAttribute("aria-invalid", String(Boolean(message)));
             if (error) error.textContent = message;
             return !message;
         }
 
-        Object.keys(rules).forEach(function (name) {
+        rules.forEach(function (name) {
             var field = form.elements[name];
             field.addEventListener("blur", function () {
                 if (field.type !== "checkbox" && (field.value || field.getAttribute("aria-invalid") === "true")) {
@@ -606,37 +640,54 @@
             status.textContent = message;
         }
 
+        /** Campos enviados, en el orden del formulario (sin la casilla ni el campo trampa). */
+        function fields() {
+            return Array.prototype.filter.call(form.elements, function (field) {
+                return field.name && field.name !== "web" && field.type !== "checkbox" &&
+                    field.type !== "submit" && field.type !== "button";
+            });
+        }
+
+        function valueOf(field) {
+            if (field.tagName === "SELECT") return field.value ? field.options[field.selectedIndex].text : "";
+            return field.value.trim();
+        }
+
         function collect() {
-            return {
-                idioma: LANG,
-                nombre: form.elements.nombre.value.trim(),
-                email: form.elements.email.value.trim(),
-                telefono: form.elements.telefono.value.trim(),
-                asunto: subject.value ? subject.options[subject.selectedIndex].text : "",
-                referencia: form.elements.referencia.value.trim(),
-                mensaje: form.elements.mensaje.value.trim()
-            };
+            var data = { idioma: LANG, formulario: form.id };
+            fields().forEach(function (field) {
+                data[field.name] = valueOf(field);
+            });
+            return data;
         }
 
         function openMailClient(data) {
-            var lines = [
-                T.mailName + ": " + data.nombre,
-                T.mailEmail + ": " + data.email,
-                T.mailPhone + ": " + (data.telefono || "—"),
-                T.mailReason + ": " + (data.asunto || "—")
-            ];
-            if (data.referencia) lines.push(T.mailRef + ": " + data.referencia);
-            lines.push("", data.mensaje);
+            var lines = [];
+            var notes = [];
+            fields().forEach(function (field) {
+                var value = data[field.name];
+                if (!value) return;
+                if (field.tagName === "TEXTAREA") {
+                    notes.push(value);
+                } else {
+                    lines.push(labelText(form, field) + ": " + value);
+                }
+            });
+            if (notes.length) lines.push("", notes.join("\n\n"));
+
+            var subjectField = form.getAttribute("data-subject-field") || "asunto";
+            var subject = (form.getAttribute("data-mail-subject") || T.mailSubject) +
+                " — " + (data[subjectField] || T.mailDefaultSubject);
 
             window.location.href = "mailto:" + CONFIG.fallbackEmail +
-                "?subject=" + encodeURIComponent(T.mailSubject + " — " + (data.asunto || T.mailDefaultSubject)) +
+                "?subject=" + encodeURIComponent(subject) +
                 "&body=" + encodeURIComponent(lines.join("\n"));
         }
 
         form.addEventListener("submit", function (event) {
             event.preventDefault();
 
-            var valid = Object.keys(rules).map(validateField).every(Boolean);
+            var valid = rules.map(validateField).every(Boolean);
             if (!valid) {
                 setStatus("error", T.invalid);
                 var firstInvalid = $("[aria-invalid='true']", form);
@@ -680,6 +731,11 @@
         });
     }
 
+    function initLeadForms() {
+        initContactPreset();
+        $$("form.lead-form").forEach(initLeadForm);
+    }
+
     /* Año actual en el pie ----------------------------------------------- */
 
     function initYear() {
@@ -700,6 +756,6 @@
     initHeroPointer();
     initFavorites();
     initPropertyFilter();
-    initContactForm();
+    initLeadForms();
     initYear();
 })();

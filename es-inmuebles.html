@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
     <script src="theme.js?v=fd1966f6e2"></script>
-    <link rel="stylesheet" href="styles.css?v=fdef226b96">
-    <script src="main.js?v=d982432d51" defer></script>
+    <link rel="stylesheet" href="styles.css?v=59ac19c6a6">
+    <script src="main.js?v=707b9a4b27" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
@@ -88,8 +88,8 @@
                         <select id="filtro-tipo" name="tipo"><option value="">Todos</option><option value="piso">Piso o apartamento</option><option value="atico">Ático</option><option value="duplex">Dúplex</option><option value="casa">Casa o chalet</option><option value="rustica">Casa rústica</option><option value="estudio">Estudio o loft</option><option value="oficina">Oficina</option><option value="local">Local o nave</option><option value="garaje">Garaje</option><option value="trastero">Trastero</option><option value="terreno">Terreno</option><option value="edificio">Edificio</option></select>
                     </div>
                     <div class="field">
-                        <label for="filtro-zona">Zona</label>
-                        <select id="filtro-zona" name="zona"><option value="">Todas</option><option value="centro">Centro</option><option value="norte">Zona Norte</option><option value="sur">Zona Sur</option><option value="este">Zona Este</option><option value="oeste">Zona Oeste</option><option value="periferia">Periferia y entorno rural</option></select>
+                        <label for="filtro-zona">Localidad</label>
+                        <select id="filtro-zona" name="zona"><option value="">Todas</option><option value="centro">Centro</option><option value="periferia">Periferia y entorno rural</option><option value="este">Zona Este</option><option value="norte">Zona Norte</option><option value="oeste">Zona Oeste</option><option value="sur">Zona Sur</option></select>
                     </div>
                     <div class="field">
                         <label for="filtro-precio">Precio máximo</label>
@@ -101,6 +101,7 @@
                     </div>
                         <button class="btn btn--outline" type="reset">Restablecer</button>
                     </form>
+                    <p class="filters__hint">¿No aparece su localidad? <a class="link-arrow" href="#alerta">Cree una alerta de búsqueda <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
                 </div>
             </div>
         </section>
@@ -297,12 +298,95 @@
                 <div class="empty-state" id="sin-resultados" hidden>
                     <h2>No hay inmuebles con estos criterios</h2>
                     <p>Modifique los filtros o indíquenos qué busca: le informaremos de las opciones disponibles, incluidas las que todavía no se han publicado.</p>
-                    <a class="btn btn--primary" href="es-contacto.html#formulario">Comuníquenos su búsqueda <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    <a class="btn btn--primary" href="#alerta">Comuníquenos su búsqueda <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 </div>
             </div>
         </section>
 
-        <section class="section section--alt sell" aria-labelledby="vender-title" data-scroll="view">
+        <section class="section section--alt" id="alerta" aria-labelledby="alerta-title">
+            <div class="container split alert">
+                <div class="reveal">
+                    <span class="eyebrow">Alerta de búsqueda</span>
+                    <h2 class="section-title" id="alerta-title">¿No encuentra inmuebles en su localidad?</h2>
+                    <div class="prose-block">
+                        <p>Indíquenos dónde y qué tipo de inmueble necesita. Si todavía no disponemos de ninguna oferta que encaje, nos pondremos a buscarla por usted y le avisaremos en cuanto encontremos una opción adecuada.</p>
+                    </div>
+                    <ul class="check-list">
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Búsqueda personalizada y sin coste</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Aviso prioritario antes de publicar nuevas ofertas</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Sus datos solo se utilizan para gestionar esta búsqueda</li>
+                    </ul>
+                </div>
+
+                <div class="card form-card reveal">
+                    <h3 class="form-card__title">Cree su alerta</h3>
+                    <p class="form-card__lead">Los campos marcados con * son obligatorios.</p>
+                    <form class="lead-form" id="formulario-alerta" action="mailto:twinsreagency@gmail.com" method="post" enctype="text/plain" novalidate data-mail-subject="Alerta de búsqueda" data-subject-field="localidad">
+                        <div class="form-grid">
+                            <div class="field field--full">
+                                <label for="alerta-localidad">Localidad en la que busca *</label>
+                                <input id="alerta-localidad" name="localidad" type="text" list="alerta-localidades" autocomplete="address-level2" maxlength="80" required placeholder="Por ejemplo, Santa Margarida de Montbui" aria-describedby="alerta-error-localidad">
+                                <datalist id="alerta-localidades"></datalist>
+                                <p class="field__error" id="alerta-error-localidad" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-operacion">Operación</label>
+                                <select id="alerta-operacion" name="operacion"><option value="">Todas</option><option value="venta">Compra</option><option value="alquiler">Alquiler</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-tipo">Tipo de inmueble</label>
+                                <select id="alerta-tipo" name="tipo"><option value="">Todos</option><option value="piso">Piso o apartamento</option><option value="atico">Ático</option><option value="duplex">Dúplex</option><option value="casa">Casa o chalet</option><option value="rustica">Casa rústica</option><option value="estudio">Estudio o loft</option><option value="oficina">Oficina</option><option value="local">Local o nave</option><option value="garaje">Garaje</option><option value="trastero">Trastero</option><option value="terreno">Terreno</option><option value="edificio">Edificio</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-precio">Precio máximo</label>
+                                <select id="alerta-precio" name="precio"><option value="">Sin límite</option><option value="200000">Hasta 200.000 €</option><option value="400000">Hasta 400.000 €</option><option value="700000">Hasta 700.000 €</option><option value="1000000">Hasta 1.000.000 €</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-dormitorios">Dormitorios</label>
+                                <select id="alerta-dormitorios" name="dormitorios"><option value="">Indiferente</option><option value="1">1 o más</option><option value="2">2 o más</option><option value="3">3 o más</option><option value="4">4 o más</option><option value="5">5 o más</option></select>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-nombre">Nombre y apellidos *</label>
+                                <input id="alerta-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required aria-describedby="alerta-error-nombre">
+                                <p class="field__error" id="alerta-error-nombre" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="alerta-email">Correo electrónico *</label>
+                                <input id="alerta-email" name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="alerta-error-email">
+                                <p class="field__error" id="alerta-error-email" aria-live="polite"></p>
+                            </div>
+                            <div class="field field--full">
+                                <label for="alerta-telefono">Teléfono</label>
+                                <input id="alerta-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" aria-describedby="alerta-error-telefono">
+                                <p class="field__error" id="alerta-error-telefono" aria-live="polite"></p>
+                            </div>
+                            <div class="field field--full">
+                                <label for="alerta-comentarios">¿Qué más necesita?</label>
+                                <textarea id="alerta-comentarios" name="comentarios" maxlength="1000" placeholder="Superficie, planta, terraza, garaje, plazos…"></textarea>
+                            </div>
+                            <div class="field field--hp" aria-hidden="true">
+                                <label for="alerta-web">No rellene este campo</label>
+                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="field field--full">
+                                <label class="checkbox" for="alerta-privacidad">
+                                    <input id="alerta-privacidad" name="privacidad" type="checkbox" required aria-describedby="alerta-error-privacidad">
+                                    <span>He leído y acepto la <a href="es-privacidad.html">política de privacidad</a>. *</span>
+                                </label>
+                                <p class="field__error" id="alerta-error-privacidad" aria-live="polite"></p>
+                            </div>
+                        </div>
+                        <p class="form-legal"><strong>Información básica sobre protección de datos.</strong> Responsable: Twins Real Estate. Finalidad: atender su consulta y, en su caso, remitirle la información solicitada. Legitimación: su consentimiento. Destinatarios: no se cederán datos a terceros, salvo obligación legal. Derechos: acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, tal como se detalla en la <a href="es-privacidad.html">política de privacidad</a>.</p>
+                        <div class="form-actions">
+                            <button class="btn btn--primary btn--block" type="submit">Crear alerta <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                        </div>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="section sell" aria-labelledby="vender-title" data-scroll="view">
             <div class="container split">
                 <div class="split__visual reveal tilt">
                     <div class="split__frame sell__frame">

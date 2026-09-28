@@ -117,7 +117,7 @@ SEARCH_VALUES = {
     "operacion": ["venta", "alquiler"],
     "tipo": ["piso", "atico", "duplex", "casa", "rustica", "estudio",   # viviendas
              "oficina", "local", "garaje", "trastero", "terreno", "edificio"],
-    "zona": ["centro", "norte", "sur", "este", "oeste", "periferia"],
+    "zona": None,  # se calcula a partir de los inmuebles publicados (ver places())
     "precio": ["200000", "400000", "700000", "1000000"],
     "dormitorios": ["1", "2", "3", "4", "5"],
 }
@@ -133,6 +133,14 @@ PROPERTIES = [
     dict(ref="TRE-008", op="alquiler", type="casa", zone="norte", price=2900, beds=4, baths=3, area=280, icon="home"),
     dict(ref="TRE-009", op="venta", type="casa", zone="este", price=890000, beds=4, baths=4, area=390, icon="villa"),
 ]
+
+# Localidades reales, con su nombre oficial (igual en los tres idiomas). Para publicar un
+# inmueble en una localidad nueva, añádala aquí y úsela en su campo «zone», por ejemplo:
+#     "igualada": "Igualada",
+#     "montbui": "Santa Margarida de Montbui",
+# El filtro «Localidad» solo muestra las localidades que tienen algún inmueble publicado.
+# Los nombres de las zonas de ejemplo están traducidos en «places» de _textos_*.py.
+TOWNS = {}
 
 SERVICES = [("compraventa", "key"), ("alquiler", "home"), ("gestion-alquileres", "clipboard"),
             ("inversion", "chart"), ("valoracion", "search"), ("asesoramiento-juridico", "shield")]
@@ -238,9 +246,34 @@ def count(n, forms):
 
 
 def options(values, labels, placeholder):
+    if len(values) != len(labels):
+        raise SystemExit(f"Opciones y textos no coinciden: {values} / {labels}")
     out = [f'<option value="">{placeholder}</option>']
-    out += [f'<option value="{v}">{label}</option>' for v, label in zip(values, labels)]
+    out += [f'<option value="{esc(v)}">{esc(label)}</option>' for v, label in zip(values, labels)]
     return "".join(out)
+
+
+def place_name(L, slug):
+    """Nombre de una localidad: traducido si es una zona de ejemplo, oficial si está en TOWNS."""
+    if slug in L["places"]:
+        return L["places"][slug]
+    if slug in TOWNS:
+        return TOWNS[slug]
+    raise SystemExit(f"Localidad «{slug}» sin nombre: añádala a TOWNS en _build.py")
+
+
+def places(L):
+    """Localidades con algún inmueble publicado, por orden alfabético."""
+    slugs = {p["zone"] for p in PROPERTIES}
+    return sorted(((s, place_name(L, s)) for s in slugs), key=lambda item: item[1].casefold())
+
+
+def field_options(L, name):
+    """Valores y textos de un desplegable del buscador."""
+    if name == "zona":
+        found = places(L)
+        return [s for s, _ in found], [label for _, label in found]
+    return SEARCH_VALUES[name], L["search"]["options"][name]
 
 
 # --------------------------------------------------------------------------
@@ -448,16 +481,19 @@ def write(ctx, title, description, active, body, extra_head="", noindex=False):
 # --------------------------------------------------------------------------
 # Componentes
 # --------------------------------------------------------------------------
-def search_fields(ctx, prefix):
+def search_fields(ctx, prefix, names=None, indent=20):
+    """Desplegables del buscador (todos o solo los indicados en «names»)."""
     S = ctx.L["search"]
+    pad = " " * indent
     out = []
-    for name, values in SEARCH_VALUES.items():
+    for name in names or SEARCH_VALUES:
         label, placeholder = S["fields"][name]
+        values, labels = field_options(ctx.L, name)
         out.append(f"""
-                    <div class="field">
-                        <label for="{prefix}-{name}">{label}</label>
-                        <select id="{prefix}-{name}" name="{name}">{options(values, S['options'][name], placeholder)}</select>
-                    </div>""")
+{pad}<div class="field">
+{pad}    <label for="{prefix}-{name}">{label}</label>
+{pad}    <select id="{prefix}-{name}" name="{name}">{options(values, labels, placeholder)}</select>
+{pad}</div>""")
     return "".join(out)
 
 
@@ -563,12 +599,12 @@ def section_header(eyebrow, title, title_id, lead=None):
                 </header>"""
 
 
-def sell_section(ctx):
+def sell_section(ctx, alt=True):
     """Invitación a los propietarios que quieren vender, con una casa 3D y su cartel."""
     T, ui = ctx.L["sell"], ctx.L["ui"]
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
     return f"""
-        <section class="section section--alt sell" aria-labelledby="vender-title" data-scroll="view">
+        <section class="section{' section--alt' if alt else ''} sell" aria-labelledby="vender-title" data-scroll="view">
             <div class="container split">
                 <div class="split__visual reveal tilt">
                     <div class="split__frame sell__frame">{object_3d("sale")}
@@ -587,6 +623,84 @@ def sell_section(ctx):
                         <a class="btn btn--primary" href="{ctx.page('contacto.html')}?asunto=venta#formulario">{T['btn']} {ARROW}</a>
                         <a class="btn btn--outline" href="mailto:{EMAIL}">{ui['cta_mail']}</a>
                     </div>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def alert_section(ctx):
+    """Alerta de búsqueda: el visitante indica la localidad y el inmueble que busca."""
+    L = ctx.L
+    T, C, ui = L["alert"], L["contacto"], L["ui"]
+    lab = C["labels"]
+    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
+    towns = "".join(f'<option value="{esc(name)}"></option>' for _, name in places(L) if _ in TOWNS)
+
+    def error(name):
+        return f'<p class="field__error" id="alerta-error-{name}" aria-live="polite"></p>'
+
+    return f"""
+        <section class="section section--alt" id="alerta" aria-labelledby="alerta-title">
+            <div class="container split alert">
+                <div class="reveal">
+                    <span class="eyebrow">{T['eyebrow']}</span>
+                    <h2 class="section-title" id="alerta-title">{T['title']}</h2>
+                    <div class="prose-block">
+                        <p>{T['text']}</p>
+                    </div>
+                    <ul class="check-list">{checks}
+                    </ul>
+                </div>
+
+                <div class="card form-card reveal">
+                    <h3 class="form-card__title">{T['form_title']}</h3>
+                    <p class="form-card__lead">{C['form_lead']}</p>
+                    <form class="lead-form" id="formulario-alerta" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                        <div class="form-grid">
+                            <div class="field field--full">
+                                <label for="alerta-localidad">{T['localidad']}</label>
+                                <input id="alerta-localidad" name="localidad" type="text" list="alerta-localidades" autocomplete="address-level2" maxlength="80" required placeholder="{esc(T['localidad_placeholder'])}" aria-describedby="alerta-error-localidad">
+                                <datalist id="alerta-localidades">{towns}</datalist>
+                                {error('localidad')}
+                            </div>{search_fields(ctx, 'alerta', ['operacion', 'tipo', 'precio', 'dormitorios'], indent=28)}
+                            <div class="field">
+                                <label for="alerta-nombre">{lab['nombre']}</label>
+                                <input id="alerta-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required aria-describedby="alerta-error-nombre">
+                                {error('nombre')}
+                            </div>
+                            <div class="field">
+                                <label for="alerta-email">{lab['email']}</label>
+                                <input id="alerta-email" name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="alerta-error-email">
+                                {error('email')}
+                            </div>
+                            <div class="field field--full">
+                                <label for="alerta-telefono">{lab['telefono']}</label>
+                                <input id="alerta-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" aria-describedby="alerta-error-telefono">
+                                {error('telefono')}
+                            </div>
+                            <div class="field field--full">
+                                <label for="alerta-comentarios">{T['comentarios']}</label>
+                                <textarea id="alerta-comentarios" name="comentarios" maxlength="1000" placeholder="{esc(T['comentarios_placeholder'])}"></textarea>
+                            </div>
+                            <div class="field field--hp" aria-hidden="true">
+                                <label for="alerta-web">{C['honeypot']}</label>
+                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="field field--full">
+                                <label class="checkbox" for="alerta-privacidad">
+                                    <input id="alerta-privacidad" name="privacidad" type="checkbox" required aria-describedby="alerta-error-privacidad">
+                                    <span>{resolve(ctx, C['privacy_html'])}</span>
+                                </label>
+                                {error('privacidad')}
+                            </div>
+                        </div>
+                        <p class="form-legal">{resolve(ctx, C['legal_html'])}</p>
+                        <div class="form-actions">
+                            <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
+                        </div>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
                 </div>
             </div>
         </section>
@@ -770,6 +884,7 @@ def build_properties(L):
                     <form class="search__form" id="filtro-inmuebles" action="{ctx.page('propiedades.html')}" method="get" role="search">{search_fields(ctx, 'filtro')}
                         <button class="btn btn--outline" type="reset">{S['reset']}</button>
                     </form>
+                    <p class="filters__hint">{L['alert']['filter_hint']} <a class="link-arrow" href="#alerta">{L['alert']['filter_link']} {icon('arrow-right')}</a></p>
                 </div>
             </div>
         </section>
@@ -786,11 +901,11 @@ def build_properties(L):
                 <div class="empty-state" id="sin-resultados" hidden>
                     <h2>{T['empty_title']}</h2>
                     <p>{T['empty_text']}</p>
-                    <a class="btn btn--primary" href="{ctx.page('contacto.html')}#formulario">{T['empty_btn']} {ARROW}</a>
+                    <a class="btn btn--primary" href="#alerta">{T['empty_btn']} {ARROW}</a>
                 </div>
             </div>
         </section>
-{sell_section(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+{alert_section(ctx)}{sell_section(ctx, alt=False)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "propiedades.html", body)
 
 
@@ -993,7 +1108,7 @@ def build_contact(L):
                 <div class="card form-card reveal" id="formulario">
                     <h2 class="form-card__title">{T['form_title']}</h2>
                     <p class="form-card__lead">{T['form_lead']}</p>
-                    <form id="formulario-contacto" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate>
+                    <form class="lead-form" id="formulario-contacto" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate>
                         <div class="form-grid">
                             <div class="field">
                                 <label for="contacto-nombre">{lab['nombre']}</label>

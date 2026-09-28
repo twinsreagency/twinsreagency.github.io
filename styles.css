@@ -1563,6 +1563,32 @@ h4 {
     height: 440px;
 }
 
+/* Alerta de búsqueda (página de inmuebles) */
+#alerta {
+    scroll-margin-top: var(--header-h);
+}
+
+.alert {
+    align-items: start;
+}
+
+@media (min-width: 861px) {
+    .alert > :first-child {
+        position: sticky;
+        top: calc(var(--header-h) + 2rem);
+    }
+}
+
+.filters__hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.75rem;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--text-2);
+}
+
 .sell__actions {
     display: flex;
     flex-wrap: wrap;
