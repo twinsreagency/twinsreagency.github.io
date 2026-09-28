@@ -265,7 +265,6 @@ h4 {
     stroke-linejoin: round;
 }
 
-.text-gradient,
 .hero3d__title em,
 .page-hero__title,
 .cta__title {
@@ -398,10 +397,6 @@ h4 {
     background: var(--bg-2);
 }
 
-.section--white {
-    background: var(--bg);
-}
-
 .section-header {
     max-width: 760px;
     margin: 0 auto 4rem;
@@ -496,8 +491,7 @@ h4 {
     gap: 0.45rem;
 }
 
-.field label,
-.field__label {
+.field label {
     font-size: 0.78rem;
     font-weight: 500;
     letter-spacing: 0.04em;

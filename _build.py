@@ -20,6 +20,7 @@ import html
 import json
 import os
 import sys
+from urllib.parse import urlparse
 
 sys.dont_write_bytecode = True  # no crear la carpeta __pycache__ en el sitio
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +38,12 @@ SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 # o "https://usuario.github.io/repositorio").
 # Mientras esté vacío no se generan las etiquetas canonical ni hreflang, que
 # requieren direcciones absolutas.
-SITE_URL = ""
+SITE_URL = "https://twinsreagency.github.io"
+
+# Ruta pública de la raíz del sitio («/» o «/repositorio/»). La usa la página 404,
+# que el servidor muestra en cualquier dirección (p. ej. /carpeta/antigua.html),
+# donde las rutas relativas no encontrarían styles.css, main.js ni los enlaces.
+SITE_PATH = urlparse(SITE_URL).path.rstrip("/") + "/"
 
 LANGS = [_textos_es.C, _textos_ca.C, _textos_en.C]
 
@@ -178,16 +184,25 @@ class Ctx:
         self.L = lang
         self.current = page
         self.is_404 = page == "404.html"
+        self.root = SITE_PATH if self.is_404 else ""   # prefijo de enlaces y recursos
 
     def page(self, name):
-        return filename(self.L, name)
+        return self.root + filename(self.L, name)
+
+    def asset(self, name):
+        return self.root + name
 
     def translation(self, other):
-        return filename(other, "index.html" if self.is_404 else self.current)
+        return self.root + filename(other, "index.html" if self.is_404 else self.current)
 
     @property
     def file(self):
         return filename(self.L, self.current)
+
+
+def url(file):
+    """Dirección absoluta de un archivo del sitio; la portada se publica como «/»."""
+    return f"{SITE_URL}/" + ("" if file == "index.html" else file)
 
 
 def resolve(ctx, text):
@@ -202,6 +217,13 @@ def resolve(ctx, text):
 # --------------------------------------------------------------------------
 def esc(text):
     return html.escape(text, quote=True)
+
+
+def json_ld(data):
+    """Bloque de datos estructurados. Se escapa «<» para que ningún texto pueda cerrar
+    la etiqueta <script> ni abrir otra (p. ej. un «</script>» en un título)."""
+    text = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    return f'\n    <script type="application/ld+json">{text}</script>'
 
 
 def price(L, value):
@@ -228,11 +250,13 @@ def head(ctx, title, description, noindex=False, extra=""):
     full_title = title if title.startswith("Twins") else f"{title} | Twins Real Estate"
     alternates = ""
     if SITE_URL and not ctx.is_404:
-        links = [f'\n    <link rel="canonical" href="{SITE_URL}/{ctx.file}">']
+        links = [f'\n    <meta property="og:url" content="{url(ctx.file)}">',
+                 f'\n    <link rel="canonical" href="{url(ctx.file)}">']
         for other in LANGS:
-            links.append(f'\n    <link rel="alternate" hreflang="{other["lang"]}" href="{SITE_URL}/{ctx.translation(other)}">')
-        links.append(f'\n    <link rel="alternate" hreflang="x-default" href="{SITE_URL}/{ctx.translation(LANGS[0])}">')
+            links.append(f'\n    <link rel="alternate" hreflang="{other["lang"]}" href="{url(ctx.translation(other))}">')
+        links.append(f'\n    <link rel="alternate" hreflang="x-default" href="{url(ctx.translation(LANGS[0]))}">')
         alternates = "".join(links)
+    og_type = "article" if ctx.current.startswith("blog/") else "website"
     robots = "noindex" if noindex else "index, follow"
     return f"""<!DOCTYPE html>
 <html lang="{L['lang']}">
@@ -246,26 +270,27 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta name="theme-color" content="#f2ede4">
     <meta name="color-scheme" content="light dark">
     <meta name="format-detection" content="telephone=no">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{og_type}">
     <meta property="og:locale" content="{L['locale']}">
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="{esc(full_title)}">
-    <meta property="og:description" content="{esc(description)}">{alternates}
-    <link rel="icon" href="favicon.ico" sizes="any">
-    <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta property="og:description" content="{esc(description)}">
+    <meta name="twitter:card" content="summary">{alternates}
+    <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
+    <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
-    <script src="{versioned('theme.js')}"></script>
-    <link rel="stylesheet" href="{versioned('styles.css')}">
-    <script src="{versioned('main.js')}" defer></script>{extra}
+    <script src="{ctx.asset(versioned('theme.js'))}"></script>
+    <link rel="stylesheet" href="{ctx.asset(versioned('styles.css'))}">
+    <script src="{ctx.asset(versioned('main.js'))}" defer></script>{extra}
 </head>"""
 
 
 def brand(ctx):
     return f"""<a class="brand" href="{ctx.page('index.html')}" aria-label="{esc(ctx.L['ui']['home_aria'])}">
-                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="{ctx.asset('logo-icon.png')}" alt="" width="26" height="34"><img class="logo--on-light" src="{ctx.asset('logo-icon-dark.png')}" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>"""
 
@@ -370,6 +395,16 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
     for label, target in crumbs[:-1]:
         trail.append(f'<li><a href="{ctx.page(target)}">{label}</a></li>')
     trail.append(f'<li aria-current="page">{crumbs[-1][0]}</li>')
+    ld = ""
+    if SITE_URL:
+        items = [(ui["home"], ctx.page("index.html"))] + [(label, ctx.page(t)) for label, t in crumbs[:-1]]
+        items.append((crumbs[-1][0], ctx.file))
+        ld = json_ld({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{"@type": "ListItem", "position": i, "name": name, "item": url(file)}
+                                for i, (name, file) in enumerate(items, start=1)],
+        }).replace("\n    ", "\n            ")
     text_html = f'\n            <p class="page-hero__text">{text}</p>' if text else ""
     return f"""
     <section class="page-hero" data-scroll="view">
@@ -377,7 +412,7 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
         <div class="container">{object_3d(obj)}
             <nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
                 <ol>{''.join(trail)}</ol>
-            </nav>{extra}
+            </nav>{ld}{extra}
             <h1 class="page-hero__title">{title}</h1>{text_html}
         </div>
     </section>
@@ -468,10 +503,19 @@ def faces(names, extra=None):
     return "".join(f'<span class="face face--{n}">{extra.get(n, "")}</span>' for n in names)
 
 
+WALLS = ["front", "back", "left", "right"]
+
+
+def house_box():
+    """Casa con ventana y tejado a dos aguas (usada en la portada y en «Inmuebles»)."""
+    window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
+    return (f'<span class="box box--house">{faces(WALLS, {"front": window})}'
+            '<span class="gable gable--front"></span><span class="gable gable--back"></span>'
+            '<span class="slope slope--left"></span><span class="slope slope--right"></span></span>')
+
+
 def model_3d():
     """Modelo 3D decorativo del logotipo (torre y casa) construido con CSS."""
-    window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
-    walls = ["front", "back", "left", "right"]
     return f"""
                 <div class="scene" aria-hidden="true">
                     <div class="scene__float">
@@ -479,8 +523,8 @@ def model_3d():
                             <span class="orbit orbit--1"></span>
                             <span class="orbit orbit--2"></span>
                             <span class="floor"></span>
-                            <span class="box box--tower">{faces(walls + ["top"])}</span>
-                            <span class="box box--house">{faces(walls, {"front": window})}<span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span>
+                            <span class="box box--tower">{faces(WALLS + ["top"])}</span>
+                            {house_box()}
                         </div>
                     </div>
                 </div>"""
@@ -488,18 +532,14 @@ def model_3d():
 
 def object_3d(kind):
     """Objeto 3D decorativo para la cabecera de las páginas interiores."""
-    walls = ["front", "back", "left", "right"]
     if kind == "house":
-        window = '<span class="window"><i></i><i></i><i></i><i></i></span>'
-        inner = (f'<span class="box box--house">{faces(walls, {"front": window})}'
-                 '<span class="gable gable--front"></span><span class="gable gable--back"></span>'
-                 '<span class="slope slope--left"></span><span class="slope slope--right"></span></span>')
+        inner = house_box()
     elif kind == "cube":
-        inner = (f'<span class="box box--cube">{faces(walls + ["top", "bottom"])}</span>'
-                 f'<span class="box box--core">{faces(walls + ["top", "bottom"])}</span>')
+        inner = (f'<span class="box box--cube">{faces(WALLS + ["top", "bottom"])}</span>'
+                 f'<span class="box box--core">{faces(WALLS + ["top", "bottom"])}</span>')
     elif kind == "twins":
-        inner = (f'<span class="box box--tower">{faces(walls + ["top"])}</span>'
-                 f'<span class="box box--tower-b">{faces(walls + ["top"])}</span>')
+        inner = (f'<span class="box box--tower">{faces(WALLS + ["top"])}</span>'
+                 f'<span class="box box--tower-b">{faces(WALLS + ["top"])}</span>')
     elif kind == "pages":
         inner = '<span class="sheet sheet--1"></span><span class="sheet sheet--2"></span><span class="sheet sheet--3"></span>'
     else:  # rings
@@ -580,16 +620,17 @@ def build_index(L):
         f'{ui["more_info"]} {icon("arrow-right")}<span class="visually-hidden"> {ui["about"]} {L["services"][sid][0].lower()}</span></a></p>'
     ) for sid, ic in SERVICES[:4])
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
-    ld = json.dumps({
+    ld = json_ld({
         "@context": "https://schema.org",
         "@type": "RealEstateAgent",
         "name": "Twins Real Estate",
         "slogan": T["slogan"],
         "email": EMAIL,
         "sameAs": [INSTAGRAM_URL],
+        **({"url": url(ctx.file), "logo": url("logo-icon.png")} if SITE_URL else {}),
         "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
         "knowsLanguage": [lang["lang"] for lang in LANGS],
-    }, ensure_ascii=False)
+    })
 
     callouts = "".join(
         f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
@@ -643,7 +684,7 @@ def build_index(L):
             <div class="statement__sticky">
                 <div class="container">
                     <p class="eyebrow">{T['about_eyebrow']}</p>
-                    <h2 class="visually-hidden" id="nosotros-title">{T['about_title']}</h2>
+                    <h2 class="visually-hidden" id="nosotros-title">{T['about_eyebrow']}</h2>
                     <p class="statement__text" data-words>{T['about_paras'][0]}</p>
                 </div>
             </div>
@@ -653,7 +694,7 @@ def build_index(L):
             <div class="container split">
                 <div class="split__visual reveal tilt">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
                         <p class="split__quote">{T['quote']}</p>
                     </div>
                 </div>
@@ -680,7 +721,7 @@ def build_index(L):
         </section>
 {commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "index.html", body,
-          extra_head=f'\n    <script type="application/ld+json">{ld}</script>')
+          extra_head=ld)
 
 
 def build_properties(L):
@@ -729,7 +770,7 @@ def build_about(L):
             <div class="container split">
                 <div class="split__visual reveal">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200">
+                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
                         <p class="split__quote">{L['index']['slogan']}</p>
                     </div>
                 </div>
@@ -838,16 +879,17 @@ def build_blog(L):
         post = L["posts"][slug]
         related = [p for i, p in enumerate(POSTS) if i != index][:3]
         related_html = "".join(post_card(ctx, *p) for p in related)
-        ld = json.dumps({
+        ld = json_ld({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
             "headline": post["title"],
             "description": post["excerpt"],
             "datePublished": date,
             "inLanguage": L["lang"],
+            **({"url": url(ctx.file), "mainEntityOfPage": url(ctx.file)} if SITE_URL else {}),
             "author": {"@type": "Organization", "name": "Twins Real Estate"},
             "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
-        }, ensure_ascii=False)
+        })
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
         body = page_hero(ctx, post["title"], "", [(ui["nav"]["blog.html"], "blog.html"), (post["title"], "")], meta, obj="pages") + f"""
         <article class="article">
@@ -869,7 +911,7 @@ def build_blog(L):
             </div>
         </section>"""
         write(ctx, post["title"], post["excerpt"], "blog.html", body,
-              extra_head=f'\n    <script type="application/ld+json">{ld}</script>')
+              extra_head=ld)
 
 
 def build_contact(L):
@@ -994,6 +1036,8 @@ def build_legal(L):
     for filename, page in L["legal"].items():
         ctx = Ctx(L, filename)
         content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)))
+        # Las tablas con desplazamiento horizontal deben poder desplazarse con el teclado.
+        content = content.replace('<div class="table-scroll">', '<div class="table-scroll" tabindex="0">')
         body = page_hero(ctx, page["title"], ui["updated"].format(ui["updated_date"]), [(page["title"], filename)]) + f"""
         <article class="article">
             <div class="container">
@@ -1020,6 +1064,65 @@ def build_404(L):
             </div>
         </section>"""
     write(ctx, T["title"], T["description"], "", body, noindex=True)
+
+
+def build_legacy_redirects(L):
+    """Redirige las direcciones antiguas sin prefijo de idioma (p. ej. «propiedades.html»),
+    publicadas por una versión anterior del sitio, a su página actual en castellano."""
+    pages = [(p, L["ui"]["nav"][p]) for p in PAGES if p != "index.html"]
+    pages += [(p, page["title"]) for p, page in L["legal"].items()]
+    pages += [(f"blog/{slug}.html", L["posts"][slug]["title"]) for slug, *_ in POSTS]
+    for page, title in pages:
+        old = page[len("blog/"):] if page.startswith("blog/") else page
+        target = filename(L, page)
+        canonical = url(target) if SITE_URL else target
+        doc = f"""<!DOCTYPE html>
+<html lang="{L['lang']}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{esc(title)} | Twins Real Estate</title>
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="{canonical}">
+    <meta http-equiv="refresh" content="0; url={target}">
+</head>
+<body>
+    <p><a href="{target}">{esc(title)}</a></p>
+</body>
+</html>
+"""
+        with open(os.path.join(SITE_DIR, old), "w", encoding="utf-8") as fh:
+            fh.write(doc)
+
+
+def logical_pages(L):
+    """Todas las páginas indexables de un idioma, con su nombre lógico."""
+    return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS])
+
+
+def build_sitemap():
+    """sitemap.xml con las versiones de cada página en los tres idiomas, y robots.txt."""
+    robots = "User-agent: *\nAllow: /\nDisallow: /404.html\n"
+    if SITE_URL:
+        dates = {f"blog/{slug}.html": date for slug, _, date, _ in POSTS}
+        entries = []
+        for L in LANGS:
+            for page in logical_pages(L):
+                alternates = "".join(
+                    f'\n    <xhtml:link rel="alternate" hreflang="{o["lang"]}" href="{url(filename(o, page))}"/>'
+                    for o in LANGS)
+                alternates += (f'\n    <xhtml:link rel="alternate" hreflang="x-default" '
+                               f'href="{url(filename(LANGS[0], page))}"/>')
+                lastmod = f"\n    <lastmod>{dates[page]}</lastmod>" if page in dates else ""
+                entries.append(f"  <url>\n    <loc>{url(filename(L, page))}</loc>{lastmod}{alternates}\n  </url>")
+        sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' + "\n".join(entries) + "\n</urlset>\n")
+        with open(os.path.join(SITE_DIR, "sitemap.xml"), "w", encoding="utf-8") as fh:
+            fh.write(sitemap)
+        robots += f"\nSitemap: {url('sitemap.xml')}\n"
+    with open(os.path.join(SITE_DIR, "robots.txt"), "w", encoding="utf-8") as fh:
+        fh.write(robots)
 
 
 def check_translations():
@@ -1052,6 +1155,8 @@ def main():
         build_contact(lang)
         build_legal(lang)
     build_404(LANGS[0])
+    build_legacy_redirects(LANGS[0])
+    build_sitemap()
     print("Sitio generado en", SITE_DIR)
 
 
