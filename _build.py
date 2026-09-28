@@ -20,6 +20,7 @@ import html
 import json
 import os
 import sys
+from urllib.parse import urlparse
 
 sys.dont_write_bytecode = True  # no crear la carpeta __pycache__ en el sitio
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -38,6 +39,11 @@ SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Mientras esté vacío no se generan las etiquetas canonical ni hreflang, que
 # requieren direcciones absolutas.
 SITE_URL = ""
+
+# Ruta pública de la raíz del sitio («/» o «/repositorio/»). La usa la página 404,
+# que el servidor muestra en cualquier dirección (p. ej. /carpeta/antigua.html),
+# donde las rutas relativas no encontrarían styles.css, main.js ni los enlaces.
+SITE_PATH = urlparse(SITE_URL).path.rstrip("/") + "/"
 
 LANGS = [_textos_es.C, _textos_ca.C, _textos_en.C]
 
@@ -178,12 +184,16 @@ class Ctx:
         self.L = lang
         self.current = page
         self.is_404 = page == "404.html"
+        self.root = SITE_PATH if self.is_404 else ""   # prefijo de enlaces y recursos
 
     def page(self, name):
-        return filename(self.L, name)
+        return self.root + filename(self.L, name)
+
+    def asset(self, name):
+        return self.root + name
 
     def translation(self, other):
-        return filename(other, "index.html" if self.is_404 else self.current)
+        return self.root + filename(other, "index.html" if self.is_404 else self.current)
 
     @property
     def file(self):
@@ -251,21 +261,21 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="{esc(full_title)}">
     <meta property="og:description" content="{esc(description)}">{alternates}
-    <link rel="icon" href="favicon.ico" sizes="any">
-    <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
+    <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
-    <script src="{versioned('theme.js')}"></script>
-    <link rel="stylesheet" href="{versioned('styles.css')}">
-    <script src="{versioned('main.js')}" defer></script>{extra}
+    <script src="{ctx.asset(versioned('theme.js'))}"></script>
+    <link rel="stylesheet" href="{ctx.asset(versioned('styles.css'))}">
+    <script src="{ctx.asset(versioned('main.js'))}" defer></script>{extra}
 </head>"""
 
 
 def brand(ctx):
     return f"""<a class="brand" href="{ctx.page('index.html')}" aria-label="{esc(ctx.L['ui']['home_aria'])}">
-                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
+                <img class="logo--on-dark" src="{ctx.asset('logo-icon.png')}" alt="" width="26" height="34"><img class="logo--on-light" src="{ctx.asset('logo-icon-dark.png')}" alt="" width="26" height="34">
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>"""
 
@@ -1022,6 +1032,35 @@ def build_404(L):
     write(ctx, T["title"], T["description"], "", body, noindex=True)
 
 
+def build_legacy_redirects(L):
+    """Redirige las direcciones antiguas sin prefijo de idioma (p. ej. «propiedades.html»),
+    publicadas por una versión anterior del sitio, a su página actual en castellano."""
+    pages = [(p, L["ui"]["nav"][p]) for p in PAGES if p != "index.html"]
+    pages += [(p, page["title"]) for p, page in L["legal"].items()]
+    pages += [(f"blog/{slug}.html", L["posts"][slug]["title"]) for slug, *_ in POSTS]
+    for page, title in pages:
+        old = page[len("blog/"):] if page.startswith("blog/") else page
+        target = filename(L, page)
+        canonical = f"{SITE_URL}/{target}" if SITE_URL else target
+        doc = f"""<!DOCTYPE html>
+<html lang="{L['lang']}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{esc(title)} | Twins Real Estate</title>
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="{canonical}">
+    <meta http-equiv="refresh" content="0; url={target}">
+</head>
+<body>
+    <p><a href="{target}">{esc(title)}</a></p>
+</body>
+</html>
+"""
+        with open(os.path.join(SITE_DIR, old), "w", encoding="utf-8") as fh:
+            fh.write(doc)
+
+
 def check_translations():
     """Comprueba que todos los idiomas definen exactamente las mismas claves."""
     def keys(value, path=""):
@@ -1052,6 +1091,7 @@ def main():
         build_contact(lang)
         build_legal(lang)
     build_404(LANGS[0])
+    build_legacy_redirects(LANGS[0])
     print("Sitio generado en", SITE_DIR)
 
 
