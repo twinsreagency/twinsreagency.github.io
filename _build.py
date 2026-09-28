@@ -38,7 +38,7 @@ SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 # o "https://usuario.github.io/repositorio").
 # Mientras esté vacío no se generan las etiquetas canonical ni hreflang, que
 # requieren direcciones absolutas.
-SITE_URL = ""
+SITE_URL = "https://twinsreagency.github.io"
 
 # Ruta pública de la raíz del sitio («/» o «/repositorio/»). La usa la página 404,
 # que el servidor muestra en cualquier dirección (p. ej. /carpeta/antigua.html),
@@ -200,6 +200,11 @@ class Ctx:
         return filename(self.L, self.current)
 
 
+def url(file):
+    """Dirección absoluta de un archivo del sitio; la portada se publica como «/»."""
+    return f"{SITE_URL}/" + ("" if file == "index.html" else file)
+
+
 def resolve(ctx, text):
     """Sustituye las marcas de los textos por enlaces y datos reales."""
     return (text.replace("%%PRIVACY%%", ctx.page("privacidad.html"))
@@ -245,11 +250,13 @@ def head(ctx, title, description, noindex=False, extra=""):
     full_title = title if title.startswith("Twins") else f"{title} | Twins Real Estate"
     alternates = ""
     if SITE_URL and not ctx.is_404:
-        links = [f'\n    <link rel="canonical" href="{SITE_URL}/{ctx.file}">']
+        links = [f'\n    <meta property="og:url" content="{url(ctx.file)}">',
+                 f'\n    <link rel="canonical" href="{url(ctx.file)}">']
         for other in LANGS:
-            links.append(f'\n    <link rel="alternate" hreflang="{other["lang"]}" href="{SITE_URL}/{ctx.translation(other)}">')
-        links.append(f'\n    <link rel="alternate" hreflang="x-default" href="{SITE_URL}/{ctx.translation(LANGS[0])}">')
+            links.append(f'\n    <link rel="alternate" hreflang="{other["lang"]}" href="{url(ctx.translation(other))}">')
+        links.append(f'\n    <link rel="alternate" hreflang="x-default" href="{url(ctx.translation(LANGS[0]))}">')
         alternates = "".join(links)
+    og_type = "article" if ctx.current.startswith("blog/") else "website"
     robots = "noindex" if noindex else "index, follow"
     return f"""<!DOCTYPE html>
 <html lang="{L['lang']}">
@@ -263,11 +270,12 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta name="theme-color" content="#f2ede4">
     <meta name="color-scheme" content="light dark">
     <meta name="format-detection" content="telephone=no">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{og_type}">
     <meta property="og:locale" content="{L['locale']}">
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="{esc(full_title)}">
-    <meta property="og:description" content="{esc(description)}">{alternates}
+    <meta property="og:description" content="{esc(description)}">
+    <meta name="twitter:card" content="summary">{alternates}
     <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
     <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
@@ -387,6 +395,16 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
     for label, target in crumbs[:-1]:
         trail.append(f'<li><a href="{ctx.page(target)}">{label}</a></li>')
     trail.append(f'<li aria-current="page">{crumbs[-1][0]}</li>')
+    ld = ""
+    if SITE_URL:
+        items = [(ui["home"], ctx.page("index.html"))] + [(label, ctx.page(t)) for label, t in crumbs[:-1]]
+        items.append((crumbs[-1][0], ctx.file))
+        ld = json_ld({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{"@type": "ListItem", "position": i, "name": name, "item": url(file)}
+                                for i, (name, file) in enumerate(items, start=1)],
+        }).replace("\n    ", "\n            ")
     text_html = f'\n            <p class="page-hero__text">{text}</p>' if text else ""
     return f"""
     <section class="page-hero" data-scroll="view">
@@ -394,7 +412,7 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
         <div class="container">{object_3d(obj)}
             <nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
                 <ol>{''.join(trail)}</ol>
-            </nav>{extra}
+            </nav>{ld}{extra}
             <h1 class="page-hero__title">{title}</h1>{text_html}
         </div>
     </section>
@@ -604,6 +622,7 @@ def build_index(L):
         "slogan": T["slogan"],
         "email": EMAIL,
         "sameAs": [INSTAGRAM_URL],
+        **({"url": url(ctx.file), "logo": url("logo-icon.png")} if SITE_URL else {}),
         "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
         "knowsLanguage": [lang["lang"] for lang in LANGS],
     })
@@ -862,6 +881,7 @@ def build_blog(L):
             "description": post["excerpt"],
             "datePublished": date,
             "inLanguage": L["lang"],
+            **({"url": url(ctx.file), "mainEntityOfPage": url(ctx.file)} if SITE_URL else {}),
             "author": {"@type": "Organization", "name": "Twins Real Estate"},
             "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
         })
@@ -1050,7 +1070,7 @@ def build_legacy_redirects(L):
     for page, title in pages:
         old = page[len("blog/"):] if page.startswith("blog/") else page
         target = filename(L, page)
-        canonical = f"{SITE_URL}/{target}" if SITE_URL else target
+        canonical = url(target) if SITE_URL else target
         doc = f"""<!DOCTYPE html>
 <html lang="{L['lang']}">
 <head>
@@ -1068,6 +1088,36 @@ def build_legacy_redirects(L):
 """
         with open(os.path.join(SITE_DIR, old), "w", encoding="utf-8") as fh:
             fh.write(doc)
+
+
+def logical_pages(L):
+    """Todas las páginas indexables de un idioma, con su nombre lógico."""
+    return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS])
+
+
+def build_sitemap():
+    """sitemap.xml con las versiones de cada página en los tres idiomas, y robots.txt."""
+    robots = "User-agent: *\nAllow: /\nDisallow: /404.html\n"
+    if SITE_URL:
+        dates = {f"blog/{slug}.html": date for slug, _, date, _ in POSTS}
+        entries = []
+        for L in LANGS:
+            for page in logical_pages(L):
+                alternates = "".join(
+                    f'\n    <xhtml:link rel="alternate" hreflang="{o["lang"]}" href="{url(filename(o, page))}"/>'
+                    for o in LANGS)
+                alternates += (f'\n    <xhtml:link rel="alternate" hreflang="x-default" '
+                               f'href="{url(filename(LANGS[0], page))}"/>')
+                lastmod = f"\n    <lastmod>{dates[page]}</lastmod>" if page in dates else ""
+                entries.append(f"  <url>\n    <loc>{url(filename(L, page))}</loc>{lastmod}{alternates}\n  </url>")
+        sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+                   'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' + "\n".join(entries) + "\n</urlset>\n")
+        with open(os.path.join(SITE_DIR, "sitemap.xml"), "w", encoding="utf-8") as fh:
+            fh.write(sitemap)
+        robots += f"\nSitemap: {url('sitemap.xml')}\n"
+    with open(os.path.join(SITE_DIR, "robots.txt"), "w", encoding="utf-8") as fh:
+        fh.write(robots)
 
 
 def check_translations():
@@ -1101,6 +1151,7 @@ def main():
         build_legal(lang)
     build_404(LANGS[0])
     build_legacy_redirects(LANGS[0])
+    build_sitemap()
     print("Sitio generado en", SITE_DIR)
 
 

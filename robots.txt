@@ -2,5 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /404.html
 
-# Cuando el dominio esté activo, añada la ubicación del mapa del sitio:
-# Sitemap: https://SU-DOMINIO/sitemap.xml
+Sitemap: https://twinsreagency.github.io/sitemap.xml
