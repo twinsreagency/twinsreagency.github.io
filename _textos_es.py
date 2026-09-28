@@ -75,7 +75,7 @@ C = {
             "dormitorios": ("Dormitorios", "Indiferente"),
         },
         "options": {
-            "operacion": ["Venta", "Alquiler"],
+            "operacion": ["Compra", "Alquiler"],
             "tipo": ["Piso o apartamento", "Ático", "Casa o chalet", "Terreno", "Oficina", "Local comercial"],
             "zona": ["Centro", "Zona Norte", "Zona Sur", "Zona Este", "Zona Oeste", "Periferia y entorno rural"],
             "precio": ["Hasta 200.000 €", "Hasta 400.000 €", "Hasta 700.000 €", "Hasta 1.000.000 €"],

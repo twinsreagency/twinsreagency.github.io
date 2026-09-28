@@ -75,7 +75,7 @@ C = {
             "dormitorios": ("Dormitoris", "Indiferent"),
         },
         "options": {
-            "operacion": ["Venda", "Lloguer"],
+            "operacion": ["Compra", "Lloguer"],
             "tipo": ["Pis o apartament", "Àtic", "Casa o xalet", "Terreny", "Oficina", "Local comercial"],
             "zona": ["Centre", "Zona Nord", "Zona Sud", "Zona Est", "Zona Oest", "Perifèria i entorn rural"],
             "precio": ["Fins a 200.000 €", "Fins a 400.000 €", "Fins a 700.000 €", "Fins a 1.000.000 €"],
