@@ -540,6 +540,9 @@ def object_3d(kind):
     elif kind == "twins":
         inner = (f'<span class="box box--tower">{faces(WALLS + ["top"])}</span>'
                  f'<span class="box box--tower-b">{faces(WALLS + ["top"])}</span>')
+    elif kind == "sale":
+        inner = ('<span class="floor"></span>' + house_box() +
+                 f'<span class="sign"><span class="sign__post"></span><span class="sign__board">{icon("key")}</span></span>')
     elif kind == "pages":
         inner = '<span class="sheet sheet--1"></span><span class="sheet sheet--2"></span><span class="sheet sheet--3"></span>'
     else:  # rings
@@ -557,6 +560,36 @@ def section_header(eyebrow, title, title_id, lead=None):
                     <h2 class="section-title" id="{title_id}">{title}</h2>{lead_html}
                     <div class="divider"></div>
                 </header>"""
+
+
+def sell_section(ctx):
+    """Invitación a los propietarios que quieren vender, con una casa 3D y su cartel."""
+    T, ui = ctx.L["sell"], ctx.L["ui"]
+    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
+    return f"""
+        <section class="section section--alt sell" aria-labelledby="vender-title" data-scroll="view">
+            <div class="container split">
+                <div class="split__visual reveal tilt">
+                    <div class="split__frame sell__frame">{object_3d("sale")}
+                        <p class="split__quote">{T['badge']}</p>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <span class="eyebrow">{T['eyebrow']}</span>
+                    <h2 class="section-title" id="vender-title">{T['title']}</h2>
+                    <div class="prose-block">
+                        <p>{T['text']}</p>
+                    </div>
+                    <ul class="check-list">{checks}
+                    </ul>
+                    <div class="sell__actions">
+                        <a class="btn btn--primary" href="{ctx.page('contacto.html')}?asunto=venta#formulario">{T['btn']} {ARROW}</a>
+                        <a class="btn btn--outline" href="mailto:{EMAIL}">{ui['cta_mail']}</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+"""
 
 
 def commitments_strip(ctx):
@@ -719,7 +752,7 @@ def build_index(L):
                 </div>
             </div>
         </section>
-{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+{sell_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "index.html", body,
           extra_head=ld)
 
@@ -756,7 +789,7 @@ def build_properties(L):
                 </div>
             </div>
         </section>
-{cta(ctx, T['cta_title'], T['cta_text'])}"""
+{sell_section(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "propiedades.html", body)
 
 

@@ -142,6 +142,17 @@ C = {
     },
     "footer_services": ["Compravenda", "Lloguer d’habitatges", "Gestió de lloguers", "Inversió immobiliària", "Valoració d’immobles"],
 
+    "sell": {
+        "eyebrow": "Propietaris",
+        "title": "Teniu un immoble que voleu vendre?",
+        "text": "Si esteu pensant a vendre el vostre habitatge, local o terreny, poseu-vos en contacte amb nosaltres. Estudiarem el vostre immoble amb detall, us proposarem un preu de sortida realista i ens ocuparem de tot el procés fins a la signatura davant notari.",
+        "checks": ["Valoració professional i sense compromís",
+                   "Difusió acurada davant compradors qualificats",
+                   "Acompanyament en la negociació, les arres i l’escriptura"],
+        "btn": "Sol·liciteu una valoració",
+        "badge": "Us acompanyem des de la valoració fins a la signatura.",
+    },
+
     "index": {
         "title": "Twins Real Estate | Agència immobiliària",
         "description": "Agència immobiliària especialitzada en compravenda, lloguer i inversió. Assessorament personalitzat, informació verificada i acompanyament fins a la signatura davant notari.",

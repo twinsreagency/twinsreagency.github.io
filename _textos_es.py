@@ -142,6 +142,17 @@ C = {
     },
     "footer_services": ["Compraventa", "Alquiler de viviendas", "Gestión de alquileres", "Inversión inmobiliaria", "Valoración de inmuebles"],
 
+    "sell": {
+        "eyebrow": "Propietarios",
+        "title": "¿Tiene un inmueble que desea vender?",
+        "text": "Si está pensando en vender su vivienda, local o terreno, contacte con nosotros. Estudiaremos su inmueble con detalle, le propondremos un precio de salida realista y nos ocuparemos de todo el proceso hasta la firma ante notario.",
+        "checks": ["Valoración profesional y sin compromiso",
+                   "Difusión cuidada ante compradores cualificados",
+                   "Acompañamiento en la negociación, las arras y la escritura"],
+        "btn": "Solicitar una valoración",
+        "badge": "Le acompañamos desde la valoración hasta la firma.",
+    },
+
     "index": {
         "title": "Twins Real Estate | Agencia inmobiliaria",
         "description": "Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento personalizado, información verificada y acompañamiento hasta la firma ante notario.",

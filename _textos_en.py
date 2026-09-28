@@ -143,6 +143,17 @@ C = {
     },
     "footer_services": ["Sales and purchases", "Residential lettings", "Rental management", "Property investment", "Property valuation"],
 
+    "sell": {
+        "eyebrow": "Homeowners",
+        "title": "Do you have a property to sell?",
+        "text": "If you are thinking of selling your home, commercial premises or land, please get in touch. We will study your property in detail, propose a realistic asking price and take care of the entire process through to signing before a notary.",
+        "checks": ["Professional, no-obligation valuation",
+                   "Careful marketing to qualified buyers",
+                   "Support with negotiation, the deposit contract and the deed"],
+        "btn": "Request a valuation",
+        "badge": "With you from the valuation through to the signing.",
+    },
+
     "index": {
         "title": "Twins Real Estate | Real estate agency",
         "description": "Real estate agency specialising in sales, lettings and investment in Spain. Personal advice, verified information and support through to signing before a notary.",
