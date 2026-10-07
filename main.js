@@ -563,7 +563,7 @@
         if (presetSubject) subject.value = presetSubject;
 
         var reference = params.get("ref");
-        if (reference && PROPERTY_REF.test(reference)) {
+        if (reference && PROPERTY_REF.test(reference) && form.elements.referencia) {
             form.elements.referencia.value = reference;
             if (!subject.value) subject.value = "compra";
             if (!form.elements.mensaje.value) {

@@ -96,17 +96,8 @@ C = {
         "ref": "Ref.",
     },
 
-    "properties": {
-        "TRE-001": ("Modern house with lake views", "North · Los Lagos residential estate", "Featured"),
-        "TRE-002": ("Penthouse in the old town", "City centre · Old town", "New"),
-        "TRE-003": ("Bright flat with terrace", "South · Jardines del Valle", None),
-        "TRE-004": ("Contemporary villa with swimming pool", "East · Club de Campo", "Exclusive"),
-        "TRE-005": ("Loft in the creative district", "West · Creative District", None),
-        "TRE-006": ("Country house with garden", "Countryside · Valle Verde", "Price reduced"),
-        "TRE-007": ("Flat with panoramic views", "City centre · Torre Mirador", "New"),
-        "TRE-008": ("Family home with large garden", "North · Los Bosques", None),
-        "TRE-009": ("Minimalist designer residence", "East · Colinas del Sol", "Exclusive"),
-    },
+    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
+    "properties": {},
 
     "commitments": [
         ("Verified information", "We review the land registry extract, any charges and the energy certificate before listing each property."),
@@ -142,9 +133,6 @@ C = {
                                     "Contract review", "Estimate of taxes and transaction costs"]),
     },
     "footer_services": ["Sales and purchases", "Residential lettings", "Rental management", "Property investment", "Property valuation"],
-
-    "places": {"centro": "City centre", "norte": "North", "sur": "South", "este": "East",
-               "oeste": "West", "periferia": "Outskirts and countryside"},
 
     "alert": {
         "eyebrow": "Property alert",
@@ -223,6 +211,15 @@ C = {
         "empty_title": "No properties match these criteria",
         "empty_text": "Adjust the filters or tell us what you are looking for: we will let you know about available options, including those not yet published.",
         "empty_btn": "Tell us what you need",
+        "soon": {
+            "description": "Twins Real Estate is selecting its first properties for sale and to let. Create a property alert or request a free valuation of your home.",
+            "text": "We are selecting our first properties. Tell us what you are looking for and you will be the first to know.",
+            "eyebrow": "Portfolio in preparation",
+            "title": "We are selecting our first properties",
+            "body": "We would rather publish a few carefully reviewed properties than fill this page with listings. While we prepare our portfolio, tell us what you are looking for and we will let you know as soon as we have a suitable option. If you wish to sell or let your home, we would be delighted to value it with no obligation.",
+            "btn_alert": "Create a property alert",
+            "btn_sell": "I wish to sell my property",
+        },
     },
 
     "nosotros": {

@@ -95,17 +95,9 @@ C = {
         "ref": "Ref.",
     },
 
-    "properties": {
-        "TRE-001": ("Casa moderna con vistas al lago", "Zona Norte · Urbanización Los Lagos", "Destacado"),
-        "TRE-002": ("Ático en el casco antiguo", "Centro · Casco antiguo", "Novedad"),
-        "TRE-003": ("Piso luminoso con terraza", "Zona Sur · Jardines del Valle", None),
-        "TRE-004": ("Villa contemporánea con piscina", "Zona Este · Club de Campo", "Exclusiva"),
-        "TRE-005": ("Loft en el distrito creativo", "Zona Oeste · Distrito Creativo", None),
-        "TRE-006": ("Casa de campo con jardín", "Entorno rural · Valle Verde", "Precio rebajado"),
-        "TRE-007": ("Piso con vistas panorámicas", "Centro · Torre Mirador", "Novedad"),
-        "TRE-008": ("Casa familiar con amplio jardín", "Zona Norte · Los Bosques", None),
-        "TRE-009": ("Residencia de diseño minimalista", "Zona Este · Colinas del Sol", "Exclusiva"),
-    },
+    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia:
+    #     "TRE-001": ("Piso luminoso con terraza", "Igualada · Centro", "Novedad"),
+    "properties": {},
 
     "commitments": [
         ("Información verificada", "Revisamos la nota simple, las cargas y el certificado energético antes de publicar cada inmueble."),
@@ -141,11 +133,6 @@ C = {
                                     "Revisión de contratos", "Estimación de impuestos y gastos de la operación"]),
     },
     "footer_services": ["Compraventa", "Alquiler de viviendas", "Gestión de alquileres", "Inversión inmobiliaria", "Valoración de inmuebles"],
-
-    # Nombres traducidos de las localidades o zonas de los inmuebles de ejemplo.
-    # Las localidades reales (Igualada, Montbui…) se definen una sola vez en TOWNS (_build.py).
-    "places": {"centro": "Centro", "norte": "Zona Norte", "sur": "Zona Sur", "este": "Zona Este",
-               "oeste": "Zona Oeste", "periferia": "Periferia y entorno rural"},
 
     "alert": {
         "eyebrow": "Alerta de búsqueda",
@@ -224,6 +211,15 @@ C = {
         "empty_title": "No hay inmuebles con estos criterios",
         "empty_text": "Modifique los filtros o indíquenos qué busca: le informaremos de las opciones disponibles, incluidas las que todavía no se han publicado.",
         "empty_btn": "Comuníquenos su búsqueda",
+        "soon": {
+            "description": "Twins Real Estate está seleccionando sus primeros inmuebles en venta y alquiler. Cree una alerta de búsqueda o solicite una valoración gratuita de su vivienda.",
+            "text": "Estamos seleccionando nuestros primeros inmuebles. Indíquenos qué busca y le avisaremos antes que a nadie.",
+            "eyebrow": "Cartera en preparación",
+            "title": "Estamos seleccionando nuestros primeros inmuebles",
+            "body": "Preferimos publicar pocos inmuebles, bien revisados, antes que llenar esta página de anuncios. Mientras preparamos la cartera, indíquenos qué busca y le avisaremos en cuanto tengamos una opción que encaje. Si desea vender o alquilar su vivienda, estaremos encantados de valorarla sin compromiso.",
+            "btn_alert": "Crear una alerta de búsqueda",
+            "btn_sell": "Quiero vender mi inmueble",
+        },
     },
 
     "nosotros": {

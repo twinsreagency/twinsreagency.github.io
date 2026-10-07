@@ -1790,6 +1790,22 @@ h4 {
     color: var(--text-2);
 }
 
+/* Cartera en preparación (página «Inmuebles» sin inmuebles publicados) */
+.portfolio-soon .eyebrow {
+    margin-bottom: 0.75rem;
+}
+
+.portfolio-soon p {
+    max-width: 620px;
+}
+
+.empty-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
 /* Tarjeta de inmueble */
 .property {
     display: flex;
@@ -3028,3 +3044,4 @@ h4 {
         margin: 0;
     }
 }
+

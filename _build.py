@@ -122,24 +122,22 @@ SEARCH_VALUES = {
     "dormitorios": ["1", "2", "3", "4", "5"],
 }
 
-PROPERTIES = [
-    dict(ref="TRE-001", op="venta", type="casa", zone="norte", price=485000, beds=4, baths=3, area=320, icon="home"),
-    dict(ref="TRE-002", op="venta", type="atico", zone="centro", price=320000, beds=3, baths=2, area=180, icon="penthouse"),
-    dict(ref="TRE-003", op="alquiler", type="piso", zone="sur", price=1350, beds=2, baths=2, area=95, icon="building"),
-    dict(ref="TRE-004", op="venta", type="casa", zone="este", price=1200000, beds=5, baths=4, area=550, icon="villa"),
-    dict(ref="TRE-005", op="venta", type="estudio", zone="oeste", price=195000, beds=1, baths=1, area=75, icon="loft"),
-    dict(ref="TRE-006", op="venta", type="casa", zone="periferia", price=410000, beds=3, baths=2, area=240, icon="tree"),
-    dict(ref="TRE-007", op="venta", type="piso", zone="centro", price=650000, beds=3, baths=3, area=210, icon="building"),
-    dict(ref="TRE-008", op="alquiler", type="casa", zone="norte", price=2900, beds=4, baths=3, area=280, icon="home"),
-    dict(ref="TRE-009", op="venta", type="casa", zone="este", price=890000, beds=4, baths=4, area=390, icon="villa"),
-]
+# Inmuebles publicados. Mientras la lista esté vacía, la web muestra en su lugar
+# la invitación a crear una alerta de búsqueda y a solicitar una valoración, y no
+# se generan el filtro, el buscador de la portada ni los destacados. En cuanto se
+# añada el primer inmueble, todo ello vuelve a aparecer solo. Ejemplo:
+#     dict(ref="TRE-001", op="venta", type="piso", zone="igualada", price=185000,
+#          beds=3, baths=2, area=90, icon="building"),
+# op: "venta" o "alquiler"; type: uno de SEARCH_VALUES["tipo"]; zone: clave de TOWNS;
+# icon: "home", "building", "penthouse", "villa", "tree" o "loft". Su título,
+# ubicación y etiqueta van en «properties» de los tres archivos de textos.
+PROPERTIES = []
 
 # Localidades reales, con su nombre oficial (igual en los tres idiomas). Para publicar un
 # inmueble en una localidad nueva, añádala aquí y úsela en su campo «zone», por ejemplo:
 #     "igualada": "Igualada",
 #     "montbui": "Santa Margarida de Montbui",
 # El filtro «Localidad» solo muestra las localidades que tienen algún inmueble publicado.
-# Los nombres de las zonas de ejemplo están traducidos en «places» de _textos_*.py.
 TOWNS = {}
 
 SERVICES = [("compraventa", "key"), ("alquiler", "home"), ("gestion-alquileres", "clipboard"),
@@ -253,25 +251,23 @@ def options(values, labels, placeholder):
     return "".join(out)
 
 
-def place_name(L, slug):
-    """Nombre de una localidad: traducido si es una zona de ejemplo, oficial si está en TOWNS."""
-    if slug in L["places"]:
-        return L["places"][slug]
+def place_name(slug):
+    """Nombre oficial de una localidad de TOWNS."""
     if slug in TOWNS:
         return TOWNS[slug]
     raise SystemExit(f"Localidad «{slug}» sin nombre: añádala a TOWNS en _build.py")
 
 
-def places(L):
+def places():
     """Localidades con algún inmueble publicado, por orden alfabético."""
     slugs = {p["zone"] for p in PROPERTIES}
-    return sorted(((s, place_name(L, s)) for s in slugs), key=lambda item: item[1].casefold())
+    return sorted(((s, place_name(s)) for s in slugs), key=lambda item: item[1].casefold())
 
 
 def field_options(L, name):
     """Valores y textos de un desplegable del buscador."""
     if name == "zona":
-        found = places(L)
+        found = places()
         return [s for s, _ in found], [label for _, label in found]
     return SEARCH_VALUES[name], L["search"]["options"][name]
 
@@ -481,6 +477,11 @@ def write(ctx, title, description, active, body, extra_head="", noindex=False):
 # --------------------------------------------------------------------------
 # Componentes
 # --------------------------------------------------------------------------
+def valuation_link(ctx):
+    """Destino de los botones «Solicitar una valoración»."""
+    return f"{ctx.page('contacto.html')}?asunto=venta#formulario"
+
+
 def search_fields(ctx, prefix, names=None, indent=20):
     """Desplegables del buscador (todos o solo los indicados en «names»)."""
     S = ctx.L["search"]
@@ -620,7 +621,7 @@ def sell_section(ctx, alt=True):
                     <ul class="check-list">{checks}
                     </ul>
                     <div class="sell__actions">
-                        <a class="btn btn--primary" href="{ctx.page('contacto.html')}?asunto=venta#formulario">{T['btn']} {ARROW}</a>
+                        <a class="btn btn--primary" href="{valuation_link(ctx)}">{T['btn']} {ARROW}</a>
                         <a class="btn btn--outline" href="mailto:{EMAIL}">{ui['cta_mail']}</a>
                     </div>
                 </div>
@@ -635,7 +636,7 @@ def alert_section(ctx):
     T, C, ui = L["alert"], L["contacto"], L["ui"]
     lab = C["labels"]
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
-    towns = "".join(f'<option value="{esc(name)}"></option>' for _, name in places(L) if _ in TOWNS)
+    towns = "".join(f'<option value="{esc(name)}"></option>' for name in sorted(TOWNS.values(), key=str.casefold))
 
     def error(name):
         return f'<p class="field__error" id="alerta-error-{name}" aria-live="polite"></p>'
@@ -758,10 +759,38 @@ def post_card(ctx, slug, icon_name, date, minutes):
 # --------------------------------------------------------------------------
 # Páginas
 # --------------------------------------------------------------------------
+def home_portfolio(ctx):
+    """Buscador e inmuebles destacados de la portada. Sin inmuebles publicados no se
+    muestran: el buscador llevaría a un listado vacío."""
+    L, T = ctx.L, ctx.L["index"]
+    if not PROPERTIES:
+        return ""
+    featured = "".join(property_card(ctx, p) for p in PROPERTIES[:6])
+    return f"""        <section class="search" aria-labelledby="buscador-title">
+            <div class="container">
+                <div class="search__panel reveal">
+                    <h2 class="search__title" id="buscador-title">{L['search']['title_home']}</h2>
+                    <form class="search__form" action="{ctx.page('propiedades.html')}" method="get" role="search">{search_fields(ctx, 'buscar')}
+                        <button class="btn btn--primary" type="submit">{icon('search')}{L['search']['submit']}</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="destacados-title">
+            <div class="container">{section_header(T['featured_eyebrow'], T['featured_title'], 'destacados-title', T['featured_lead'])}
+                <div class="grid grid--3">{featured}
+                </div>
+                <div class="section-footer">
+                    <a class="btn btn--outline" href="{ctx.page('propiedades.html')}">{T['featured_all']} {ARROW}</a>
+                </div>
+            </div>
+        </section>"""
+
+
 def build_index(L):
     ctx = Ctx(L, "index.html")
     T, ui = L["index"], L["ui"]
-    featured = "".join(property_card(ctx, p) for p in PROPERTIES[:6])
     services = "".join(feature_card(
         ic, L["services"][sid][0], L["services"][sid][1],
         f'\n                    <p class="feature__more"><a class="link-arrow" href="{ctx.page("servicios.html")}#{sid}">'
@@ -780,6 +809,7 @@ def build_index(L):
         "knowsLanguage": [lang["lang"] for lang in LANGS],
     })
 
+    portfolio = home_portfolio(ctx)
     callouts = "".join(
         f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
         for i, (ic, text) in enumerate(zip(PILLAR_ICONS, T["pillars"]), start=1))
@@ -807,27 +837,7 @@ def build_index(L):
             </div>
         </section>
 
-        <section class="search" aria-labelledby="buscador-title">
-            <div class="container">
-                <div class="search__panel reveal">
-                    <h2 class="search__title" id="buscador-title">{L['search']['title_home']}</h2>
-                    <form class="search__form" action="{ctx.page('propiedades.html')}" method="get" role="search">{search_fields(ctx, 'buscar')}
-                        <button class="btn btn--primary" type="submit">{icon('search')}{L['search']['submit']}</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <section class="section" aria-labelledby="destacados-title">
-            <div class="container">{section_header(T['featured_eyebrow'], T['featured_title'], 'destacados-title', T['featured_lead'])}
-                <div class="grid grid--3">{featured}
-                </div>
-                <div class="section-footer">
-                    <a class="btn btn--outline" href="{ctx.page('propiedades.html')}">{T['featured_all']} {ARROW}</a>
-                </div>
-            </div>
-        </section>
-
+{portfolio}
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
@@ -875,6 +885,9 @@ def build_index(L):
 def build_properties(L):
     ctx = Ctx(L, "propiedades.html")
     T, S = L["propiedades"], L["search"]
+    if not PROPERTIES:
+        build_properties_soon(ctx)
+        return
     cards = "".join(property_card(ctx, p) for p in PROPERTIES)
     body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["propiedades.html"], "propiedades.html")], obj="house") + f"""
         <section class="filters" aria-labelledby="filtros-title">
@@ -907,6 +920,30 @@ def build_properties(L):
         </section>
 {alert_section(ctx)}{sell_section(ctx, alt=False)}"""
     write(ctx, T["title"], T["description"], "propiedades.html", body)
+
+
+def build_properties_soon(ctx):
+    """«Inmuebles» mientras no hay ninguno publicado: invita a crear una alerta de
+    búsqueda y a solicitar una valoración. Sin inmuebles no tiene sentido mostrar
+    el filtro, así que tampoco se genera el desplegable «Localidad» vacío."""
+    L = ctx.L
+    T, soon = L["propiedades"], L["propiedades"]["soon"]
+    body = page_hero(ctx, T["h1"], soon["text"], [(L["ui"]["nav"]["propiedades.html"], "propiedades.html")], obj="house") + f"""
+        <section class="section" aria-labelledby="cartera-title">
+            <div class="container">
+                <div class="empty-state portfolio-soon reveal">
+                    <span class="eyebrow">{soon['eyebrow']}</span>
+                    <h2 id="cartera-title">{soon['title']}</h2>
+                    <p>{soon['body']}</p>
+                    <div class="empty-state__actions">
+                        <a class="btn btn--primary" href="#alerta">{soon['btn_alert']} {ARROW}</a>
+                        <a class="btn btn--outline" href="{valuation_link(ctx)}">{soon['btn_sell']}</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+{alert_section(ctx)}{sell_section(ctx, alt=False)}"""
+    write(ctx, T["title"], soon["description"], "propiedades.html", body)
 
 
 def build_about(L):
@@ -1071,6 +1108,14 @@ def build_contact(L):
     def error(name):
         return f'<p class="field__error" id="error-{name}" aria-live="polite"></p>'
 
+    # La referencia solo tiene sentido cuando hay inmuebles publicados.
+    reference = f"""                            <div class="field field--full">
+                                <label for="contacto-referencia">{lab['referencia']}</label>
+                                <input id="contacto-referencia" name="referencia" type="text" maxlength="20" placeholder="{esc(T['ref_placeholder'])}" aria-describedby="ayuda-referencia">
+                                <p class="field__hint" id="ayuda-referencia">{T['ref_hint']}</p>
+                            </div>
+""" if PROPERTIES else ""
+
     body = page_hero(ctx, T["h1"], T["text"], [(ui["nav"]["contacto.html"], "contacto.html")]) + f"""
         <section class="section" aria-label="{esc(T['section_aria'])}">
             <div class="container contact-grid">
@@ -1129,12 +1174,7 @@ def build_contact(L):
                                 <label for="contacto-asunto">{lab['asunto']}</label>
                                 <select id="contacto-asunto" name="asunto">{options(SUBJECTS, T['subjects'], T['subject_placeholder'])}</select>
                             </div>
-                            <div class="field field--full">
-                                <label for="contacto-referencia">{lab['referencia']}</label>
-                                <input id="contacto-referencia" name="referencia" type="text" maxlength="20" placeholder="{esc(T['ref_placeholder'])}" aria-describedby="ayuda-referencia">
-                                <p class="field__hint" id="ayuda-referencia">{T['ref_hint']}</p>
-                            </div>
-                            <div class="field field--full">
+{reference}                            <div class="field field--full">
                                 <label for="contacto-mensaje">{lab['mensaje']}</label>
                                 <textarea id="contacto-mensaje" name="mensaje" maxlength="2000" required aria-describedby="error-mensaje"></textarea>
                                 {error('mensaje')}

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Immobles en venda i lloguer | Twins Real Estate</title>
-    <meta name="description" content="Pisos, àtics, cases i xalets en venda i lloguer. Consulteu la cartera de Twins Real Estate i filtreu per zona, tipus d’immoble, preu i nombre de dormitoris.">
+    <meta name="description" content="Twins Real Estate està seleccionant els seus primers immobles en venda i lloguer. Creeu una alerta de cerca o sol·liciteu una valoració gratuïta del vostre habitatge.">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#f2ede4">
     <meta name="color-scheme" content="light dark">
@@ -14,7 +14,7 @@
     <meta property="og:locale" content="ca_ES">
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="Immobles en venda i lloguer | Twins Real Estate">
-    <meta property="og:description" content="Pisos, àtics, cases i xalets en venda i lloguer. Consulteu la cartera de Twins Real Estate i filtreu per zona, tipus d’immoble, preu i nombre de dormitoris.">
+    <meta property="og:description" content="Twins Real Estate està seleccionant els seus primers immobles en venda i lloguer. Creeu una alerta de cerca o sol·liciteu una valoració gratuïta del vostre habitatge.">
     <meta name="twitter:card" content="summary">
     <meta property="og:url" content="https://twinsreagency.github.io/ca-immobles.html">
     <link rel="canonical" href="https://twinsreagency.github.io/ca-immobles.html">
@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
     <script src="theme.js?v=fd1966f6e2"></script>
-    <link rel="stylesheet" href="styles.css?v=59ac19c6a6">
-    <script src="main.js?v=707b9a4b27" defer></script>
+    <link rel="stylesheet" href="styles.css?v=bf7896d607">
+    <script src="main.js?v=d4ee48206f" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#contenido">Salta al contingut principal</a>
@@ -70,235 +70,20 @@
             </nav>
             <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inici", "item": "https://twinsreagency.github.io/ca-inici.html"}, {"@type": "ListItem", "position": 2, "name": "Immobles", "item": "https://twinsreagency.github.io/ca-immobles.html"}]}</script>
             <h1 class="page-hero__title">Immobles en venda i lloguer</h1>
-            <p class="page-hero__text">Consulteu la nostra cartera d’habitatges i utilitzeu els filtres per trobar l’immoble que millor s’adapta a les vostres necessitats.</p>
+            <p class="page-hero__text">Estem seleccionant els nostres primers immobles. Indiqueu-nos què busqueu i us avisarem abans que a ningú.</p>
         </div>
     </section>
 
-        <section class="filters" aria-labelledby="filtros-title">
+        <section class="section" aria-labelledby="cartera-title">
             <div class="container">
-                <div class="search__panel reveal">
-                    <h2 class="search__title" id="filtros-title">Filtra els immobles</h2>
-                    <form class="search__form" id="filtro-inmuebles" action="ca-immobles.html" method="get" role="search">
-                    <div class="field">
-                        <label for="filtro-operacion">Operació</label>
-                        <select id="filtro-operacion" name="operacion"><option value="">Totes</option><option value="venta">Compra</option><option value="alquiler">Lloguer</option></select>
+                <div class="empty-state portfolio-soon reveal">
+                    <span class="eyebrow">Cartera en preparació</span>
+                    <h2 id="cartera-title">Estem seleccionant els nostres primers immobles</h2>
+                    <p>Preferim publicar pocs immobles, ben revisats, abans que omplir aquesta pàgina d’anuncis. Mentre preparem la cartera, indiqueu-nos què busqueu i us avisarem tan bon punt tinguem una opció que hi encaixi. Si voleu vendre o llogar el vostre habitatge, estarem encantats de valorar-lo sense compromís.</p>
+                    <div class="empty-state__actions">
+                        <a class="btn btn--primary" href="#alerta">Crear una alerta de cerca <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                        <a class="btn btn--outline" href="ca-contacte.html?asunto=venta#formulario">Vull vendre el meu immoble</a>
                     </div>
-                    <div class="field">
-                        <label for="filtro-tipo">Tipus d’immoble</label>
-                        <select id="filtro-tipo" name="tipo"><option value="">Tots</option><option value="piso">Pis o apartament</option><option value="atico">Àtic</option><option value="duplex">Dúplex</option><option value="casa">Casa o xalet</option><option value="rustica">Casa rústica</option><option value="estudio">Estudi o loft</option><option value="oficina">Oficina</option><option value="local">Local o nau</option><option value="garaje">Garatge</option><option value="trastero">Traster</option><option value="terreno">Terreny</option><option value="edificio">Edifici</option></select>
-                    </div>
-                    <div class="field">
-                        <label for="filtro-zona">Localitat</label>
-                        <select id="filtro-zona" name="zona"><option value="">Totes</option><option value="centro">Centre</option><option value="periferia">Perifèria i entorn rural</option><option value="este">Zona Est</option><option value="norte">Zona Nord</option><option value="oeste">Zona Oest</option><option value="sur">Zona Sud</option></select>
-                    </div>
-                    <div class="field">
-                        <label for="filtro-precio">Preu màxim</label>
-                        <select id="filtro-precio" name="precio"><option value="">Sense límit</option><option value="200000">Fins a 200.000 €</option><option value="400000">Fins a 400.000 €</option><option value="700000">Fins a 700.000 €</option><option value="1000000">Fins a 1.000.000 €</option></select>
-                    </div>
-                    <div class="field">
-                        <label for="filtro-dormitorios">Dormitoris</label>
-                        <select id="filtro-dormitorios" name="dormitorios"><option value="">Indiferent</option><option value="1">1 o més</option><option value="2">2 o més</option><option value="3">3 o més</option><option value="4">4 o més</option><option value="5">5 o més</option></select>
-                    </div>
-                        <button class="btn btn--outline" type="reset">Restableix</button>
-                    </form>
-                    <p class="filters__hint">No hi apareix la vostra localitat? <a class="link-arrow" href="#alerta">Creeu una alerta de cerca <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section" aria-labelledby="listado-title">
-            <div class="container">
-                <h2 class="visually-hidden" id="listado-title">Llistat d’immobles</h2>
-                <div class="results-bar">
-                    <p role="status" aria-live="polite"><strong id="resultados-total">9</strong> immobles trobats</p>
-                    <p>Preus de venda sense impostos ni despeses de l’operació.</p>
-                </div>
-                <div class="grid grid--3" id="listado-inmuebles">
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="norte" data-precio="485000" data-dormitorios="4">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
-                        <span class="property__badge">Destacat</span>
-                        <button class="fav-btn" type="button" data-ref="TRE-001" aria-pressed="false" aria-label="Desa Casa moderna amb vistes al llac als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-001</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">485.000 €</p>
-                        <h3 class="property__title">Casa moderna amb vistes al llac</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zona Nord · Urbanització Els Llacs</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>4 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>3 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>320 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-001#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Casa moderna amb vistes al llac</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="atico" data-zona="centro" data-precio="320000" data-dormitorios="3">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 21V8l8-5 8 5v13"/><path d="M4 12h16"/><path d="M9 16h2M13 16h2"/><path d="M9 21v-2h6v2"/></svg>
-                        <span class="property__badge">Novetat</span>
-                        <button class="fav-btn" type="button" data-ref="TRE-002" aria-pressed="false" aria-label="Desa Àtic al nucli antic als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-002</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">320.000 €</p>
-                        <h3 class="property__title">Àtic al nucli antic</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Centre · Nucli antic</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>3 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>2 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>180 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-002#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Àtic al nucli antic</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="alquiler" data-tipo="piso" data-zona="sur" data-precio="1350" data-dormitorios="2">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/></svg>
-                        
-                        <button class="fav-btn" type="button" data-ref="TRE-003" aria-pressed="false" aria-label="Desa Pis lluminós amb terrassa als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-003</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En lloguer</p>
-                        <p class="property__price">1.350 € <small>/ mes</small></p>
-                        <h3 class="property__title">Pis lluminós amb terrassa</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zona Sud · Jardins de la Vall</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>2 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>2 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>95 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-003#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Pis lluminós amb terrassa</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="este" data-precio="1200000" data-dormitorios="5">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12 12 4l10 8"/><path d="M4 10.5V20h16v-9.5"/><path d="M2 20h20"/><rect x="7" y="13" width="4" height="4"/><path d="M14 20v-5h3v5"/></svg>
-                        <span class="property__badge">Exclusiva</span>
-                        <button class="fav-btn" type="button" data-ref="TRE-004" aria-pressed="false" aria-label="Desa Vil·la contemporània amb piscina als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-004</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">1.200.000 €</p>
-                        <h3 class="property__title">Vil·la contemporània amb piscina</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zona Est · Club de Camp</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>5 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>4 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>550 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-004#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Vil·la contemporània amb piscina</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="estudio" data-zona="oeste" data-precio="195000" data-dormitorios="1">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 10h18"/><path d="M9 4v6M15 4v6"/><path d="M7 15h4v6"/></svg>
-                        
-                        <button class="fav-btn" type="button" data-ref="TRE-005" aria-pressed="false" aria-label="Desa Loft al districte creatiu als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-005</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">195.000 €</p>
-                        <h3 class="property__title">Loft al districte creatiu</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zona Oest · Districte Creatiu</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>1 dormitori</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>1 bany</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>75 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-005#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Loft al districte creatiu</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="periferia" data-precio="410000" data-dormitorios="3">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21v-6"/><path d="M12 3 6 11h3l-4 5h14l-4-5h3z"/></svg>
-                        <span class="property__badge">Preu rebaixat</span>
-                        <button class="fav-btn" type="button" data-ref="TRE-006" aria-pressed="false" aria-label="Desa Casa de camp amb jardí als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-006</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">410.000 €</p>
-                        <h3 class="property__title">Casa de camp amb jardí</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Entorn rural · Vall Verda</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>3 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>2 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>240 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-006#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Casa de camp amb jardí</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="piso" data-zona="centro" data-precio="650000" data-dormitorios="3">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/></svg>
-                        <span class="property__badge">Novetat</span>
-                        <button class="fav-btn" type="button" data-ref="TRE-007" aria-pressed="false" aria-label="Desa Pis amb vistes panoràmiques als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-007</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">650.000 €</p>
-                        <h3 class="property__title">Pis amb vistes panoràmiques</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Centre · Torre Mirador</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>3 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>3 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>210 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-007#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Pis amb vistes panoràmiques</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="alquiler" data-tipo="casa" data-zona="norte" data-precio="2900" data-dormitorios="4">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
-                        
-                        <button class="fav-btn" type="button" data-ref="TRE-008" aria-pressed="false" aria-label="Desa Casa familiar amb un ampli jardí als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-008</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En lloguer</p>
-                        <p class="property__price">2.900 € <small>/ mes</small></p>
-                        <h3 class="property__title">Casa familiar amb un ampli jardí</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zona Nord · Els Boscos</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>4 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>3 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>280 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-008#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Casa familiar amb un ampli jardí</span></a>
-                    </div>
-                </article>
-                <article class="card property reveal tilt" data-operacion="venta" data-tipo="casa" data-zona="este" data-precio="890000" data-dormitorios="4">
-                    <div class="property__media">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12 12 4l10 8"/><path d="M4 10.5V20h16v-9.5"/><path d="M2 20h20"/><rect x="7" y="13" width="4" height="4"/><path d="M14 20v-5h3v5"/></svg>
-                        <span class="property__badge">Exclusiva</span>
-                        <button class="fav-btn" type="button" data-ref="TRE-009" aria-pressed="false" aria-label="Desa Residència de disseny minimalista als preferits"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/></svg></button>
-                        <span class="property__ref">Ref. TRE-009</span>
-                    </div>
-                    <div class="property__body">
-                        <p class="property__operation">En venda</p>
-                        <p class="property__price">890.000 €</p>
-                        <h3 class="property__title">Residència de disseny minimalista</h3>
-                        <p class="property__location"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Zona Est · Turons del Sol</p>
-                        <ul class="property__features" aria-label="Característiques">
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18V6"/><path d="M3 14h18v4"/><path d="M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="2"/></svg>4 dormitoris</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><path d="m7 19-1 2M17 19l1 2"/></svg>4 banys</li>
-                            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>390 m²</li>
-                        </ul>
-                        <a class="link-arrow property__cta" href="ca-contacte.html?ref=TRE-009#formulario">Sol·liciteu informació <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre Residència de disseny minimalista</span></a>
-                    </div>
-                </article>
-                </div>
-                <div class="empty-state" id="sin-resultados" hidden>
-                    <h2>No hi ha immobles amb aquests criteris</h2>
-                    <p>Modifiqueu els filtres o indiqueu-nos què busqueu: us informarem de les opcions disponibles, incloses les que encara no s’han publicat.</p>
-                    <a class="btn btn--primary" href="#alerta">Comuniqueu-nos la vostra cerca <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 </div>
             </div>
         </section>

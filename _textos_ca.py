@@ -95,17 +95,8 @@ C = {
         "ref": "Ref.",
     },
 
-    "properties": {
-        "TRE-001": ("Casa moderna amb vistes al llac", "Zona Nord · Urbanització Els Llacs", "Destacat"),
-        "TRE-002": ("Àtic al nucli antic", "Centre · Nucli antic", "Novetat"),
-        "TRE-003": ("Pis lluminós amb terrassa", "Zona Sud · Jardins de la Vall", None),
-        "TRE-004": ("Vil·la contemporània amb piscina", "Zona Est · Club de Camp", "Exclusiva"),
-        "TRE-005": ("Loft al districte creatiu", "Zona Oest · Districte Creatiu", None),
-        "TRE-006": ("Casa de camp amb jardí", "Entorn rural · Vall Verda", "Preu rebaixat"),
-        "TRE-007": ("Pis amb vistes panoràmiques", "Centre · Torre Mirador", "Novetat"),
-        "TRE-008": ("Casa familiar amb un ampli jardí", "Zona Nord · Els Boscos", None),
-        "TRE-009": ("Residència de disseny minimalista", "Zona Est · Turons del Sol", "Exclusiva"),
-    },
+    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
+    "properties": {},
 
     "commitments": [
         ("Informació verificada", "Revisem la nota simple, les càrregues i el certificat energètic abans de publicar cada immoble."),
@@ -141,9 +132,6 @@ C = {
                                     "Revisió de contractes", "Estimació d’impostos i despeses de l’operació"]),
     },
     "footer_services": ["Compravenda", "Lloguer d’habitatges", "Gestió de lloguers", "Inversió immobiliària", "Valoració d’immobles"],
-
-    "places": {"centro": "Centre", "norte": "Zona Nord", "sur": "Zona Sud", "este": "Zona Est",
-               "oeste": "Zona Oest", "periferia": "Perifèria i entorn rural"},
 
     "alert": {
         "eyebrow": "Alerta de cerca",
@@ -222,6 +210,15 @@ C = {
         "empty_title": "No hi ha immobles amb aquests criteris",
         "empty_text": "Modifiqueu els filtres o indiqueu-nos què busqueu: us informarem de les opcions disponibles, incloses les que encara no s’han publicat.",
         "empty_btn": "Comuniqueu-nos la vostra cerca",
+        "soon": {
+            "description": "Twins Real Estate està seleccionant els seus primers immobles en venda i lloguer. Creeu una alerta de cerca o sol·liciteu una valoració gratuïta del vostre habitatge.",
+            "text": "Estem seleccionant els nostres primers immobles. Indiqueu-nos què busqueu i us avisarem abans que a ningú.",
+            "eyebrow": "Cartera en preparació",
+            "title": "Estem seleccionant els nostres primers immobles",
+            "body": "Preferim publicar pocs immobles, ben revisats, abans que omplir aquesta pàgina d’anuncis. Mentre preparem la cartera, indiqueu-nos què busqueu i us avisarem tan bon punt tinguem una opció que hi encaixi. Si voleu vendre o llogar el vostre habitatge, estarem encantats de valorar-lo sense compromís.",
+            "btn_alert": "Crear una alerta de cerca",
+            "btn_sell": "Vull vendre el meu immoble",
+        },
     },
 
     "nosotros": {

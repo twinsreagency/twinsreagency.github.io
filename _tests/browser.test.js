@@ -5,42 +5,54 @@
  *     node --test _tests/browser.test.js
  *
  * Las páginas se abren directamente desde el disco (file://), igual que al
- * previsualizar el sitio; las fuentes de Google se bloquean para no depender
- * de la red.
+ * previsualizar el sitio. Las pruebas del listado, el filtro y los favoritos usan
+ * una copia del sitio con inmuebles de prueba (_tests/fixture.py), porque la
+ * cartera real puede estar vacía.
  */
 "use strict";
 
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
+const { execFileSync } = require("node:child_process");
 const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
 const SITE = path.resolve(__dirname, "..");
-const url = (file) => pathToFileURL(path.join(SITE, file)).href;
+const FIXTURE = fs.mkdtempSync(path.join(os.tmpdir(), "twins-fixture-"));
+const url = (file, site = SITE) => pathToFileURL(path.join(site, file)).href;
 
 let browser;
 
 before(async () => {
+    execFileSync("python3", [path.join(__dirname, "fixture.py"), path.join(FIXTURE, "site")]);
     browser = await chromium.launch();
 });
 
 after(async () => {
     await browser.close();
+    fs.rmSync(FIXTURE, { recursive: true, force: true });
 });
 
 /** Abre una página y recoge los errores de JavaScript y de consola. */
-async function open(file, { width = 1280, search = "" } = {}) {
+async function open(file, { width = 1280, search = "", fixture = false } = {}) {
     const context = await browser.newContext({ viewport: { width, height: 900 } });
-    await context.route(/fonts\.(googleapis|gstatic)\.com/, (route) => route.abort());
+    /* Ninguna página debe pedir nada fuera del sitio. */
+    const external = [];
+    await context.route(/^https?:/, (route) => {
+        external.push(route.request().url());
+        route.abort();
+    });
     const page = await context.newPage();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (msg) => {
         if (msg.type() === "error" && !/ERR_FAILED/.test(msg.text())) errors.push(msg.text());
     });
-    await page.goto(url(file) + search);
-    return { page, errors, close: () => context.close() };
+    await page.goto(url(file, fixture ? path.join(FIXTURE, "site") : SITE) + search);
+    return { page, errors, external, close: () => context.close() };
 }
 
 const visibleCards = (page) => page.locator("#listado-inmuebles .property:not([hidden])").count();
@@ -53,13 +65,47 @@ test("las páginas principales cargan sin errores de JavaScript", async () => {
     }
 });
 
+test("sin inmuebles publicados, la web invita a crear una alerta y a vender", async () => {
+    let { page, errors, close } = await open("es-inmuebles.html");
+    assert.equal(await page.locator("#filtro-inmuebles").count(), 0);
+    assert.equal(await page.locator(".property").count(), 0);
+    assert.equal(await page.isVisible("#cartera-title"), true);
+    assert.equal(await page.getAttribute(".portfolio-soon a.btn--primary", "href"), "#alerta");
+    assert.equal(await page.isVisible("#formulario-alerta"), true);
+    assert.deepEqual(errors, []);
+    await close();
+
+    ({ page, close } = await open("index.html"));
+    assert.equal(await page.locator(".property, .search__form").count(), 0);
+    await close();
+
+    /* Una referencia en la URL no rompe el formulario aunque no haya campo de referencia. */
+    ({ page, errors, close } = await open("es-contacto.html", { search: "?ref=TRE-003&asunto=venta" }));
+    assert.equal(await page.locator("#contacto-referencia").count(), 0);
+    assert.equal(await page.inputValue("#contacto-asunto"), "venta");
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("al publicar inmuebles vuelven el listado, el buscador y los destacados", async () => {
+    let { page, close } = await open("index.html", { fixture: true });
+    assert.equal(await page.locator(".property").count(), 4);
+    assert.equal(await page.locator(".search__form").count(), 1);
+    await close();
+
+    ({ page, close } = await open("es-inmuebles.html", { fixture: true }));
+    assert.equal(await page.locator("#cartera-title").count(), 0);
+    assert.deepEqual(await page.locator("#filtro-zona option").allTextContents(), ["Todas", "Igualada", "Santa Margarida de Montbui"]);
+    await close();
+});
+
 test("el filtro de inmuebles muestra solo los resultados que coinciden", async () => {
-    const { page, close } = await open("es-inmuebles.html");
-    assert.equal(await visibleCards(page), 9);
+    const { page, close } = await open("es-inmuebles.html", { fixture: true });
+    assert.equal(await visibleCards(page), 4);
 
     await page.selectOption("#filtro-operacion", "alquiler");
-    assert.equal(await visibleCards(page), 2);
-    assert.equal(await page.textContent("#resultados-total"), "2");
+    assert.equal(await visibleCards(page), 1);
+    assert.equal(await page.textContent("#resultados-total"), "1");
     assert.match(page.url(), /\?operacion=alquiler$/);
 
     await page.selectOption("#filtro-dormitorios", "5");
@@ -67,19 +113,19 @@ test("el filtro de inmuebles muestra solo los resultados que coinciden", async (
     assert.equal(await page.isVisible("#sin-resultados"), true);
 
     await page.click("#filtro-inmuebles button[type='reset']");
-    await page.waitForFunction(() => document.getElementById("resultados-total").textContent === "9");
+    await page.waitForFunction(() => document.getElementById("resultados-total").textContent === "4");
     assert.equal(await page.isVisible("#sin-resultados"), false);
     await close();
 });
 
 test("el filtro lee los parámetros de la URL e ignora valores no permitidos", async () => {
-    let { page, close } = await open("es-inmuebles.html", { search: "?dormitorios=5" });
+    let { page, close } = await open("es-inmuebles.html", { search: "?dormitorios=5", fixture: true });
     assert.equal(await visibleCards(page), 1);
     await close();
 
-    ({ page, close } = await open("es-inmuebles.html", { search: "?zona=<script>" }));
+    ({ page, close } = await open("es-inmuebles.html", { search: "?zona=<script>", fixture: true }));
     assert.equal(await page.inputValue("#filtro-zona"), "");
-    assert.equal(await visibleCards(page), 9);
+    assert.equal(await visibleCards(page), 4);
     await close();
 });
 
@@ -109,29 +155,29 @@ test("el formulario de contacto valida los campos obligatorios", async () => {
 });
 
 test("el formulario se rellena con la referencia del inmueble solo si es válida", async () => {
-    let { page, close } = await open("es-contacto.html", { search: "?ref=TRE-003" });
+    let { page, close } = await open("es-contacto.html", { search: "?ref=TRE-003", fixture: true });
     assert.equal(await page.inputValue("#contacto-referencia"), "TRE-003");
     assert.equal(await page.inputValue("#contacto-asunto"), "compra");
     assert.match(await page.inputValue("#contacto-mensaje"), /TRE-003/);
     await close();
 
-    ({ page, close } = await open("es-contacto.html", { search: "?ref=%3Cimg%3E&asunto=hack" }));
+    ({ page, close } = await open("es-contacto.html", { search: "?ref=%3Cimg%3E&asunto=hack", fixture: true }));
     assert.equal(await page.inputValue("#contacto-referencia"), "");
     assert.equal(await page.inputValue("#contacto-asunto"), "");
     await close();
 });
 
 test("la alerta de búsqueda recoge los criterios del filtro y valida la localidad", async () => {
-    const { page, close } = await open("es-inmuebles.html");
+    const { page, close } = await open("es-inmuebles.html", { fixture: true });
     await page.selectOption("#filtro-tipo", "casa");
-    await page.selectOption("#filtro-zona", "norte");
+    await page.selectOption("#filtro-zona", "igualada");
     assert.equal(await page.inputValue("#alerta-tipo"), "casa");
-    assert.equal(await page.inputValue("#alerta-localidad"), "Zona Norte");
+    assert.equal(await page.inputValue("#alerta-localidad"), "Igualada");
 
     /* Lo que escribe el visitante no se sobrescribe al cambiar el filtro. */
-    await page.fill("#alerta-localidad", "Santa Margarida de Montbui");
-    await page.selectOption("#filtro-zona", "sur");
-    assert.equal(await page.inputValue("#alerta-localidad"), "Santa Margarida de Montbui");
+    await page.fill("#alerta-localidad", "Òdena");
+    await page.selectOption("#filtro-zona", "montbui");
+    assert.equal(await page.inputValue("#alerta-localidad"), "Òdena");
 
     await page.fill("#alerta-localidad", "");
     await page.click("#formulario-alerta button[type='submit']");
@@ -144,7 +190,7 @@ test("la alerta de búsqueda recoge los criterios del filtro y valida la localid
 });
 
 test("sin resultados, el aviso lleva a la alerta de búsqueda", async () => {
-    const { page, close } = await open("es-inmuebles.html", { search: "?dormitorios=5&operacion=alquiler" });
+    const { page, close } = await open("es-inmuebles.html", { search: "?dormitorios=5&operacion=alquiler", fixture: true });
     assert.equal(await page.isVisible("#sin-resultados"), true);
     assert.equal(await page.getAttribute("#sin-resultados a.btn", "href"), "#alerta");
     await close();
@@ -174,7 +220,7 @@ test("el tema elegido se guarda y se aplica en la siguiente página", async () =
 });
 
 test("los favoritos se marcan y se recuerdan", async () => {
-    const { page, close } = await open("es-inmuebles.html");
+    const { page, close } = await open("es-inmuebles.html", { fixture: true });
     const button = page.locator(".fav-btn[data-ref='TRE-001']");
     assert.equal(await button.getAttribute("aria-pressed"), "false");
     await button.click();
