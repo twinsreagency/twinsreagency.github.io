@@ -15,8 +15,9 @@
      * servicio como Formspree o un backend propio. Si se deja vacío, el
      * formulario abre el cliente de correo del usuario con el mensaje
      * preparado para `fallbackEmail`.
-     * Al configurar un endpoint externo, añada su dominio a la directiva
-     * `connect-src` de la política CSP (en .htaccess y _headers).
+     * Tras cambiarlo, ejecute `python3 _build.py`: el generador lee este valor y
+     * añade el dominio a la política CSP (<meta> y _headers) y actualiza la
+     * política de privacidad.
      */
     var CONFIG = {
         endpoint: "",

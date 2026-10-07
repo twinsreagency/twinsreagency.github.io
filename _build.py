@@ -13,7 +13,7 @@ Todos los archivos del sitio están en una única carpeta, sin subcarpetas:
 Los textos se editan en _textos_es.py, _textos_ca.py y _textos_en.py; este
 fichero solo contiene la estructura y los datos comunes. Después de modificar
 cualquier texto, vuelva a ejecutar el script. Los archivos que empiezan por
-«_» no se publican en GitHub Pages ni se sirven con la configuración .htaccess.
+«_» no se publican en GitHub Pages (ver _config.yml).
 """
 import hashlib
 import html
@@ -54,6 +54,11 @@ INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
 
 
+# Caducidad de /.well-known/security.txt (RFC 9116 recomienda menos de un año).
+# Un test avisa cuando falte menos de un mes: basta con adelantarla y regenerar.
+SECURITY_TXT_EXPIRES = "2027-10-01T00:00:00Z"
+
+
 def form_endpoint():
     """Dirección del servicio de formularios (CONFIG.endpoint de main.js), o "" si los
     formularios abren el programa de correo. main.js es la única fuente de este dato:
@@ -66,6 +71,22 @@ def form_endpoint():
     if endpoint and urlparse(endpoint).scheme != "https":
         raise SystemExit("CONFIG.endpoint debe ser una dirección https://")
     return endpoint
+
+def csp(meta=True):
+    """Política de seguridad de contenidos: solo recursos del propio sitio, sin código
+    en línea. Se publica como <meta> en cada página (GitHub Pages no permite enviar
+    cabeceras) y como cabecera en _headers (Netlify / Cloudflare Pages). Las directivas
+    frame-ancestors y upgrade-insecure-requests solo funcionan como cabecera.
+    Los bloques JSON-LD no son scripts ejecutables y la CSP no los bloquea."""
+    endpoint = form_endpoint()
+    service = f" {urlparse(endpoint).scheme}://{urlparse(endpoint).netloc}" if endpoint else ""
+    rules = ["default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self' data:",
+             "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
+             "base-uri 'self'", "object-src 'none'"]
+    if not meta:
+        rules += ["frame-ancestors 'none'", "upgrade-insecure-requests"]
+    return "; ".join(rules)
+
 
 # --------------------------------------------------------------------------
 # Iconos (trazo, 24x24, heredan el color del texto)
@@ -319,6 +340,7 @@ def head(ctx, title, description, noindex=False, extra=""):
 <html lang="{L['lang']}">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="{csp()}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>{esc(full_title)}</title>
@@ -712,7 +734,7 @@ def alert_section(ctx):
                             </div>
                             <div class="field field--hp" aria-hidden="true">
                                 <label for="alerta-web">{C['honeypot']}</label>
-                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
                             </div>
                             <div class="field field--full">
                                 <label class="checkbox" for="alerta-privacidad">
@@ -807,7 +829,7 @@ def valuation_section(ctx):
                             </div>
                             <div class="field field--hp" aria-hidden="true">
                                 <label for="valoracion-web">{C['honeypot']}</label>
-                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
                             </div>
                             <div class="field field--full">
                                 <label class="checkbox" for="valoracion-privacidad">
@@ -1356,7 +1378,7 @@ def build_contact(L):
                             </div>
                             <div class="field field--hp" aria-hidden="true">
                                 <label for="contacto-web">{T['honeypot']}</label>
-                                <input id="contacto-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                                <input id="contacto-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
                             </div>
                             <div class="field field--full">
                                 <label class="checkbox" for="contacto-privacidad">
@@ -1454,6 +1476,7 @@ def build_legacy_redirects(L):
 <html lang="{L['lang']}">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{esc(title)} | Twins Real Estate</title>
     <meta name="robots" content="noindex, follow">
@@ -1499,6 +1522,49 @@ def build_sitemap():
         fh.write(robots)
 
 
+def build_headers():
+    """_headers: cabeceras de seguridad y de caché para Netlify o Cloudflare Pages.
+    GitHub Pages lo ignora (y no lo publica, porque empieza por «_»)."""
+    text = f"""# Generado por _build.py: no lo edite a mano.
+# Cabeceras de seguridad para Netlify / Cloudflare Pages. GitHub Pages ignora este
+# archivo; allí la política de seguridad (CSP) va en una etiqueta <meta> de cada página.
+/*
+  Content-Security-Policy: {csp(meta=False)}
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+
+# styles.css, main.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
+# (ver versioned()): cada cambio genera una dirección nueva, así que el navegador
+# puede guardarlos en caché indefinidamente. Las tipografías no cambian nunca.
+/styles.css
+  Cache-Control: public, max-age=31536000, immutable
+/main.js
+  Cache-Control: public, max-age=31536000, immutable
+/theme.js
+  Cache-Control: public, max-age=31536000, immutable
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+"""
+    with open(os.path.join(SITE_DIR, "_headers"), "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def build_security_txt():
+    """/.well-known/security.txt (RFC 9116): a quién avisar de un problema de seguridad.
+    _config.yml indica a Jekyll (GitHub Pages) que publique la carpeta .well-known."""
+    lines = [f"Contact: mailto:{EMAIL}", f"Expires: {SECURITY_TXT_EXPIRES}", "Preferred-Languages: es, ca, en"]
+    if SITE_URL:
+        lines.append(f"Canonical: {SITE_URL}/.well-known/security.txt")
+    os.makedirs(os.path.join(SITE_DIR, ".well-known"), exist_ok=True)
+    with open(os.path.join(SITE_DIR, ".well-known", "security.txt"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
 def check_translations():
     """Comprueba que todos los idiomas definen exactamente las mismas claves."""
     def keys(value, path=""):
@@ -1531,6 +1597,8 @@ def main():
     build_404(LANGS[0])
     build_legacy_redirects(LANGS[0])
     build_sitemap()
+    build_headers()
+    build_security_txt()
     print("Sitio generado en", SITE_DIR)
 
 

@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; base-uri 'self'; object-src 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Twins Real Estate | Agencia inmobiliaria</title>
@@ -29,7 +30,7 @@
     <link rel="preload" href="fonts/playfair-display-600-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="theme.js?v=fd1966f6e2"></script>
     <link rel="stylesheet" href="styles.css?v=6fd2907716">
-    <script src="main.js?v=1b63cfcc5a" defer></script>
+    <script src="main.js?v=afcc4e10df" defer></script>
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "name": "Twins Real Estate", "slogan": "Porque cada nueva etapa merece un lugar al que llamar hogar.", "email": "twinsreagency@gmail.com", "sameAs": ["https://www.instagram.com/twins.real.estate.agency/"], "url": "https://twinsreagency.github.io/", "logo": "https://twinsreagency.github.io/logo-icon.png", "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"], "knowsLanguage": ["es", "ca", "en"]}</script>
 </head>
 <body>
@@ -186,7 +187,7 @@
                             </div>
                             <div class="field field--hp" aria-hidden="true">
                                 <label for="valoracion-web">No rellene este campo</label>
-                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
                             </div>
                             <div class="field field--full">
                                 <label class="checkbox" for="valoracion-privacidad">

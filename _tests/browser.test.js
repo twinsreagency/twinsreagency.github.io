@@ -86,8 +86,12 @@ async function open(file, { width = 1280, search = "", fixture: useFixture = fal
 
 const visibleCards = (page) => page.locator("#listado-inmuebles .property:not([hidden])").count();
 
-test("las páginas principales cargan sin errores ni recursos externos", async () => {
-    for (const file of ["index.html", "es-inmuebles.html", "es-contacto.html", "ca-inici.html", "en-home.html", "es-blog-mitos-hipoteca.html", "es-nosotros.html", "en-privacy.html"]) {
+test("todas las páginas cargan sin errores, sin bloqueos de la CSP y sin recursos externos", async () => {
+    /* Todas las páginas con contenido (las redirecciones antiguas solo llevan a otra). */
+    const pages = fs.readdirSync(SITE).filter((f) => f.endsWith(".html") &&
+        !fs.readFileSync(path.join(SITE, f), "utf8").includes('http-equiv="refresh"'));
+    assert.ok(pages.length > 50);
+    for (const file of pages) {
         const { page, errors, external, close } = await open(file);
         await page.waitForLoadState("load");
         assert.deepEqual(errors, [], file);
@@ -95,6 +99,25 @@ test("las páginas principales cargan sin errores ni recursos externos", async (
         assert.ok(await page.evaluate(() => document.fonts.check("16px Inter") && document.fonts.check("600 16px 'Playfair Display'")), `${file}: tipografías`);
         await close();
     }
+});
+
+test("la CSP bloquea el código en línea y los recursos de otros dominios", async () => {
+    const { page, close } = await open("index.html");
+    const result = await page.evaluate(() => new Promise((resolve) => {
+        const blocked = [];
+        document.addEventListener("securitypolicyviolation", (e) => blocked.push(e.violatedDirective));
+        const script = document.createElement("script");
+        script.textContent = "window.__inline = true;";
+        document.body.appendChild(script);
+        const img = document.createElement("img");
+        img.src = "https://example.com/pixel.png";
+        document.body.appendChild(img);
+        setTimeout(() => resolve({ inline: Boolean(window.__inline), blocked }), 300);
+    }));
+    assert.equal(result.inline, false);
+    assert.ok(result.blocked.some((d) => d.startsWith("script-src")), JSON.stringify(result.blocked));
+    assert.ok(result.blocked.some((d) => d.startsWith("img-src")), JSON.stringify(result.blocked));
+    await close();
 });
 
 test("sin inmuebles publicados, la web invita a crear una alerta y a vender", async () => {
