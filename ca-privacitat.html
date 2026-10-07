@@ -2,6 +2,7 @@
 <html lang="ca">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; base-uri 'self'; object-src 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Política de privacitat | Twins Real Estate</title>
@@ -15,7 +16,12 @@
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="Política de privacitat | Twins Real Estate">
     <meta property="og:description" content="Política de privacitat de Twins Real Estate: com tractem les vostres dades personals d’acord amb el RGPD i la LOPDGDD.">
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:image" content="https://twinsreagency.github.io/og-image.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Twins Real Estate: compravenda, lloguer i valoració d’immobles">
     <meta property="og:url" content="https://twinsreagency.github.io/ca-privacitat.html">
     <link rel="canonical" href="https://twinsreagency.github.io/ca-privacitat.html">
     <link rel="alternate" hreflang="es" href="https://twinsreagency.github.io/es-privacidad.html">
@@ -25,12 +31,11 @@
     <link rel="icon" href="favicon.ico" sizes="any">
     <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/playfair-display-600-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="theme.js?v=fd1966f6e2"></script>
-    <link rel="stylesheet" href="styles.css?v=59ac19c6a6">
-    <script src="main.js?v=707b9a4b27" defer></script>
+    <link rel="stylesheet" href="styles.min.css?v=ed8f1a04d9">
+    <script src="main.min.js?v=b7f21ca26f" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#contenido">Salta al contingut principal</a>
@@ -38,7 +43,7 @@
     <header class="site-header">
         <div class="container">
             <a class="brand" href="ca-inici.html" aria-label="Twins Real Estate, anar a la pàgina d’inici">
-                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
+                <picture class="logo--on-dark"><source srcset="logo-icon-sm.webp" type="image/webp"><img src="logo-icon-sm.png" alt="" width="26" height="34"></picture><picture class="logo--on-light"><source srcset="logo-icon-dark-sm.webp" type="image/webp"><img src="logo-icon-dark-sm.png" alt="" width="26" height="34"></picture>
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
             <nav class="nav" id="menu-principal" aria-label="Navegació principal">
@@ -70,7 +75,7 @@
             </nav>
             <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Inici", "item": "https://twinsreagency.github.io/ca-inici.html"}, {"@type": "ListItem", "position": 2, "name": "Política de privacitat", "item": "https://twinsreagency.github.io/ca-privacitat.html"}]}</script>
             <h1 class="page-hero__title">Política de privacitat</h1>
-            <p class="page-hero__text">Darrera actualització: 27 de setembre de 2026</p>
+            <p class="page-hero__text">Darrera actualització: 7 d’octubre de 2026</p>
         </div>
     </section>
 
@@ -88,23 +93,25 @@
 <tr><th scope="row">Domicili</th><td><strong>[pendent de completar]</strong></td></tr>
 <tr><th scope="row">Correu electrònic</th><td><a href="mailto:twinsreagency@gmail.com">twinsreagency@gmail.com</a></td></tr>
 <tr><th scope="row">Dades registrals</th><td><strong>[pendent de completar]</strong> (Registre Mercantil, si es tracta d’una societat)</td></tr>
-<tr><th scope="row">Registre d’agents immobiliaris</th><td><strong>[pendent de completar]</strong> (número d’inscripció, quan la normativa autonòmica ho exigeixi)</td></tr>
+<tr><th scope="row">Registre d’agents immobiliaris</th><td><strong>[pendent de completar]</strong> (número d’inscripció al Registre d’Agents Immobiliaris de Catalunya)</td></tr>
 </tbody>
 </table>
 </div>
 <h2>2. Dades que tractem</h2>
-<p>Tractem les dades que ens faciliteu a través del formulari de contacte, per correu electrònic o mitjançant les nostres xarxes socials: nom i cognoms, dades de contacte, el contingut de la vostra consulta i, si escau, la informació necessària per a la prestació dels nostres serveis.</p>
+<p>Tractem les dades que ens faciliteu a través dels formularis del web (contacte, valoració gratuïta i alerta de cerca), per correu electrònic o mitjançant les nostres xarxes socials: nom i cognoms, correu electrònic i telèfon, la localitat, l’adreça i les característiques de l’immoble que voleu valorar o que busqueu, el contingut de la vostra consulta i, si escau, la informació necessària per a la prestació dels nostres serveis.</p>
+<p><strong>Com s’envien els formularis.</strong> En enviar un formulari s’obre el vostre programa de correu electrònic amb el missatge preparat, que només s’envia si vós ho confirmeu. El web no desa ni transmet per si mateix les dades dels formularis.</p>
 <h2>3. Finalitats i base jurídica</h2>
 <ul>
 <li><strong>Atendre les vostres consultes</strong> i trametre-us la informació sol·licitada. Base jurídica: el vostre consentiment (art. 6.1.a RGPD).</li>
 <li><strong>Gestionar la relació precontractual i contractual</strong> derivada dels nostres serveis d’intermediació i assessorament immobiliari. Base jurídica: l’execució d’un contracte o de mesures precontractuals (art. 6.1.b RGPD).</li>
 <li><strong>Complir les obligacions legals</strong> aplicables, entre les quals les derivades de la Llei 10/2010, de prevenció del blanqueig de capitals i del finançament del terrorisme, i de la normativa fiscal. Base jurídica: obligació legal (art. 6.1.c RGPD).</li>
+<li><strong>Garantir la seguretat i el funcionament del lloc web.</strong> El proveïdor d’allotjament registra tècnicament l’adreça IP dels visitants. Base jurídica: interès legítim (art. 6.1.f RGPD).</li>
 </ul>
 <p>No es prenen decisions automatitzades ni s’elaboren perfils amb les vostres dades.</p>
 <h2>4. Termini de conservació</h2>
 <p>Les dades de les consultes es conservaran durant el temps necessari per atendre-les i, com a màxim, durant un any si no s’inicia una relació contractual. Les dades vinculades a un contracte es conservaran mentre duri la relació i, posteriorment, durant els terminis de prescripció de les responsabilitats legals.</p>
 <h2>5. Destinataris</h2>
-<p>No cedim les vostres dades a tercers, llevat d’obligació legal. Hi poden accedir els proveïdors que ens presten serveis de correu electrònic i d’allotjament web, en qualitat d’encarregats del tractament i amb les garanties exigides pel RGPD. Quan algun d’aquests proveïdors es trobi fora de l’Espai Econòmic Europeu, la transferència s’empara en una decisió d’adequació de la Comissió Europea, com el Marc de Privacitat de Dades UE-EUA, o en clàusules contractuals tipus.</p>
+<p>No cedim les vostres dades a tercers, llevat d’obligació legal. Hi poden accedir els proveïdors que ens presten serveis de correu electrònic i d’allotjament web, en qualitat d’encarregats del tractament i amb les garanties exigides pel RGPD. Quan algun d’aquests proveïdors es trobi fora de l’Espai Econòmic Europeu, la transferència s’empara en una decisió d’adequació de la Comissió Europea, com el Marc de Privacitat de Dades UE-EUA, o en clàusules contractuals tipus. En concret, el lloc web està allotjat a GitHub Pages (GitHub, Inc.) i el correu electrònic el presta Google (Gmail).</p>
 <h2>6. Els vostres drets</h2>
 <p>Podeu exercir els drets d’accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, així com retirar el vostre consentiment en qualsevol moment, escrivint a <a href="mailto:twinsreagency@gmail.com">twinsreagency@gmail.com</a> i indicant el dret que voleu exercir.</p>
 <p>Si considereu que el tractament de les vostres dades no s’ajusta a la normativa, podeu presentar una reclamació davant l’Agència Espanyola de Protecció de Dades (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -125,7 +132,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a class="brand" href="ca-inici.html" aria-label="Twins Real Estate, anar a la pàgina d’inici">
-                <img class="logo--on-dark" src="logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="26" height="34">
+                <picture class="logo--on-dark"><source srcset="logo-icon-sm.webp" type="image/webp"><img src="logo-icon-sm.png" alt="" width="26" height="34"></picture><picture class="logo--on-light"><source srcset="logo-icon-dark-sm.webp" type="image/webp"><img src="logo-icon-dark-sm.png" alt="" width="26" height="34"></picture>
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
                     <p>Agència immobiliària especialitzada en compravenda, lloguer i inversió. Assessorament proper, rigorós i transparent en cada operació.</p>
@@ -164,6 +171,7 @@
                     </ul>
                 </div>
             </div>
+
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. Tots els drets reservats.</p>
                 <nav class="footer-legal" aria-label="Informació legal">

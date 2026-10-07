@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- Plantilla de la imagen para compartir en redes (og-image.jpg, 1200 × 630).
+     No se publica (la carpeta empieza por «_»). Para regenerarla:
+     node _og/make.js   (necesita Playwright) -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Inter"; font-weight: 300 700; src: url("../fonts/inter-latin.woff2") format("woff2"); }
+@font-face { font-family: "Playfair Display"; font-weight: 600; src: url("../fonts/playfair-display-600-latin.woff2") format("woff2"); }
+@font-face { font-family: "Playfair Display"; font-style: italic; font-weight: 500; src: url("../fonts/playfair-display-500-italic-latin.woff2") format("woff2"); }
+html, body { margin: 0; }
+.card {
+    position: relative; width: 1200px; height: 630px; overflow: hidden; box-sizing: border-box;
+    display: flex; align-items: center; gap: 80px; padding: 0 120px;
+    background:
+        radial-gradient(60% 70% at 22% 50%, rgba(176, 141, 93, 0.28), transparent 70%),
+        repeating-linear-gradient(0deg, transparent 0 39px, rgba(26, 26, 26, 0.035) 39px 40px),
+        repeating-linear-gradient(90deg, transparent 0 39px, rgba(26, 26, 26, 0.035) 39px 40px),
+        linear-gradient(160deg, #fbf8f3 0%, #f2ede4 55%, #e6dccb 100%);
+    font-family: "Inter", sans-serif; color: #1a1a1a;
+}
+.card::after { content: ""; position: absolute; inset: 24px; border: 1px solid rgba(122, 92, 51, 0.35); border-radius: 28px; }
+.logo { width: 151px; height: auto; filter: drop-shadow(0 0 40px rgba(176, 141, 93, 0.45)); }
+.name { margin: 0; font-family: "Playfair Display", serif; font-weight: 600; font-size: 74px; line-height: 1; white-space: nowrap; letter-spacing: 0.01em; color: #7a5c33; }
+.name span { color: #1a1a1a; }
+.rule { width: 120px; height: 4px; margin: 34px 0 30px; border-radius: 2px; background: linear-gradient(120deg, #b08d5d 0%, #8a6a3e 50%, #5e4524 100%); }
+.tagline { margin: 0; font-family: "Playfair Display", serif; font-style: italic; font-weight: 500; font-size: 38px; line-height: 1.3; color: #2e2923; }
+</style>
+</head>
+<body>
+<div class="card">
+    <img class="logo" src="../logo-icon-dark.png" alt="">
+    <div>
+        <p class="name">Twins <span>Real Estate</span></p>
+        <div class="rule"></div>
+        <p class="tagline">Compraventa · Alquiler · Valoración</p>
+    </div>
+</div>
+</body>
+</html>

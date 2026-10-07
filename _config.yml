@@ -1,0 +1,12 @@
+# Configuración de Jekyll, que GitHub Pages usa para publicar el sitio.
+# Las páginas ya están generadas por _build.py: Jekyll solo copia los archivos.
+# Por defecto no publica nada que empiece por «_» o «.» (generador, textos, pruebas,
+# .github…); aquí se añade solo la carpeta .well-known, que contiene security.txt.
+include:
+  - ".well-known"
+
+# Fuentes de styles.min.css y main.min.js (las genera _build.py): las páginas
+# solo enlazan las versiones compactas.
+exclude:
+  - "styles.css"
+  - "main.js"

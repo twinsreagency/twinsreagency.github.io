@@ -6,7 +6,7 @@ C = {
     "locale": "es_ES",
     "label": "Español",
     "abbr": "ES",
-    "slugs": {"index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
+    "slugs": {"zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
 
     "ui": {
         "skip": "Saltar al contenido principal",
@@ -55,10 +55,11 @@ C = {
         "consult": "Consultar con un asesor",
         "article_notice": "Este artículo tiene carácter meramente informativo y no constituye asesoramiento jurídico, fiscal ni financiero. La normativa puede variar según la comunidad autónoma; consulte su caso con un profesional.",
         "updated": "Última actualización: {}",
-        "updated_date": "27 de septiembre de 2026",
+        "updated_date": "7 de octubre de 2026",
         "theme_to_light": "Cambiar a tema claro",
         "theme_to_dark": "Cambiar a tema oscuro",
         "scroll_hint": "Deslice para descubrir",
+        "og_image_alt": "Twins Real Estate: compraventa, alquiler y valoración de inmuebles",
         "commitments_title": "Nuestros compromisos",
     },
 
@@ -95,17 +96,9 @@ C = {
         "ref": "Ref.",
     },
 
-    "properties": {
-        "TRE-001": ("Casa moderna con vistas al lago", "Zona Norte · Urbanización Los Lagos", "Destacado"),
-        "TRE-002": ("Ático en el casco antiguo", "Centro · Casco antiguo", "Novedad"),
-        "TRE-003": ("Piso luminoso con terraza", "Zona Sur · Jardines del Valle", None),
-        "TRE-004": ("Villa contemporánea con piscina", "Zona Este · Club de Campo", "Exclusiva"),
-        "TRE-005": ("Loft en el distrito creativo", "Zona Oeste · Distrito Creativo", None),
-        "TRE-006": ("Casa de campo con jardín", "Entorno rural · Valle Verde", "Precio rebajado"),
-        "TRE-007": ("Piso con vistas panorámicas", "Centro · Torre Mirador", "Novedad"),
-        "TRE-008": ("Casa familiar con amplio jardín", "Zona Norte · Los Bosques", None),
-        "TRE-009": ("Residencia de diseño minimalista", "Zona Este · Colinas del Sol", "Exclusiva"),
-    },
+    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia:
+    #     "TRE-001": ("Piso luminoso con terraza", "Igualada · Centro", "Novedad"),
+    "properties": {},
 
     "commitments": [
         ("Información verificada", "Revisamos la nota simple, las cargas y el certificado energético antes de publicar cada inmueble."),
@@ -142,11 +135,6 @@ C = {
     },
     "footer_services": ["Compraventa", "Alquiler de viviendas", "Gestión de alquileres", "Inversión inmobiliaria", "Valoración de inmuebles"],
 
-    # Nombres traducidos de las localidades o zonas de los inmuebles de ejemplo.
-    # Las localidades reales (Igualada, Montbui…) se definen una sola vez en TOWNS (_build.py).
-    "places": {"centro": "Centro", "norte": "Zona Norte", "sur": "Zona Sur", "este": "Zona Este",
-               "oeste": "Zona Oeste", "periferia": "Periferia y entorno rural"},
-
     "alert": {
         "eyebrow": "Alerta de búsqueda",
         "title": "¿No encuentra inmuebles en su localidad?",
@@ -162,7 +150,57 @@ C = {
         "submit": "Crear alerta",
         "mail_subject": "Alerta de búsqueda",
         "filter_hint": "¿No aparece su localidad?",
+        "purpose": "gestionar su alerta de búsqueda y avisarle de los inmuebles que encajen con ella",
         "filter_link": "Cree una alerta de búsqueda",
+    },
+
+    # Páginas por localidad (una por cada localidad de TOWNS en _build.py). {town} es el
+    # nombre de la localidad. El texto propio de cada una va en «towns», por clave de TOWNS.
+    "town_page": {
+        "title": "Vender o comprar vivienda en {town}",
+        "description": "Twins Real Estate le ayuda a vender, comprar o alquilar vivienda en {town}: valoración gratuita, alerta de búsqueda y acompañamiento hasta la firma.",
+        "h1": "Vender o comprar vivienda en {town}",
+        "text": "Le acompañamos en la venta, la compra y el alquiler de inmuebles en {town}, con un asesoramiento cercano, riguroso y transparente.",
+        "crumb": "Zonas",
+        "eyebrow": "Cómo trabajamos",
+        "h2": "Su agencia inmobiliaria en {town}",
+        "paras": [
+            "Somos una agencia inmobiliaria con base en Igualada que trabaja sin oficina abierta al público: le atendemos con cita previa, en persona o por videollamada, y nos desplazamos a {town} para visitar su inmueble y acompañarle en las visitas.",
+            "Antes de comercializar un inmueble revisamos su documentación y su situación registral, y fijamos el precio a partir de inmuebles comparables. Las condiciones de nuestro trabajo se acuerdan por escrito desde el principio.",
+        ],
+        "services_title": "Qué podemos hacer por usted en {town}",
+        "owners_title": "Si desea vender o alquilar",
+        "owners_text": "Solicite una valoración gratuita y sin compromiso de su vivienda, local o terreno en {town}. Le propondremos un precio realista y un plan para comercializarlo.",
+        "buyers_title": "Si busca vivienda",
+        "buyers_text": "Cree una alerta de búsqueda para {town}: le avisaremos en cuanto tengamos un inmueble que encaje con lo que necesita, antes de publicarlo.",
+        "listings_title": "Inmuebles en {town}",
+        "footer_title": "Dónde trabajamos",
+    },
+    "towns": {},
+
+    "valuation": {
+        "eyebrow": "Valoración gratuita",
+        "title": "Valoración gratuita de su inmueble",
+        "text": "¿Desea saber cuánto vale su vivienda antes de venderla o alquilarla? Facilítenos unos datos básicos y le llamaremos para conocer su inmueble. Después de estudiarlo, le daremos una valoración de mercado razonada, gratuita y sin compromiso.",
+        "checks": ["Sin coste y sin compromiso de venta",
+                   "Basada en el estado del inmueble y en la oferta de la zona",
+                   "Sus datos solo se utilizan para preparar la valoración"],
+        "note": "No es una tasación oficial: las tasaciones con validez hipotecaria solo pueden emitirlas las sociedades de tasación homologadas.",
+        "form_title": "Solicite su valoración",
+        "labels": {
+            "localidad": "Localidad *",
+            "direccion": "Dirección (opcional)",
+            "tipo": "Tipo de inmueble *",
+            "metros": "Superficie (m²) *",
+            "dormitorios": "Dormitorios",
+            "telefono": "Teléfono *",
+        },
+        "localidad_placeholder": "Por ejemplo, Igualada",
+        "direccion_placeholder": "Calle y número",
+        "tipo_placeholder": "Seleccione una opción",
+        "submit": "Solicitar la valoración",
+        "mail_subject": "Valoración gratuita",
+        "purpose": "ponernos en contacto con usted para valorar su inmueble y remitirle la valoración",
     },
 
     "sell": {
@@ -184,8 +222,16 @@ C = {
         "slogan": "Porque cada nueva etapa merece un lugar al que llamar hogar.",
         "text": "Acompañamos a particulares, familias e inversores en la compra, la venta y el alquiler de inmuebles, con un asesoramiento cercano, riguroso y transparente en cada fase de la operación.",
         "btn_props": "Ver inmuebles",
+        "btn_valuation": "Valore su inmueble gratis",
         "btn_advice": "Solicitar asesoramiento",
         "pillars": ["Operaciones con seguridad jurídica", "Honorarios claros desde el inicio", "Atención personalizada"],
+        "paths_eyebrow": "Cómo podemos ayudarle",
+        "paths_title": "Díganos qué necesita",
+        "paths_lead": "Mientras preparamos nuestra cartera, ya podemos ayudarle tanto si desea vender o alquilar su inmueble como si busca uno.",
+        "paths": [
+            ("Quiero vender o alquilar", "Solicite una valoración gratuita y sin compromiso. Estudiaremos su inmueble y le propondremos un precio realista y un plan para comercializarlo.", "Solicitar una valoración"),
+            ("Busco vivienda", "Indíquenos la localidad y el tipo de inmueble que necesita. Le avisaremos en cuanto tengamos una opción que encaje, antes de publicarla.", "Crear una alerta de búsqueda"),
+        ],
         "featured_eyebrow": "Cartera de inmuebles",
         "featured_title": "Inmuebles destacados",
         "featured_lead": "Una selección de viviendas disponibles, revisadas por nuestro equipo en cuanto a documentación, estado y precio de mercado.",
@@ -224,6 +270,15 @@ C = {
         "empty_title": "No hay inmuebles con estos criterios",
         "empty_text": "Modifique los filtros o indíquenos qué busca: le informaremos de las opciones disponibles, incluidas las que todavía no se han publicado.",
         "empty_btn": "Comuníquenos su búsqueda",
+        "soon": {
+            "description": "Twins Real Estate está seleccionando sus primeros inmuebles en venta y alquiler. Cree una alerta de búsqueda o solicite una valoración gratuita de su vivienda.",
+            "text": "Estamos seleccionando nuestros primeros inmuebles. Indíquenos qué busca y le avisaremos antes que a nadie.",
+            "eyebrow": "Cartera en preparación",
+            "title": "Estamos seleccionando nuestros primeros inmuebles",
+            "body": "Preferimos publicar pocos inmuebles, bien revisados, antes que llenar esta página de anuncios. Mientras preparamos la cartera, indíquenos qué busca y le avisaremos en cuanto tengamos una opción que encaje. Si desea vender o alquilar su vivienda, estaremos encantados de valorarla sin compromiso.",
+            "btn_alert": "Crear una alerta de búsqueda",
+            "btn_sell": "Quiero vender mi inmueble",
+        },
     },
 
     "nosotros": {
@@ -236,8 +291,13 @@ C = {
         "paras": [
             "Twins Real Estate nace de una convicción sencilla: comprar, vender o alquilar una vivienda es una de las decisiones más importantes en la vida de una persona, y merece un acompañamiento profesional, honesto y cercano.",
             "Por ello hemos construido una agencia centrada en las personas, en la que cada cliente cuenta con un asesor de referencia, información clara en todo momento y un proceso ordenado desde la primera reunión hasta la entrega de llaves.",
-            "Trabajamos con una cartera cuidadosamente seleccionada y con una red de profesionales colaboradores —notarías, abogados, gestorías y entidades financieras— que nos permite ofrecer un servicio integral.",
+            "Seleccionamos con cuidado cada inmueble que comercializamos y coordinamos cada operación con notarías, abogados, gestorías y entidades financieras, para ofrecerle un servicio integral.",
         ],
+        "photos_eyebrow": "En persona",
+        "photos_title": "Conozca al equipo",
+        # Texto alternativo y pie de cada foto de TEAM_PHOTOS (_build.py), por nombre de archivo:
+        #     "equipo": ("Gerard y … en una reunión con clientes", "El equipo de Twins Real Estate"),
+        "photos": {},
         "btn": "Hablar con un asesor",
         "purpose_eyebrow": "Propósito",
         "purpose_title": "Misión y visión",
@@ -301,6 +361,76 @@ C = {
     },
 
     "posts": {
+        "gastos-impuestos-vender-piso-cataluna": dict(
+            slug="gastos-impuestos-vender-piso-cataluna", category="Fiscalidad", date_label="7 de octubre de 2026",
+            title="Gastos e impuestos al vender un piso en Cataluña",
+            excerpt="Plusvalía municipal, IRPF, cancelación de la hipoteca y otros gastos: lo que conviene prever antes de poner su vivienda a la venta.",
+            body="""
+<p class="lead">Antes de fijar el precio de venta de su vivienda, conviene saber qué parte de ese importe se destinará a impuestos y gastos. Estos son los conceptos más habituales para el vendedor en Cataluña. Las cantidades exactas dependen de cada caso, por lo que le recomendamos confirmarlas con su asesor fiscal.</p>
+<h2>1. La plusvalía municipal</h2>
+<p>El impuesto sobre el incremento de valor de los terrenos de naturaleza urbana, conocido como <strong>plusvalía municipal</strong>, lo cobra el ayuntamiento y, en una compraventa, lo paga el vendedor. Grava el aumento de valor del suelo durante los años en que ha sido propietario.</p>
+<p>Desde la reforma de noviembre de 2021, el contribuyente puede optar por el cálculo que le resulte más favorable: el método objetivo, basado en el valor catastral del suelo y en unos coeficientes que dependen de los años transcurridos, o el método real, basado en la ganancia efectiva. Si puede acreditar que no ha habido incremento de valor, no se paga. Cada ayuntamiento fija el tipo dentro de los límites legales y el plazo para declararlo, en una venta, es de 30 días hábiles.</p>
+<h2>2. El IRPF por la ganancia patrimonial</h2>
+<p>Si vende por un importe superior al que pagó, la diferencia tributa en la declaración de la renta del año siguiente como <strong>ganancia patrimonial</strong>. Para calcularla, al precio de compra se suman los gastos e impuestos que pagó al adquirir la vivienda y las mejoras realizadas, y al precio de venta se restan los gastos de la venta, como los honorarios de la agencia o la plusvalía municipal.</p>
+<p>La ganancia se integra en la base del ahorro, que tributa por tramos: 19 % hasta 6.000 €, 21 % de 6.000 a 50.000 €, 23 % de 50.000 a 200.000 €, 27 % de 200.000 a 300.000 € y 30 % a partir de 300.000 €.</p>
+<p>Existen supuestos en los que la ganancia puede quedar exenta, entre ellos la reinversión del importe obtenido en una nueva vivienda habitual dentro de los plazos legales y la venta de la vivienda habitual por personas mayores de 65 años. Si el vendedor no reside en España, el comprador debe retener el 3 % del precio e ingresarlo en Hacienda a cuenta del impuesto del vendedor.</p>
+<h2>3. La cancelación de la hipoteca</h2>
+<p>Si la vivienda tiene una hipoteca pendiente, lo habitual es cancelarla en el momento de la firma con parte del precio. Además de la deuda pendiente, revise si su contrato prevé una comisión por amortización anticipada, que la ley limita. Para que la carga desaparezca del Registro de la Propiedad también hay que cancelarla registralmente, lo que supone gastos de notaría, de registro y, en su caso, de gestoría.</p>
+<h2>4. Notaría, IBI y comunidad</h2>
+<p>Según el Código civil, salvo que las partes pacten otra cosa, los gastos de otorgamiento de la escritura corresponden al vendedor y los de la primera copia y posteriores, al comprador. En la práctica es habitual pactar el reparto, por lo que conviene dejarlo por escrito en el contrato de arras.</p>
+<p>El IBI del año de la venta lo debe la persona que era propietaria el 1 de enero, aunque es frecuente acordar que se reparta en proporción a los meses de cada parte. Conviene que las cuotas de la comunidad de propietarios estén al día en el momento de la venta: el comprador puede exigirlo y la vivienda responde de determinadas deudas con la comunidad.</p>
+<h2>5. Certificados y honorarios</h2>
+<p>Para vender necesitará el <strong>certificado de eficiencia energética</strong> y, en Cataluña, por regla general, la <strong>cédula de habitabilidad</strong> vigente. Si alguno no está en vigor, deberá encargarlo a un técnico. A ello se suman los honorarios de la agencia inmobiliaria, si la contrata, que deben acordarse por escrito antes de iniciar la venta.</p>
+<h2>Calcule antes de fijar el precio</h2>
+<p>Conocer estos gastos le permitirá saber cuánto recibirá realmente por su vivienda y negociar con tranquilidad. En Twins Real Estate le ayudamos a estimar los gastos de su operación y le orientamos para que consulte con un asesor fiscal los aspectos que lo requieran.</p>
+"""),
+        "documentos-vender-vivienda": dict(
+            slug="documentos-vender-vivienda", category="Legal", date_label="7 de octubre de 2026",
+            title="Documentos que necesita para vender su vivienda",
+            excerpt="Escritura, nota simple, certificado energético, cédula de habitabilidad y otros documentos que conviene reunir antes de anunciar la venta.",
+            body="""
+<p class="lead">Tener la documentación preparada desde el principio transmite confianza a los compradores y evita retrasos en la firma de las arras y de la escritura. Esta es la lista de documentos que se suele pedir para vender una vivienda en Cataluña.</p>
+<h2>1. Identificación de los propietarios</h2>
+<p>El DNI o NIE vigente de todas las personas que figuran como titulares. Si la vivienda es la residencia familiar, puede ser necesario el consentimiento del cónyuge o de la pareja aunque no figure como propietario, por lo que conviene comprobarlo con antelación.</p>
+<h2>2. Título de propiedad y nota simple</h2>
+<p>La <strong>escritura de propiedad</strong> acredita cómo adquirió la vivienda: compraventa, herencia, donación u otro título. Además, conviene solicitar una <strong>nota simple</strong> reciente al Registro de la Propiedad, que muestra quién es el titular y si existen cargas, como una hipoteca o un embargo. Si heredó la vivienda, necesitará también la escritura de aceptación de la herencia.</p>
+<h2>3. Certificado de eficiencia energética</h2>
+<p>Es obligatorio para vender y para anunciar la vivienda: la etiqueta energética debe figurar en los anuncios. Lo emite un técnico competente después de visitar el inmueble y con carácter general tiene una validez de diez años.</p>
+<h2>4. Cédula de habitabilidad</h2>
+<p>En Cataluña, la Ley del derecho a la vivienda exige, por regla general, entregar al comprador la cédula de habitabilidad vigente, y el notario debe comprobarlo. La ley prevé excepciones limitadas, por ejemplo cuando la vivienda se vende para rehabilitarla y el comprador lo acepta expresamente. Si la cédula ha caducado, puede solicitarse una nueva con el certificado de un técnico.</p>
+<h2>5. Recibos y certificados de pago</h2>
+<ul>
+<li>El último recibo del <strong>IBI</strong>, que además indica la referencia catastral.</li>
+<li>Un <strong>certificado de la comunidad de propietarios</strong> sobre el estado de pago de las cuotas, que expide el secretario o el administrador de la finca.</li>
+<li>Si hay hipoteca pendiente, un <strong>certificado de deuda</strong> emitido por la entidad financiera.</li>
+<li>Los últimos recibos de los suministros (agua, luz y gas), útiles para el cambio de titularidad.</li>
+</ul>
+<h2>6. Otros documentos útiles</h2>
+<p>Los planos de la vivienda, los estatutos de la comunidad y, si el edificio ha pasado la inspección técnica obligatoria, el informe y el certificado correspondientes. No siempre son imprescindibles, pero responden a preguntas frecuentes de los compradores.</p>
+<h2>Le ayudamos a reunirla</h2>
+<p>Revisamos la documentación de su vivienda antes de ponerla a la venta, le indicamos qué falta y le orientamos para obtenerlo. Así la operación avanza sin sorpresas hasta la firma ante notario.</p>
+"""),
+        "preparar-vivienda-vender": dict(
+            slug="preparar-vivienda-vender", category="Venta", date_label="7 de octubre de 2026",
+            title="Cómo preparar su vivienda para venderla antes",
+            excerpt="Orden, pequeñas reparaciones, buena luz y un precio realista: consejos prácticos para que su vivienda atraiga compradores desde el primer día.",
+            body="""
+<p class="lead">Los compradores se forman una opinión en pocos segundos, primero con las fotografías y después en la visita. Preparar la vivienda antes de anunciarla no requiere grandes obras, sino atención a los detalles.</p>
+<h2>1. Orden y despersonalización</h2>
+<p>Retire objetos personales, fotografías familiares y muebles que estrechen los espacios. Una vivienda despejada parece más amplia y permite que el comprador se imagine viviendo en ella. Aproveche para vaciar armarios y trasteros: también se visitan.</p>
+<h2>2. Pequeñas reparaciones</h2>
+<p>Arregle grifos que gotean, persianas que no suben, enchufes sueltos o puertas que rozan. Son reparaciones económicas, pero un comprador las percibe como señales de falta de mantenimiento y tiende a descontarlas del precio.</p>
+<h2>3. Limpieza, pintura y luz</h2>
+<p>Una limpieza a fondo y, si hace falta, una mano de pintura en tonos neutros mejoran mucho la primera impresión. Abra persianas y cortinas, cambie las bombillas fundidas y ventile antes de cada visita.</p>
+<h2>4. Fotografías de calidad</h2>
+<p>La mayoría de los compradores empieza su búsqueda en internet. Unas buenas fotografías, tomadas con luz natural y con las estancias ordenadas, son decisivas para conseguir visitas.</p>
+<h2>5. Documentación preparada</h2>
+<p>Tener a mano la nota simple, el certificado energético y la cédula de habitabilidad permite responder con rapidez a los compradores interesados y evita retrasos cuando llega una oferta.</p>
+<h2>6. Un precio realista desde el inicio</h2>
+<p>Es el factor más importante. Una vivienda con un precio por encima del mercado recibe menos visitas y, con el tiempo, suele acabar vendiéndose después de varias rebajas. Un precio fundamentado en inmuebles comparables de la zona atrae a los compradores adecuados desde el primer día.</p>
+<h2>Solicite una valoración gratuita</h2>
+<p>Visitamos su vivienda, le indicamos qué mejoras merecen la pena y le proponemos un precio de salida realista, sin compromiso.</p>
+"""),
         "comprar-o-alquilar-en-2026": dict(
             slug="comprar-o-alquilar-en-2026", category="Mercado", date_label="15 de enero de 2026",
             title="¿Comprar o alquilar vivienda en 2026? Claves para decidir",
@@ -474,8 +604,14 @@ C = {
         "subject_placeholder": "Seleccione una opción",
         "subjects": ["Compra de un inmueble", "Venta de un inmueble", "Alquiler de un inmueble", "Gestión de alquileres",
                      "Valoración de un inmueble", "Asesoramiento para inversión", "Solicitar una cita", "Otra consulta"],
-        "legal_html": '<strong>Información básica sobre protección de datos.</strong> Responsable: Twins Real Estate. Finalidad: atender su consulta y, en su caso, remitirle la información solicitada. Legitimación: su consentimiento. Destinatarios: no se cederán datos a terceros, salvo obligación legal. Derechos: acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, tal como se detalla en la <a href="%%PRIVACY%%">política de privacidad</a>.',
+        "legal_html": '<strong>Información básica sobre protección de datos.</strong> Responsable: Twins Real Estate. Finalidad: %%PURPOSE%%. Legitimación: su consentimiento. Destinatarios: no se cederán datos a terceros, salvo obligación legal. Derechos: acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, tal como se detalla en la <a href="%%PRIVACY%%">política de privacidad</a>.',
+        "purpose": "atender su consulta y, en su caso, remitirle la información solicitada",
         "submit": "Enviar consulta",
+    },
+
+    "privacy_forms": {
+        "mail": '<p><strong>Cómo se envían los formularios.</strong> Al enviar un formulario se abre su programa de correo electrónico con el mensaje preparado, que solo se envía si usted lo confirma. La web no guarda ni transmite por sí misma los datos de los formularios.</p>',
+        "endpoint": '<p><strong>Cómo se envían los formularios.</strong> Los datos de los formularios se envían de forma cifrada al servicio Formspree (Formspree, Inc., EE. UU.), que los reenvía a nuestro correo electrónico y actúa como encargado del tratamiento.</p>',
     },
 
     "owner": {
@@ -487,7 +623,7 @@ C = {
             ("Domicilio", "pending", ""),
             ("Correo electrónico", "email", ""),
             ("Datos registrales", "pending", "(Registro Mercantil, si se trata de una sociedad)"),
-            ("Registro de agentes inmobiliarios", "pending", "(número de inscripción, cuando la normativa autonómica lo exija)"),
+            ("Registro de agentes inmobiliarios", "pending", "(número de inscripción en el Registro de Agentes Inmobiliarios de Cataluña)"),
         ],
     },
 
@@ -525,18 +661,20 @@ C = {
 <h2>1. Responsable del tratamiento</h2>
 %%OWNER%%
 <h2>2. Datos que tratamos</h2>
-<p>Tratamos los datos que usted nos facilita a través del formulario de contacto, por correo electrónico o mediante nuestras redes sociales: nombre y apellidos, datos de contacto, el contenido de su consulta y, en su caso, la información necesaria para la prestación de nuestros servicios.</p>
+<p>Tratamos los datos que usted nos facilita a través de los formularios de la web (contacto, valoración gratuita y alerta de búsqueda), por correo electrónico o mediante nuestras redes sociales: nombre y apellidos, correo electrónico y teléfono, la localidad, la dirección y las características del inmueble que desea valorar o que busca, el contenido de su consulta y, en su caso, la información necesaria para la prestación de nuestros servicios.</p>
+%%FORMS%%
 <h2>3. Finalidades y base jurídica</h2>
 <ul>
 <li><strong>Atender sus consultas</strong> y remitirle la información solicitada. Base jurídica: su consentimiento (art. 6.1.a RGPD).</li>
 <li><strong>Gestionar la relación precontractual y contractual</strong> derivada de nuestros servicios de intermediación y asesoramiento inmobiliario. Base jurídica: la ejecución de un contrato o de medidas precontractuales (art. 6.1.b RGPD).</li>
 <li><strong>Cumplir las obligaciones legales</strong> aplicables, entre ellas las derivadas de la Ley 10/2010, de prevención del blanqueo de capitales y de la financiación del terrorismo, y de la normativa fiscal. Base jurídica: obligación legal (art. 6.1.c RGPD).</li>
+<li><strong>Garantizar la seguridad y el funcionamiento del sitio web.</strong> El proveedor de alojamiento registra técnicamente la dirección IP de los visitantes. Base jurídica: interés legítimo (art. 6.1.f RGPD).</li>
 </ul>
 <p>No se adoptan decisiones automatizadas ni se elaboran perfiles con sus datos.</p>
 <h2>4. Plazo de conservación</h2>
 <p>Los datos de las consultas se conservarán durante el tiempo necesario para atenderlas y, como máximo, durante un año si no se inicia una relación contractual. Los datos vinculados a un contrato se conservarán mientras dure la relación y, posteriormente, durante los plazos de prescripción de las responsabilidades legales.</p>
 <h2>5. Destinatarios</h2>
-<p>No cedemos sus datos a terceros, salvo obligación legal. Pueden acceder a ellos los proveedores que nos prestan servicios de correo electrónico y de alojamiento web, en calidad de encargados del tratamiento y con las garantías exigidas por el RGPD. Cuando alguno de estos proveedores se encuentre fuera del Espacio Económico Europeo, la transferencia se ampara en una decisión de adecuación de la Comisión Europea, como el Marco de Privacidad de Datos UE-EE. UU., o en cláusulas contractuales tipo.</p>
+<p>No cedemos sus datos a terceros, salvo obligación legal. Pueden acceder a ellos los proveedores que nos prestan servicios de correo electrónico y de alojamiento web, en calidad de encargados del tratamiento y con las garantías exigidas por el RGPD. Cuando alguno de estos proveedores se encuentre fuera del Espacio Económico Europeo, la transferencia se ampara en una decisión de adecuación de la Comisión Europea, como el Marco de Privacidad de Datos UE-EE. UU., o en cláusulas contractuales tipo. En concreto, el sitio web está alojado en GitHub Pages (GitHub, Inc.) y el correo electrónico lo presta Google (Gmail).</p>
 <h2>6. Sus derechos</h2>
 <p>Puede ejercer sus derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, así como retirar su consentimiento en cualquier momento, escribiendo a <a href="mailto:%%EMAIL%%">%%EMAIL%%</a> e indicando el derecho que desea ejercer.</p>
 <p>Si considera que el tratamiento de sus datos no se ajusta a la normativa, puede presentar una reclamación ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -568,7 +706,7 @@ C = {
 </table>
 </div>
 <h2>3. Recursos de terceros</h2>
-<p>Para mostrar las tipografías del sitio, su navegador descarga archivos del servicio Google Fonts, prestado por Google. Este servicio no instala cookies, aunque, como en cualquier conexión a internet, recibe la dirección IP del dispositivo que realiza la solicitud. Puede consultar la política de privacidad de Google en <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+<p>Las tipografías y el resto de recursos de esta web se sirven desde el propio sitio: no se carga ningún servicio de terceros, como Google Fonts, herramientas de analítica, publicidad, vídeos o mapas.</p>
 <p>Los enlaces a Instagram solo le dirigen a esa red social cuando usted hace clic en ellos; este sitio no incorpora contenidos ni complementos de redes sociales.</p>
 <h2>4. Cambios en esta política</h2>
 <p>Si en el futuro incorporamos cookies que requieran su consentimiento, actualizaremos esta política y habilitaremos el mecanismo de consentimiento correspondiente antes de su instalación.</p>

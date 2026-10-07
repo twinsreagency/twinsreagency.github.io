@@ -9,6 +9,34 @@
                8. Movimiento · 9. Responsive
    ========================================================================== */
 
+/* 0. Tipografías ------------------------------------------------------------ */
+/* Servidas desde la propia web (sin Google Fonts: no se envía la IP del visitante a
+   terceros). Solo el juego de caracteres latino, que cubre el castellano, el catalán
+   y el inglés, y solo los pesos que se usan. Licencia SIL OFL 1.1 (fonts/OFL-*.txt). */
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("fonts/inter-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Playfair Display";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("fonts/playfair-display-600-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Playfair Display";
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url("fonts/playfair-display-500-italic-latin.woff2") format("woff2");
+}
+
 /* 1. Tokens ---------------------------------------------------------------- */
 /* Valores base: tema oscuro. El tema crema (predeterminado) los redefine abajo.
    theme.js fija data-theme en <html> antes de pintar; sin JavaScript se ve el crema. */
@@ -645,6 +673,7 @@ h4 {
 }
 
 .brand img {
+    display: block;
     width: 22px;
     height: 29px;
 }
@@ -834,6 +863,28 @@ h4 {
     border-bottom: 1px solid var(--stroke);
 }
 
+.footer-areas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--stroke);
+}
+
+.footer-areas .footer-title {
+    margin: 0;
+}
+
+.footer-areas ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .footer-brand .brand {
     margin-bottom: 1.25rem;
 }
@@ -857,6 +908,7 @@ h4 {
 }
 
 .footer-links a:hover,
+.footer-areas a:hover,
 .footer-contact a:hover,
 .footer-legal a:hover {
     color: var(--text);
@@ -1568,12 +1620,20 @@ h4 {
     scroll-margin-top: var(--header-h);
 }
 
-.alert {
+.alert,
+.valuation .split {
     align-items: start;
 }
 
+.valuation__note {
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-2);
+}
+
 @media (min-width: 861px) {
-    .alert > :first-child {
+    .alert > :first-child,
+    .valuation .split > :first-child {
         position: sticky;
         top: calc(var(--header-h) + 2rem);
     }
@@ -1788,6 +1848,50 @@ h4 {
     max-width: 480px;
     margin: 0 auto 1.5rem;
     color: var(--text-2);
+}
+
+/* Fotos reales del equipo («Nosotros») */
+.photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 1.5rem;
+}
+
+.photo {
+    margin: 0;
+}
+
+.photo img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius-lg);
+}
+
+.photo figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-2);
+}
+
+.section-title--sm {
+    font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+}
+
+/* Cartera en preparación (página «Inmuebles» sin inmuebles publicados) */
+.portfolio-soon .eyebrow {
+    margin-bottom: 0.75rem;
+}
+
+.portfolio-soon p {
+    max-width: 620px;
+}
+
+.empty-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
 }
 
 /* Tarjeta de inmueble */
@@ -2127,8 +2231,13 @@ h4 {
         linear-gradient(180deg, var(--media-a), var(--media-b));
 }
 
-.split__frame img {
+.split__frame picture {
     width: 30%;
+}
+
+.split__frame img {
+    width: 100%;
+    height: auto;
     filter: drop-shadow(0 0 30px rgba(199, 169, 125, 0.5));
 }
 
@@ -2832,6 +2941,27 @@ h4 {
     }
 }
 
+/* Móviles muy estrechos (320 px): la cabecera necesita algo más de espacio
+   para que el botón del menú no quede pegado al borde. */
+@media (max-width: 480px) {
+    /* Los botones con textos largos (p. ej. en catalán) pueden partirse en dos líneas. */
+    .btn {
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+    }
+}
+
+@media (max-width: 359px) {
+    .site-header .container {
+        gap: 0.75rem;
+    }
+
+    .brand {
+        font-size: 1.2rem;
+    }
+}
+
 @media (max-width: 1024px) {
     .grid--3 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3028,3 +3158,4 @@ h4 {
         margin: 0;
     }
 }
+

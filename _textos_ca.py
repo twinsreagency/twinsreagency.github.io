@@ -6,7 +6,7 @@ C = {
     "locale": "ca_ES",
     "label": "Català",
     "abbr": "CA",
-    "slugs": {"index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
+    "slugs": {"zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
 
     "ui": {
         "skip": "Salta al contingut principal",
@@ -55,10 +55,11 @@ C = {
         "consult": "Consulteu un assessor",
         "article_notice": "Aquest article té caràcter merament informatiu i no constitueix assessorament jurídic, fiscal ni financer. La normativa pot variar segons la comunitat autònoma; consulteu el vostre cas amb un professional.",
         "updated": "Darrera actualització: {}",
-        "updated_date": "27 de setembre de 2026",
+        "updated_date": "7 d’octubre de 2026",
         "theme_to_light": "Canvia al tema clar",
         "theme_to_dark": "Canvia al tema fosc",
         "scroll_hint": "Llisqueu per descobrir",
+        "og_image_alt": "Twins Real Estate: compravenda, lloguer i valoració d’immobles",
         "commitments_title": "Els nostres compromisos",
     },
 
@@ -95,17 +96,8 @@ C = {
         "ref": "Ref.",
     },
 
-    "properties": {
-        "TRE-001": ("Casa moderna amb vistes al llac", "Zona Nord · Urbanització Els Llacs", "Destacat"),
-        "TRE-002": ("Àtic al nucli antic", "Centre · Nucli antic", "Novetat"),
-        "TRE-003": ("Pis lluminós amb terrassa", "Zona Sud · Jardins de la Vall", None),
-        "TRE-004": ("Vil·la contemporània amb piscina", "Zona Est · Club de Camp", "Exclusiva"),
-        "TRE-005": ("Loft al districte creatiu", "Zona Oest · Districte Creatiu", None),
-        "TRE-006": ("Casa de camp amb jardí", "Entorn rural · Vall Verda", "Preu rebaixat"),
-        "TRE-007": ("Pis amb vistes panoràmiques", "Centre · Torre Mirador", "Novetat"),
-        "TRE-008": ("Casa familiar amb un ampli jardí", "Zona Nord · Els Boscos", None),
-        "TRE-009": ("Residència de disseny minimalista", "Zona Est · Turons del Sol", "Exclusiva"),
-    },
+    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
+    "properties": {},
 
     "commitments": [
         ("Informació verificada", "Revisem la nota simple, les càrregues i el certificat energètic abans de publicar cada immoble."),
@@ -142,9 +134,6 @@ C = {
     },
     "footer_services": ["Compravenda", "Lloguer d’habitatges", "Gestió de lloguers", "Inversió immobiliària", "Valoració d’immobles"],
 
-    "places": {"centro": "Centre", "norte": "Zona Nord", "sur": "Zona Sud", "este": "Zona Est",
-               "oeste": "Zona Oest", "periferia": "Perifèria i entorn rural"},
-
     "alert": {
         "eyebrow": "Alerta de cerca",
         "title": "No trobeu immobles a la vostra localitat?",
@@ -160,7 +149,55 @@ C = {
         "submit": "Crear l’alerta",
         "mail_subject": "Alerta de cerca",
         "filter_hint": "No hi apareix la vostra localitat?",
+        "purpose": "gestionar la vostra alerta de cerca i avisar-vos dels immobles que hi encaixin",
         "filter_link": "Creeu una alerta de cerca",
+    },
+
+    "town_page": {
+        "title": "Vendre o comprar habitatge a {town}",
+        "description": "Twins Real Estate us ajuda a vendre, comprar o llogar habitatge a {town}: valoració gratuïta, alerta de cerca i acompanyament fins a la signatura.",
+        "h1": "Vendre o comprar habitatge a {town}",
+        "text": "Us acompanyem en la venda, la compra i el lloguer d’immobles a {town}, amb un assessorament proper, rigorós i transparent.",
+        "crumb": "Zones",
+        "eyebrow": "Com treballem",
+        "h2": "La vostra agència immobiliària a {town}",
+        "paras": [
+            "Som una agència immobiliària amb base a Igualada que treballa sense oficina oberta al públic: us atenem amb cita prèvia, en persona o per videotrucada, i ens desplacem a {town} per visitar el vostre immoble i acompanyar-vos a les visites.",
+            "Abans de comercialitzar un immoble en revisem la documentació i la situació registral, i en fixem el preu a partir d’immobles comparables. Les condicions de la nostra feina s’acorden per escrit des del principi.",
+        ],
+        "services_title": "Què podem fer per vós a {town}",
+        "owners_title": "Si voleu vendre o llogar",
+        "owners_text": "Sol·liciteu una valoració gratuïta i sense compromís del vostre habitatge, local o terreny a {town}. Us proposarem un preu realista i un pla per comercialitzar-lo.",
+        "buyers_title": "Si busqueu habitatge",
+        "buyers_text": "Creeu una alerta de cerca per a {town}: us avisarem tan bon punt tinguem un immoble que encaixi amb el que necessiteu, abans de publicar-lo.",
+        "listings_title": "Immobles a {town}",
+        "footer_title": "On treballem",
+    },
+    "towns": {},
+
+    "valuation": {
+        "eyebrow": "Valoració gratuïta",
+        "title": "Valoració gratuïta del vostre immoble",
+        "text": "Voleu saber quant val el vostre habitatge abans de vendre’l o llogar-lo? Faciliteu-nos unes dades bàsiques i us trucarem per conèixer el vostre immoble. Després d’estudiar-lo, us donarem una valoració de mercat raonada, gratuïta i sense compromís.",
+        "checks": ["Sense cost i sense compromís de venda",
+                   "Basada en l’estat de l’immoble i en l’oferta de la zona",
+                   "Les vostres dades només s’utilitzen per preparar la valoració"],
+        "note": "No és una taxació oficial: les taxacions amb validesa hipotecària només les poden emetre les societats de taxació homologades.",
+        "form_title": "Sol·liciteu la vostra valoració",
+        "labels": {
+            "localidad": "Localitat *",
+            "direccion": "Adreça (opcional)",
+            "tipo": "Tipus d’immoble *",
+            "metros": "Superfície (m²) *",
+            "dormitorios": "Dormitoris",
+            "telefono": "Telèfon *",
+        },
+        "localidad_placeholder": "Per exemple, Igualada",
+        "direccion_placeholder": "Carrer i número",
+        "tipo_placeholder": "Seleccioneu una opció",
+        "submit": "Sol·licitar la valoració",
+        "mail_subject": "Valoració gratuïta",
+        "purpose": "posar-nos en contacte amb vós per valorar el vostre immoble i trametre-us la valoració",
     },
 
     "sell": {
@@ -182,8 +219,16 @@ C = {
         "slogan": "Perquè cada nova etapa mereix un lloc al qual anomenar llar.",
         "text": "Acompanyem particulars, famílies i inversors en la compra, la venda i el lloguer d’immobles, amb un assessorament proper, rigorós i transparent en cada fase de l’operació.",
         "btn_props": "Vegeu els immobles",
+        "btn_valuation": "Valoreu el vostre immoble gratis",
         "btn_advice": "Sol·liciteu assessorament",
         "pillars": ["Operacions amb seguretat jurídica", "Honoraris clars des de l’inici", "Atenció personalitzada"],
+        "paths_eyebrow": "Com us podem ajudar",
+        "paths_title": "Digueu-nos què necessiteu",
+        "paths_lead": "Mentre preparem la nostra cartera, ja us podem ajudar tant si voleu vendre o llogar el vostre immoble com si en busqueu un.",
+        "paths": [
+            ("Vull vendre o llogar", "Sol·liciteu una valoració gratuïta i sense compromís. Estudiarem el vostre immoble i us proposarem un preu realista i un pla per comercialitzar-lo.", "Sol·licitar una valoració"),
+            ("Busco habitatge", "Indiqueu-nos la localitat i el tipus d’immoble que necessiteu. Us avisarem tan bon punt tinguem una opció que hi encaixi, abans de publicar-la.", "Crear una alerta de cerca"),
+        ],
         "featured_eyebrow": "Cartera d’immobles",
         "featured_title": "Immobles destacats",
         "featured_lead": "Una selecció d’habitatges disponibles, revisats pel nostre equip pel que fa a documentació, estat i preu de mercat.",
@@ -222,6 +267,15 @@ C = {
         "empty_title": "No hi ha immobles amb aquests criteris",
         "empty_text": "Modifiqueu els filtres o indiqueu-nos què busqueu: us informarem de les opcions disponibles, incloses les que encara no s’han publicat.",
         "empty_btn": "Comuniqueu-nos la vostra cerca",
+        "soon": {
+            "description": "Estem seleccionant els nostres primers immobles en venda i lloguer. Creeu una alerta de cerca o sol·liciteu una valoració gratuïta del vostre habitatge.",
+            "text": "Estem seleccionant els nostres primers immobles. Indiqueu-nos què busqueu i us avisarem abans que a ningú.",
+            "eyebrow": "Cartera en preparació",
+            "title": "Estem seleccionant els nostres primers immobles",
+            "body": "Preferim publicar pocs immobles, ben revisats, abans que omplir aquesta pàgina d’anuncis. Mentre preparem la cartera, indiqueu-nos què busqueu i us avisarem tan bon punt tinguem una opció que hi encaixi. Si voleu vendre o llogar el vostre habitatge, estarem encantats de valorar-lo sense compromís.",
+            "btn_alert": "Crear una alerta de cerca",
+            "btn_sell": "Vull vendre el meu immoble",
+        },
     },
 
     "nosotros": {
@@ -234,8 +288,11 @@ C = {
         "paras": [
             "Twins Real Estate neix d’una convicció senzilla: comprar, vendre o llogar un habitatge és una de les decisions més importants de la vida d’una persona, i mereix un acompanyament professional, honest i proper.",
             "Per això hem construït una agència centrada en les persones, en què cada client té un assessor de referència, informació clara en tot moment i un procés ordenat des de la primera reunió fins al lliurament de claus.",
-            "Treballem amb una cartera seleccionada acuradament i amb una xarxa de professionals col·laboradors —notaries, advocats, gestories i entitats financeres— que ens permet oferir un servei integral.",
+            "Seleccionem amb cura cada immoble que comercialitzem i coordinem cada operació amb notaries, advocats, gestories i entitats financeres, per oferir-vos un servei integral.",
         ],
+        "photos_eyebrow": "En persona",
+        "photos_title": "Coneixeu l’equip",
+        "photos": {},
         "btn": "Parleu amb un assessor",
         "purpose_eyebrow": "Propòsit",
         "purpose_title": "Missió i visió",
@@ -299,6 +356,76 @@ C = {
     },
 
     "posts": {
+        "gastos-impuestos-vender-piso-cataluna": dict(
+            slug="despeses-impostos-vendre-pis-catalunya", category="Fiscalitat", date_label="7 d’octubre de 2026",
+            title="Despeses i impostos en vendre un pis a Catalunya",
+            excerpt="Plusvàlua municipal, IRPF, cancel·lació de la hipoteca i altres despeses: el que convé preveure abans de posar el vostre habitatge a la venda.",
+            body="""
+<p class="lead">Abans de fixar el preu de venda del vostre habitatge, convé saber quina part d’aquest import es destinarà a impostos i despeses. Aquests són els conceptes més habituals per al venedor a Catalunya. Les quantitats exactes depenen de cada cas, per la qual cosa us recomanem confirmar-les amb el vostre assessor fiscal.</p>
+<h2>1. La plusvàlua municipal</h2>
+<p>L’impost sobre l’increment de valor dels terrenys de naturalesa urbana, conegut com a <strong>plusvàlua municipal</strong>, el cobra l’ajuntament i, en una compravenda, el paga el venedor. Grava l’augment de valor del sòl durant els anys en què n’heu estat propietari.</p>
+<p>Des de la reforma de novembre de 2021, el contribuent pot optar pel càlcul que li resulti més favorable: el mètode objectiu, basat en el valor cadastral del sòl i en uns coeficients que depenen dels anys transcorreguts, o el mètode real, basat en el guany efectiu. Si podeu acreditar que no hi ha hagut increment de valor, no es paga. Cada ajuntament fixa el tipus dins dels límits legals i el termini per declarar-lo, en una venda, és de 30 dies hàbils.</p>
+<h2>2. L’IRPF pel guany patrimonial</h2>
+<p>Si veneu per un import superior al que vau pagar, la diferència tributa en la declaració de la renda de l’any següent com a <strong>guany patrimonial</strong>. Per calcular-lo, al preu de compra s’hi sumen les despeses i els impostos que vau pagar en adquirir l’habitatge i les millores fetes, i del preu de venda se’n resten les despeses de la venda, com els honoraris de l’agència o la plusvàlua municipal.</p>
+<p>El guany s’integra en la base de l’estalvi, que tributa per trams: 19 % fins a 6.000 €, 21 % de 6.000 a 50.000 €, 23 % de 50.000 a 200.000 €, 27 % de 200.000 a 300.000 € i 30 % a partir de 300.000 €.</p>
+<p>Hi ha supòsits en què el guany pot quedar exempt, entre els quals la reinversió de l’import obtingut en un nou habitatge habitual dins dels terminis legals i la venda de l’habitatge habitual per part de persones més grans de 65 anys. Si el venedor no resideix a Espanya, el comprador ha de retenir el 3 % del preu i ingressar-lo a Hisenda a compte de l’impost del venedor.</p>
+<h2>3. La cancel·lació de la hipoteca</h2>
+<p>Si l’habitatge té una hipoteca pendent, el més habitual és cancel·lar-la en el moment de la signatura amb una part del preu. A més del deute pendent, reviseu si el contracte preveu una comissió per amortització anticipada, que la llei limita. Perquè la càrrega desaparegui del Registre de la Propietat també cal cancel·lar-la registralment, cosa que comporta despeses de notaria, de registre i, si escau, de gestoria.</p>
+<h2>4. Notaria, IBI i comunitat</h2>
+<p>Segons el Codi civil, llevat que les parts pactin una altra cosa, les despeses d’atorgament de l’escriptura corresponen al venedor i les de la primera còpia i posteriors, al comprador. A la pràctica és habitual pactar-ne el repartiment, per la qual cosa convé deixar-ho per escrit en el contracte d’arres.</p>
+<p>L’IBI de l’any de la venda l’ha de pagar qui n’era propietari l’1 de gener, tot i que és freqüent acordar repartir-lo en proporció als mesos de cada part. Convé que les quotes de la comunitat de propietaris estiguin al dia en el moment de la venda: el comprador ho pot exigir i l’habitatge respon de determinats deutes amb la comunitat.</p>
+<h2>5. Certificats i honoraris</h2>
+<p>Per vendre necessitareu el <strong>certificat d’eficiència energètica</strong> i, a Catalunya, per regla general, la <strong>cèdula d’habitabilitat</strong> vigent. Si algun dels dos no és vigent, l’haureu d’encarregar a un tècnic. A això s’hi afegeixen els honoraris de l’agència immobiliària, si la contracteu, que s’han d’acordar per escrit abans d’iniciar la venda.</p>
+<h2>Calculeu-ho abans de fixar el preu</h2>
+<p>Conèixer aquestes despeses us permetrà saber quant rebreu realment pel vostre habitatge i negociar amb tranquil·litat. A Twins Real Estate us ajudem a estimar les despeses de la vostra operació i us orientem perquè consulteu amb un assessor fiscal els aspectes que ho requereixin.</p>
+"""),
+        "documentos-vender-vivienda": dict(
+            slug="documents-vendre-habitatge", category="Legal", date_label="7 d’octubre de 2026",
+            title="Documents que necessiteu per vendre el vostre habitatge",
+            excerpt="Escriptura, nota simple, certificat energètic, cèdula d’habitabilitat i altres documents que convé reunir abans d’anunciar la venda.",
+            body="""
+<p class="lead">Tenir la documentació preparada des del principi transmet confiança als compradors i evita endarreriments en la signatura de les arres i de l’escriptura. Aquesta és la llista de documents que se sol demanar per vendre un habitatge a Catalunya.</p>
+<h2>1. Identificació dels propietaris</h2>
+<p>El DNI o NIE vigent de totes les persones que hi figuren com a titulars. Si l’habitatge és la residència familiar, pot ser necessari el consentiment del cònjuge o de la parella encara que no en sigui propietari, per la qual cosa convé comprovar-ho amb antelació.</p>
+<h2>2. Títol de propietat i nota simple</h2>
+<p>L’<strong>escriptura de propietat</strong> acredita com vau adquirir l’habitatge: compravenda, herència, donació o un altre títol. A més, convé demanar una <strong>nota simple</strong> recent al Registre de la Propietat, que mostra qui n’és el titular i si hi ha càrregues, com ara una hipoteca o un embargament. Si vau heretar l’habitatge, també necessitareu l’escriptura d’acceptació de l’herència.</p>
+<h2>3. Certificat d’eficiència energètica</h2>
+<p>És obligatori per vendre i per anunciar l’habitatge: l’etiqueta energètica ha de figurar en els anuncis. L’emet un tècnic competent després de visitar l’immoble i, amb caràcter general, té una validesa de deu anys.</p>
+<h2>4. Cèdula d’habitabilitat</h2>
+<p>A Catalunya, la Llei del dret a l’habitatge exigeix, per regla general, lliurar al comprador la cèdula d’habitabilitat vigent, i el notari ho ha de comprovar. La llei preveu excepcions limitades, per exemple quan l’habitatge es ven per rehabilitar-lo i el comprador ho accepta expressament. Si la cèdula ha caducat, se’n pot sol·licitar una de nova amb el certificat d’un tècnic.</p>
+<h2>5. Rebuts i certificats de pagament</h2>
+<ul>
+<li>L’últim rebut de l’<strong>IBI</strong>, que a més indica la referència cadastral.</li>
+<li>Un <strong>certificat de la comunitat de propietaris</strong> sobre l’estat de pagament de les quotes, que expedeix el secretari o l’administrador de la finca.</li>
+<li>Si hi ha hipoteca pendent, un <strong>certificat de deute</strong> emès per l’entitat financera.</li>
+<li>Els últims rebuts dels subministraments (aigua, llum i gas), útils per al canvi de titularitat.</li>
+</ul>
+<h2>6. Altres documents útils</h2>
+<p>Els plànols de l’habitatge, els estatuts de la comunitat i, si l’edifici ha passat la inspecció tècnica obligatòria, l’informe i el certificat corresponents. No sempre són imprescindibles, però responen preguntes freqüents dels compradors.</p>
+<h2>Us ajudem a reunir-la</h2>
+<p>Revisem la documentació del vostre habitatge abans de posar-lo a la venda, us indiquem què hi falta i us orientem per obtenir-ho. Així l’operació avança sense sorpreses fins a la signatura davant notari.</p>
+"""),
+        "preparar-vivienda-vender": dict(
+            slug="preparar-habitatge-vendre", category="Venda", date_label="7 d’octubre de 2026",
+            title="Com preparar el vostre habitatge per vendre’l abans",
+            excerpt="Ordre, petites reparacions, bona llum i un preu realista: consells pràctics perquè el vostre habitatge atregui compradors des del primer dia.",
+            body="""
+<p class="lead">Els compradors es formen una opinió en pocs segons, primer amb les fotografies i després en la visita. Preparar l’habitatge abans d’anunciar-lo no requereix grans obres, sinó atenció als detalls.</p>
+<h2>1. Ordre i despersonalització</h2>
+<p>Retireu objectes personals, fotografies familiars i mobles que estrenyin els espais. Un habitatge endreçat sembla més ampli i permet que el comprador s’hi imagini vivint. Aprofiteu per buidar armaris i trasters: també es visiten.</p>
+<h2>2. Petites reparacions</h2>
+<p>Arregleu aixetes que degoten, persianes que no pugen, endolls solts o portes que freguen. Són reparacions econòmiques, però un comprador les percep com a senyals de manca de manteniment i tendeix a descomptar-les del preu.</p>
+<h2>3. Neteja, pintura i llum</h2>
+<p>Una neteja a fons i, si cal, una mà de pintura en tons neutres milloren molt la primera impressió. Obriu persianes i cortines, canvieu les bombetes foses i ventileu abans de cada visita.</p>
+<h2>4. Fotografies de qualitat</h2>
+<p>La majoria dels compradors comença la cerca a internet. Unes bones fotografies, fetes amb llum natural i amb les estances endreçades, són decisives per aconseguir visites.</p>
+<h2>5. Documentació preparada</h2>
+<p>Tenir a mà la nota simple, el certificat energètic i la cèdula d’habitabilitat permet respondre amb rapidesa als compradors interessats i evita endarreriments quan arriba una oferta.</p>
+<h2>6. Un preu realista des de l’inici</h2>
+<p>És el factor més important. Un habitatge amb un preu per sobre del mercat rep menys visites i, amb el temps, sol acabar venent-se després de diverses rebaixes. Un preu fonamentat en immobles comparables de la zona atreu els compradors adequats des del primer dia.</p>
+<h2>Sol·liciteu una valoració gratuïta</h2>
+<p>Visitem el vostre habitatge, us indiquem quines millores valen la pena i us proposem un preu de sortida realista, sense compromís.</p>
+"""),
         "comprar-o-alquilar-en-2026": dict(
             slug="comprar-o-llogar-el-2026", category="Mercat", date_label="15 de gener de 2026",
             title="Comprar o llogar habitatge el 2026? Claus per decidir",
@@ -472,8 +599,14 @@ C = {
         "subject_placeholder": "Seleccioneu una opció",
         "subjects": ["Compra d’un immoble", "Venda d’un immoble", "Lloguer d’un immoble", "Gestió de lloguers",
                      "Valoració d’un immoble", "Assessorament per a inversió", "Demanar una cita", "Una altra consulta"],
-        "legal_html": '<strong>Informació bàsica sobre protecció de dades.</strong> Responsable: Twins Real Estate. Finalitat: atendre la vostra consulta i, si escau, trametre-us la informació sol·licitada. Legitimació: el vostre consentiment. Destinataris: no se cediran dades a tercers, llevat d’obligació legal. Drets: accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, tal com es detalla a la <a href="%%PRIVACY%%">política de privacitat</a>.',
+        "legal_html": '<strong>Informació bàsica sobre protecció de dades.</strong> Responsable: Twins Real Estate. Finalitat: %%PURPOSE%%. Legitimació: el vostre consentiment. Destinataris: no se cediran dades a tercers, llevat d’obligació legal. Drets: accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, tal com es detalla a la <a href="%%PRIVACY%%">política de privacitat</a>.',
+        "purpose": "atendre la vostra consulta i, si escau, trametre-us la informació sol·licitada",
         "submit": "Envia la consulta",
+    },
+
+    "privacy_forms": {
+        "mail": '<p><strong>Com s’envien els formularis.</strong> En enviar un formulari s’obre el vostre programa de correu electrònic amb el missatge preparat, que només s’envia si vós ho confirmeu. El web no desa ni transmet per si mateix les dades dels formularis.</p>',
+        "endpoint": '<p><strong>Com s’envien els formularis.</strong> Les dades dels formularis s’envien de manera xifrada al servei Formspree (Formspree, Inc., EUA), que les reenvia al nostre correu electrònic i actua com a encarregat del tractament.</p>',
     },
 
     "owner": {
@@ -485,7 +618,7 @@ C = {
             ("Domicili", "pending", ""),
             ("Correu electrònic", "email", ""),
             ("Dades registrals", "pending", "(Registre Mercantil, si es tracta d’una societat)"),
-            ("Registre d’agents immobiliaris", "pending", "(número d’inscripció, quan la normativa autonòmica ho exigeixi)"),
+            ("Registre d’agents immobiliaris", "pending", "(número d’inscripció al Registre d’Agents Immobiliaris de Catalunya)"),
         ],
     },
 
@@ -523,18 +656,20 @@ C = {
 <h2>1. Responsable del tractament</h2>
 %%OWNER%%
 <h2>2. Dades que tractem</h2>
-<p>Tractem les dades que ens faciliteu a través del formulari de contacte, per correu electrònic o mitjançant les nostres xarxes socials: nom i cognoms, dades de contacte, el contingut de la vostra consulta i, si escau, la informació necessària per a la prestació dels nostres serveis.</p>
+<p>Tractem les dades que ens faciliteu a través dels formularis del web (contacte, valoració gratuïta i alerta de cerca), per correu electrònic o mitjançant les nostres xarxes socials: nom i cognoms, correu electrònic i telèfon, la localitat, l’adreça i les característiques de l’immoble que voleu valorar o que busqueu, el contingut de la vostra consulta i, si escau, la informació necessària per a la prestació dels nostres serveis.</p>
+%%FORMS%%
 <h2>3. Finalitats i base jurídica</h2>
 <ul>
 <li><strong>Atendre les vostres consultes</strong> i trametre-us la informació sol·licitada. Base jurídica: el vostre consentiment (art. 6.1.a RGPD).</li>
 <li><strong>Gestionar la relació precontractual i contractual</strong> derivada dels nostres serveis d’intermediació i assessorament immobiliari. Base jurídica: l’execució d’un contracte o de mesures precontractuals (art. 6.1.b RGPD).</li>
 <li><strong>Complir les obligacions legals</strong> aplicables, entre les quals les derivades de la Llei 10/2010, de prevenció del blanqueig de capitals i del finançament del terrorisme, i de la normativa fiscal. Base jurídica: obligació legal (art. 6.1.c RGPD).</li>
+<li><strong>Garantir la seguretat i el funcionament del lloc web.</strong> El proveïdor d’allotjament registra tècnicament l’adreça IP dels visitants. Base jurídica: interès legítim (art. 6.1.f RGPD).</li>
 </ul>
 <p>No es prenen decisions automatitzades ni s’elaboren perfils amb les vostres dades.</p>
 <h2>4. Termini de conservació</h2>
 <p>Les dades de les consultes es conservaran durant el temps necessari per atendre-les i, com a màxim, durant un any si no s’inicia una relació contractual. Les dades vinculades a un contracte es conservaran mentre duri la relació i, posteriorment, durant els terminis de prescripció de les responsabilitats legals.</p>
 <h2>5. Destinataris</h2>
-<p>No cedim les vostres dades a tercers, llevat d’obligació legal. Hi poden accedir els proveïdors que ens presten serveis de correu electrònic i d’allotjament web, en qualitat d’encarregats del tractament i amb les garanties exigides pel RGPD. Quan algun d’aquests proveïdors es trobi fora de l’Espai Econòmic Europeu, la transferència s’empara en una decisió d’adequació de la Comissió Europea, com el Marc de Privacitat de Dades UE-EUA, o en clàusules contractuals tipus.</p>
+<p>No cedim les vostres dades a tercers, llevat d’obligació legal. Hi poden accedir els proveïdors que ens presten serveis de correu electrònic i d’allotjament web, en qualitat d’encarregats del tractament i amb les garanties exigides pel RGPD. Quan algun d’aquests proveïdors es trobi fora de l’Espai Econòmic Europeu, la transferència s’empara en una decisió d’adequació de la Comissió Europea, com el Marc de Privacitat de Dades UE-EUA, o en clàusules contractuals tipus. En concret, el lloc web està allotjat a GitHub Pages (GitHub, Inc.) i el correu electrònic el presta Google (Gmail).</p>
 <h2>6. Els vostres drets</h2>
 <p>Podeu exercir els drets d’accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, així com retirar el vostre consentiment en qualsevol moment, escrivint a <a href="mailto:%%EMAIL%%">%%EMAIL%%</a> i indicant el dret que voleu exercir.</p>
 <p>Si considereu que el tractament de les vostres dades no s’ajusta a la normativa, podeu presentar una reclamació davant l’Agència Espanyola de Protecció de Dades (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -566,7 +701,7 @@ C = {
 </table>
 </div>
 <h2>3. Recursos de tercers</h2>
-<p>Per mostrar les tipografies del lloc, el vostre navegador descarrega fitxers del servei Google Fonts, prestat per Google. Aquest servei no instal·la galetes, tot i que, com en qualsevol connexió a internet, rep l’adreça IP del dispositiu que fa la sol·licitud. Podeu consultar la política de privacitat de Google a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+<p>Les tipografies i la resta de recursos d’aquest web se serveixen des del mateix lloc: no es carrega cap servei de tercers, com ara Google Fonts, eines d’analítica, publicitat, vídeos o mapes.</p>
 <p>Els enllaços a Instagram només us dirigeixen a aquesta xarxa social quan hi feu clic; aquest lloc no incorpora continguts ni complements de xarxes socials.</p>
 <h2>4. Canvis en aquesta política</h2>
 <p>Si en el futur incorporem galetes que requereixin el vostre consentiment, actualitzarem aquesta política i habilitarem el mecanisme de consentiment corresponent abans d’instal·lar-les.</p>

@@ -6,7 +6,7 @@ C = {
     "locale": "en_GB",
     "label": "English",
     "abbr": "EN",
-    "slugs": {"index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
+    "slugs": {"zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
               "contacto": "contact", "aviso-legal": "legal-notice", "privacidad": "privacy", "cookies": "cookies"},
 
     "ui": {
@@ -56,10 +56,11 @@ C = {
         "consult": "Speak to an adviser",
         "article_notice": "This article is for information purposes only and does not constitute legal, tax or financial advice. Regulations may vary between Spanish regions; please consult a professional about your specific case.",
         "updated": "Last updated: {}",
-        "updated_date": "27 September 2026",
+        "updated_date": "7 October 2026",
         "theme_to_light": "Switch to light theme",
         "theme_to_dark": "Switch to dark theme",
         "scroll_hint": "Scroll to explore",
+        "og_image_alt": "Twins Real Estate: property sales, lettings and valuations",
         "commitments_title": "Our commitments",
     },
 
@@ -96,17 +97,8 @@ C = {
         "ref": "Ref.",
     },
 
-    "properties": {
-        "TRE-001": ("Modern house with lake views", "North · Los Lagos residential estate", "Featured"),
-        "TRE-002": ("Penthouse in the old town", "City centre · Old town", "New"),
-        "TRE-003": ("Bright flat with terrace", "South · Jardines del Valle", None),
-        "TRE-004": ("Contemporary villa with swimming pool", "East · Club de Campo", "Exclusive"),
-        "TRE-005": ("Loft in the creative district", "West · Creative District", None),
-        "TRE-006": ("Country house with garden", "Countryside · Valle Verde", "Price reduced"),
-        "TRE-007": ("Flat with panoramic views", "City centre · Torre Mirador", "New"),
-        "TRE-008": ("Family home with large garden", "North · Los Bosques", None),
-        "TRE-009": ("Minimalist designer residence", "East · Colinas del Sol", "Exclusive"),
-    },
+    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
+    "properties": {},
 
     "commitments": [
         ("Verified information", "We review the land registry extract, any charges and the energy certificate before listing each property."),
@@ -143,9 +135,6 @@ C = {
     },
     "footer_services": ["Sales and purchases", "Residential lettings", "Rental management", "Property investment", "Property valuation"],
 
-    "places": {"centro": "City centre", "norte": "North", "sur": "South", "este": "East",
-               "oeste": "West", "periferia": "Outskirts and countryside"},
-
     "alert": {
         "eyebrow": "Property alert",
         "title": "Can’t find a property in your town?",
@@ -161,7 +150,55 @@ C = {
         "submit": "Create alert",
         "mail_subject": "Property alert",
         "filter_hint": "Can’t see your town?",
+        "purpose": "to manage your property alert and notify you of properties that match it",
         "filter_link": "Create a property alert",
+    },
+
+    "town_page": {
+        "title": "Selling or buying a home in {town}",
+        "description": "Twins Real Estate helps you sell, buy or let a home in {town}: a free valuation, property alerts and support through to completion.",
+        "h1": "Selling or buying a home in {town}",
+        "text": "We support you in selling, buying and letting property in {town}, with personal, rigorous and transparent advice.",
+        "crumb": "Areas",
+        "eyebrow": "How we work",
+        "h2": "Your estate agent in {town}",
+        "paras": [
+            "We are an estate agency based in Igualada that works without an office open to the public: we see clients by appointment, in person or by video call, and we travel to {town} to visit your property and accompany you on viewings.",
+            "Before marketing a property, we review its documentation and land registry status and set the price on the basis of comparable properties. The terms of our work are agreed in writing from the outset.",
+        ],
+        "services_title": "How we can help you in {town}",
+        "owners_title": "If you wish to sell or let",
+        "owners_text": "Request a free, no-obligation valuation of your home, commercial premises or land in {town}. We will propose a realistic price and a plan for marketing it.",
+        "buyers_title": "If you are looking for a home",
+        "buyers_text": "Create a property alert for {town}: we will let you know as soon as we have a property that matches your needs, before it is published.",
+        "listings_title": "Properties in {town}",
+        "footer_title": "Where we work",
+    },
+    "towns": {},
+
+    "valuation": {
+        "eyebrow": "Free valuation",
+        "title": "A free valuation of your property",
+        "text": "Would you like to know what your home is worth before selling or letting it? Give us a few basic details and we will call you to learn about your property. Having studied it, we will provide a reasoned market valuation, free of charge and with no obligation.",
+        "checks": ["Free of charge, with no obligation to sell",
+                   "Based on the condition of the property and local supply",
+                   "Your details are only used to prepare the valuation"],
+        "note": "This is not an official appraisal: valuations accepted for mortgage purposes may only be issued by approved valuation companies.",
+        "form_title": "Request your valuation",
+        "labels": {
+            "localidad": "Town *",
+            "direccion": "Address (optional)",
+            "tipo": "Property type *",
+            "metros": "Floor area (m²) *",
+            "dormitorios": "Bedrooms",
+            "telefono": "Telephone *",
+        },
+        "localidad_placeholder": "For example, Igualada",
+        "direccion_placeholder": "Street and number",
+        "tipo_placeholder": "Please select an option",
+        "submit": "Request valuation",
+        "mail_subject": "Free valuation",
+        "purpose": "to contact you in order to value your property and send you the valuation",
     },
 
     "sell": {
@@ -183,8 +220,16 @@ C = {
         "slogan": "Because every new chapter deserves a place to call home.",
         "text": "We support individuals, families and investors in buying, selling and renting property, with personal, rigorous and transparent advice at every stage of the transaction.",
         "btn_props": "View properties",
+        "btn_valuation": "Value your property for free",
         "btn_advice": "Request advice",
         "pillars": ["Legally secure transactions", "Clear fees from the outset", "Personal service"],
+        "paths_eyebrow": "How we can help",
+        "paths_title": "Tell us what you need",
+        "paths_lead": "While we prepare our portfolio, we can already help you, whether you wish to sell or let your property or are looking for one.",
+        "paths": [
+            ("I wish to sell or let", "Request a free, no-obligation valuation. We will study your property and propose a realistic price and a plan for marketing it.", "Request a valuation"),
+            ("I am looking for a home", "Tell us the town and the type of property you need. We will let you know as soon as we have a suitable option, before it is published.", "Create a property alert"),
+        ],
         "featured_eyebrow": "Property portfolio",
         "featured_title": "Featured properties",
         "featured_lead": "A selection of available homes, reviewed by our team in terms of documentation, condition and market price.",
@@ -223,6 +268,15 @@ C = {
         "empty_title": "No properties match these criteria",
         "empty_text": "Adjust the filters or tell us what you are looking for: we will let you know about available options, including those not yet published.",
         "empty_btn": "Tell us what you need",
+        "soon": {
+            "description": "Twins Real Estate is selecting its first properties for sale and to let. Create a property alert or request a free valuation of your home.",
+            "text": "We are selecting our first properties. Tell us what you are looking for and you will be the first to know.",
+            "eyebrow": "Portfolio in preparation",
+            "title": "We are selecting our first properties",
+            "body": "We would rather publish a few carefully reviewed properties than fill this page with listings. While we prepare our portfolio, tell us what you are looking for and we will let you know as soon as we have a suitable option. If you wish to sell or let your home, we would be delighted to value it with no obligation.",
+            "btn_alert": "Create a property alert",
+            "btn_sell": "I wish to sell my property",
+        },
     },
 
     "nosotros": {
@@ -235,8 +289,11 @@ C = {
         "paras": [
             "Twins Real Estate was born from a simple conviction: buying, selling or renting a home is one of the most important decisions in a person’s life, and it deserves professional, honest and personal support.",
             "That is why we have built a people-focused agency, where every client has a dedicated adviser, clear information at all times and an orderly process from the first meeting to the handover of keys.",
-            "We work with a carefully selected portfolio and a network of trusted professionals —notaries, lawyers, administrative agents and lenders— that allows us to offer a comprehensive service.",
+            "We carefully select every property we market and coordinate each transaction with notaries, lawyers, administrative agents and lenders, so as to offer you a comprehensive service.",
         ],
+        "photos_eyebrow": "In person",
+        "photos_title": "Meet the team",
+        "photos": {},
         "btn": "Speak to an adviser",
         "purpose_eyebrow": "Purpose",
         "purpose_title": "Mission and vision",
@@ -300,6 +357,76 @@ C = {
     },
 
     "posts": {
+        "gastos-impuestos-vender-piso-cataluna": dict(
+            slug="costs-taxes-selling-flat-catalonia", category="Tax", date_label="7 October 2026",
+            title="Costs and taxes when selling a flat in Catalonia",
+            excerpt="Municipal capital gains tax, income tax, mortgage cancellation and other costs: what to plan for before putting your home on the market.",
+            body="""
+<p class="lead">Before setting the asking price for your home, it is worth knowing how much of that amount will go on taxes and costs. These are the items sellers most commonly face in Catalonia. The exact amounts depend on each case, so we recommend confirming them with your tax adviser.</p>
+<h2>1. Municipal capital gains tax (plusvalía)</h2>
+<p>The tax on the increase in value of urban land, known as the <strong>plusvalía municipal</strong>, is levied by the town council and, in a sale, is paid by the seller. It taxes the increase in the value of the land during the years you have owned the property.</p>
+<p>Since the reform of November 2021, the taxpayer may choose whichever calculation is more favourable: the objective method, based on the cadastral value of the land and coefficients that depend on the number of years elapsed, or the actual method, based on the real gain. If you can show that there has been no increase in value, no tax is payable. Each council sets the rate within the legal limits, and in a sale the deadline for filing is 30 working days.</p>
+<h2>2. Income tax on the capital gain</h2>
+<p>If you sell for more than you paid, the difference is taxed as a <strong>capital gain</strong> in the following year’s income tax return. To calculate it, the costs and taxes you paid when buying the home and any improvements made are added to the purchase price, and the costs of the sale, such as agency fees or the municipal capital gains tax, are deducted from the sale price.</p>
+<p>The gain forms part of the savings tax base, which is taxed in bands: 19% up to €6,000, 21% from €6,000 to €50,000, 23% from €50,000 to €200,000, 27% from €200,000 to €300,000 and 30% above €300,000.</p>
+<p>In some cases the gain may be exempt, including when the proceeds are reinvested in a new main residence within the legal time limits and when people over 65 sell their main residence. If the seller is not resident in Spain, the buyer must withhold 3% of the price and pay it to the tax authorities on account of the seller’s tax.</p>
+<h2>3. Cancelling the mortgage</h2>
+<p>If there is an outstanding mortgage on the property, it is usually repaid on signing with part of the price. In addition to the outstanding debt, check whether your agreement includes an early repayment fee, which the law limits. For the charge to be removed from the Land Registry, the mortgage must also be cancelled in the register, which involves notary, registry and, where applicable, agency fees.</p>
+<h2>4. Notary, property tax and community fees</h2>
+<p>Under the Civil Code, unless the parties agree otherwise, the cost of executing the deed is borne by the seller and that of the first and subsequent copies by the buyer. In practice the split is often negotiated, so it is advisable to set it out in writing in the deposit contract (arras).</p>
+<p>Property tax (IBI) for the year of sale is owed by whoever owned the property on 1 January, although it is common to agree to share it in proportion to the months owned by each party. Community fees should be up to date at the time of sale: the buyer may require it, and the property is liable for certain debts owed to the community.</p>
+<h2>5. Certificates and fees</h2>
+<p>To sell you will need an <strong>energy performance certificate</strong> and, in Catalonia, as a general rule, a valid <strong>certificate of occupancy</strong> (cédula de habitabilidad). If either has expired, you will need to commission a qualified professional to issue a new one. In addition, there are the estate agency’s fees, if you engage one, which should be agreed in writing before the sale begins.</p>
+<h2>Work out the figures before setting the price</h2>
+<p>Knowing these costs will tell you how much you will actually receive for your home and allow you to negotiate with peace of mind. At Twins Real Estate we help you estimate the costs of your sale and advise you on which points to discuss with a tax adviser.</p>
+"""),
+        "documentos-vender-vivienda": dict(
+            slug="documents-selling-home", category="Legal", date_label="7 October 2026",
+            title="The documents you need to sell your home",
+            excerpt="Title deeds, land registry extract, energy certificate, certificate of occupancy and other documents worth gathering before advertising the sale.",
+            body="""
+<p class="lead">Having your paperwork ready from the outset reassures buyers and avoids delays in signing the deposit contract and the deed of sale. This is the list of documents usually requested to sell a home in Catalonia.</p>
+<h2>1. Identification of the owners</h2>
+<p>A valid DNI or NIE for every person registered as an owner. If the property is the family home, the consent of the spouse or partner may be required even if they are not an owner, so it is advisable to check this in advance.</p>
+<h2>2. Title deeds and land registry extract</h2>
+<p>The <strong>title deeds</strong> show how you acquired the property: by purchase, inheritance, gift or another title. It is also advisable to request a recent <strong>land registry extract</strong> (nota simple), which shows who the registered owner is and whether there are any charges, such as a mortgage or an attachment. If you inherited the property, you will also need the deed of acceptance of the inheritance.</p>
+<h2>3. Energy performance certificate</h2>
+<p>It is compulsory both to sell and to advertise the property: the energy rating must appear in listings. It is issued by a qualified professional after visiting the property and, as a general rule, is valid for ten years.</p>
+<h2>4. Certificate of occupancy</h2>
+<p>In Catalonia, the Right to Housing Act generally requires the seller to hand over a valid certificate of occupancy (cédula de habitabilidad) to the buyer, and the notary must check this. The law provides for limited exceptions, for example when the property is sold for refurbishment and the buyer expressly agrees. If the certificate has expired, a new one can be requested with a certificate from a qualified professional.</p>
+<h2>5. Receipts and payment certificates</h2>
+<ul>
+<li>The latest <strong>property tax (IBI)</strong> receipt, which also shows the cadastral reference.</li>
+<li>A <strong>certificate from the owners’ community</strong> on the status of fee payments, issued by the secretary or the property manager.</li>
+<li>If there is an outstanding mortgage, a <strong>statement of the outstanding debt</strong> from the lender.</li>
+<li>The latest utility bills (water, electricity and gas), useful for transferring the accounts.</li>
+</ul>
+<h2>6. Other useful documents</h2>
+<p>Floor plans of the property, the community by-laws and, if the building has undergone the compulsory technical inspection, the corresponding report and certificate. They are not always essential, but they answer questions buyers frequently ask.</p>
+<h2>We help you gather them</h2>
+<p>We review your property’s documents before putting it on the market, tell you what is missing and guide you in obtaining it, so that the sale proceeds without surprises through to signing before a notary.</p>
+"""),
+        "preparar-vivienda-vender": dict(
+            slug="prepare-home-for-sale", category="Selling", date_label="7 October 2026",
+            title="How to prepare your home to sell it sooner",
+            excerpt="Tidiness, minor repairs, good light and a realistic price: practical advice to help your home attract buyers from day one.",
+            body="""
+<p class="lead">Buyers form an opinion within seconds, first from the photographs and then during the viewing. Preparing your home before advertising it does not require major works, only attention to detail.</p>
+<h2>1. Declutter and depersonalise</h2>
+<p>Remove personal items, family photographs and furniture that makes rooms feel smaller. An uncluttered home looks more spacious and allows buyers to picture themselves living there. Take the opportunity to clear wardrobes and storage rooms: they are viewed too.</p>
+<h2>2. Minor repairs</h2>
+<p>Fix dripping taps, stuck blinds, loose sockets and doors that catch. These repairs are inexpensive, but buyers see them as signs of poor maintenance and tend to deduct them from the price.</p>
+<h2>3. Cleaning, paint and light</h2>
+<p>A thorough clean and, if necessary, a coat of paint in neutral tones greatly improve the first impression. Open blinds and curtains, replace any blown bulbs and air the rooms before each viewing.</p>
+<h2>4. Quality photographs</h2>
+<p>Most buyers begin their search online. Good photographs, taken in natural light with tidy rooms, are decisive in securing viewings.</p>
+<h2>5. Documents to hand</h2>
+<p>Having the land registry extract, the energy certificate and the certificate of occupancy ready allows you to respond quickly to interested buyers and avoids delays when an offer arrives.</p>
+<h2>6. A realistic price from the start</h2>
+<p>This is the most important factor. A home priced above the market receives fewer viewings and, over time, usually ends up selling after several price reductions. A price based on comparable properties in the area attracts the right buyers from day one.</p>
+<h2>Request a free valuation</h2>
+<p>We visit your home, tell you which improvements are worthwhile and propose a realistic asking price, with no obligation.</p>
+"""),
         "comprar-o-alquilar-en-2026": dict(
             slug="buy-or-rent-in-2026", category="Market", date_label="15 January 2026",
             title="Buying or renting a home in 2026? Key factors to decide",
@@ -473,8 +600,14 @@ C = {
         "subject_placeholder": "Select an option",
         "subjects": ["Buying a property", "Selling a property", "Renting a property", "Rental management",
                      "Property valuation", "Investment advice", "Booking a meeting", "Other enquiry"],
-        "legal_html": '<strong>Basic data protection information.</strong> Controller: Twins Real Estate. Purpose: to handle your enquiry and, where applicable, send you the information requested. Legal basis: your consent. Recipients: your data will not be disclosed to third parties unless required by law. Rights: access, rectification, erasure, objection, restriction of processing and portability, as detailed in the <a href="%%PRIVACY%%">privacy policy</a>.',
+        "legal_html": '<strong>Basic data protection information.</strong> Controller: Twins Real Estate. Purpose: %%PURPOSE%%. Legal basis: your consent. Recipients: your data will not be disclosed to third parties unless required by law. Rights: access, rectification, erasure, objection, restriction of processing and portability, as detailed in the <a href="%%PRIVACY%%">privacy policy</a>.',
+        "purpose": "to handle your enquiry and, where applicable, send you the information requested",
         "submit": "Send enquiry",
+    },
+
+    "privacy_forms": {
+        "mail": '<p><strong>How the forms are sent.</strong> When you submit a form, your email application opens with the message ready, and it is only sent if you confirm it. The website itself does not store or transmit the data entered in the forms.</p>',
+        "endpoint": '<p><strong>How the forms are sent.</strong> Form data is sent in encrypted form to the Formspree service (Formspree, Inc., USA), which forwards it to our email address and acts as a data processor.</p>',
     },
 
     "owner": {
@@ -486,7 +619,7 @@ C = {
             ("Registered address", "pending", ""),
             ("Email", "email", ""),
             ("Registration details", "pending", "(Companies Register, if a company)"),
-            ("Real estate agents register", "pending", "(registration number, where required by regional law)"),
+            ("Real estate agents register", "pending", "(registration number in the Register of Estate Agents of Catalonia)"),
         ],
     },
 
@@ -524,18 +657,20 @@ C = {
 <h2>1. Data controller</h2>
 %%OWNER%%
 <h2>2. Data we process</h2>
-<p>We process the data you provide through the contact form, by email or via our social media channels: your full name, contact details, the content of your enquiry and, where applicable, the information required to provide our services.</p>
+<p>We process the data you provide through the forms on this website (contact, free valuation and property alert), by email or via our social media channels: your full name, email address and telephone number, the town, address and features of the property you wish to have valued or are looking for, the content of your enquiry and, where applicable, the information required to provide our services.</p>
+%%FORMS%%
 <h2>3. Purposes and legal basis</h2>
 <ul>
 <li><strong>Handling your enquiries</strong> and sending you the information requested. Legal basis: your consent (Art. 6(1)(a) GDPR).</li>
 <li><strong>Managing the pre-contractual and contractual relationship</strong> arising from our real estate brokerage and advisory services. Legal basis: performance of a contract or pre-contractual measures (Art. 6(1)(b) GDPR).</li>
 <li><strong>Complying with applicable legal obligations</strong>, including those arising from Spanish Law 10/2010 on the prevention of money laundering and terrorist financing, and from tax regulations. Legal basis: legal obligation (Art. 6(1)(c) GDPR).</li>
+<li><strong>Ensuring the security and operation of the website.</strong> The hosting provider technically logs visitors’ IP addresses. Legal basis: legitimate interest (Art. 6(1)(f) GDPR).</li>
 </ul>
 <p>No automated decisions are made and no profiles are created using your data.</p>
 <h2>4. Retention period</h2>
 <p>Enquiry data will be kept for as long as necessary to handle the enquiry and, at most, for one year if no contractual relationship begins. Data linked to a contract will be kept for the duration of the relationship and thereafter for the applicable statutory limitation periods.</p>
 <h2>5. Recipients</h2>
-<p>We do not disclose your data to third parties unless required by law. Providers of email and web hosting services may access it as data processors, with the safeguards required by the GDPR. Where any of these providers is located outside the European Economic Area, the transfer is based on a European Commission adequacy decision, such as the EU-US Data Privacy Framework, or on standard contractual clauses.</p>
+<p>We do not disclose your data to third parties unless required by law. Providers of email and web hosting services may access it as data processors, with the safeguards required by the GDPR. Where any of these providers is located outside the European Economic Area, the transfer is based on a European Commission adequacy decision, such as the EU-US Data Privacy Framework, or on standard contractual clauses. Specifically, the website is hosted on GitHub Pages (GitHub, Inc.) and our email service is provided by Google (Gmail).</p>
 <h2>6. Your rights</h2>
 <p>You may exercise your rights of access, rectification, erasure, objection, restriction of processing and portability, and withdraw your consent at any time, by writing to <a href="mailto:%%EMAIL%%">%%EMAIL%%</a> and stating the right you wish to exercise.</p>
 <p>If you consider that the processing of your data does not comply with the regulations, you may lodge a complaint with the Spanish Data Protection Agency (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -567,7 +702,7 @@ C = {
 </table>
 </div>
 <h2>3. Third-party resources</h2>
-<p>To display the website’s typefaces, your browser downloads files from the Google Fonts service, provided by Google. This service does not set cookies, although, as with any internet connection, it receives the IP address of the device making the request. You can read Google’s privacy policy at <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+<p>The typefaces and all other resources on this website are served from the website itself: no third-party services are loaded, such as Google Fonts, analytics tools, advertising, videos or maps.</p>
 <p>Links to Instagram only take you to that social network when you click on them; this website does not embed any social media content or plug-ins.</p>
 <h2>4. Changes to this policy</h2>
 <p>If we introduce cookies that require your consent in the future, we will update this policy and enable the corresponding consent mechanism before they are set.</p>

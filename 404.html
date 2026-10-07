@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self' mailto:; base-uri 'self'; object-src 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Página no encontrada | Twins Real Estate</title>
@@ -15,16 +16,20 @@
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="Página no encontrada | Twins Real Estate">
     <meta property="og:description" content="La página que busca no existe o ha cambiado de dirección.">
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:image" content="https://twinsreagency.github.io/og-image.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Twins Real Estate: compraventa, alquiler y valoración de inmuebles">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/playfair-display-600-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="/theme.js?v=fd1966f6e2"></script>
-    <link rel="stylesheet" href="/styles.css?v=59ac19c6a6">
-    <script src="/main.js?v=707b9a4b27" defer></script>
+    <link rel="stylesheet" href="/styles.min.css?v=ed8f1a04d9">
+    <script src="/main.min.js?v=b7f21ca26f" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
@@ -32,7 +37,7 @@
     <header class="site-header">
         <div class="container">
             <a class="brand" href="/index.html" aria-label="Twins Real Estate, ir a la página de inicio">
-                <img class="logo--on-dark" src="/logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="/logo-icon-dark.png" alt="" width="26" height="34">
+                <picture class="logo--on-dark"><source srcset="/logo-icon-sm.webp" type="image/webp"><img src="/logo-icon-sm.png" alt="" width="26" height="34"></picture><picture class="logo--on-light"><source srcset="/logo-icon-dark-sm.webp" type="image/webp"><img src="/logo-icon-dark-sm.png" alt="" width="26" height="34"></picture>
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
             <nav class="nav" id="menu-principal" aria-label="Navegación principal">
@@ -74,7 +79,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a class="brand" href="/index.html" aria-label="Twins Real Estate, ir a la página de inicio">
-                <img class="logo--on-dark" src="/logo-icon.png" alt="" width="26" height="34"><img class="logo--on-light" src="/logo-icon-dark.png" alt="" width="26" height="34">
+                <picture class="logo--on-dark"><source srcset="/logo-icon-sm.webp" type="image/webp"><img src="/logo-icon-sm.png" alt="" width="26" height="34"></picture><picture class="logo--on-light"><source srcset="/logo-icon-dark-sm.webp" type="image/webp"><img src="/logo-icon-dark-sm.png" alt="" width="26" height="34"></picture>
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>
                     <p>Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento cercano, riguroso y transparente en cada operación.</p>
@@ -113,6 +118,7 @@
                     </ul>
                 </div>
             </div>
+
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. Todos los derechos reservados.</p>
                 <nav class="footer-legal" aria-label="Información legal">

@@ -13,14 +13,15 @@ Todos los archivos del sitio están en una única carpeta, sin subcarpetas:
 Los textos se editan en _textos_es.py, _textos_ca.py y _textos_en.py; este
 fichero solo contiene la estructura y los datos comunes. Después de modificar
 cualquier texto, vuelva a ejecutar el script. Los archivos que empiezan por
-«_» no se publican en GitHub Pages ni se sirven con la configuración .htaccess.
+«_» no se publican en GitHub Pages (ver _config.yml).
 """
 import hashlib
 import html
 import json
 import os
+import re
 import sys
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 sys.dont_write_bytecode = True  # no crear la carpeta __pycache__ en el sitio
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -48,13 +49,47 @@ SITE_PATH = urlparse(SITE_URL).path.rstrip("/") + "/"
 LANGS = [_textos_es.C, _textos_ca.C, _textos_en.C]
 
 EMAIL = "twinsreagency@gmail.com"
+OG_IMAGE = "og-image.jpg"  # imagen para compartir en redes (1200 × 630); se genera con _og/make.js
+# Agencia en línea con base en Igualada (sin oficina abierta al público).
+LOCALITY = "Igualada"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
-# La política de seguridad (CSP) se envía como cabecera HTTP desde .htaccess
-# (Apache) o _headers (Netlify / Cloudflare Pages). No se incluye como <meta>
-# en el HTML porque bloquearía styles.css y main.js al abrir las páginas desde
-# el disco (file://) o desde previsualizadores externos.
+
+
+# Caducidad de /.well-known/security.txt (RFC 9116 recomienda menos de un año).
+# Un test avisa cuando falte menos de un mes: basta con adelantarla y regenerar.
+SECURITY_TXT_EXPIRES = "2027-10-01T00:00:00Z"
+
+
+def form_endpoint():
+    """Dirección del servicio de formularios (CONFIG.endpoint de main.js), o "" si los
+    formularios abren el programa de correo. main.js es la única fuente de este dato:
+    de él dependen la CSP y el texto de la política de privacidad."""
+    with open(os.path.join(SITE_DIR, "main.js"), encoding="utf-8") as fh:
+        match = re.search(r'^\s*endpoint:\s*"([^"]*)"', fh.read(), re.M)
+    if not match:
+        raise SystemExit("No se encuentra CONFIG.endpoint en main.js")
+    endpoint = match.group(1)
+    if endpoint and urlparse(endpoint).scheme != "https":
+        raise SystemExit("CONFIG.endpoint debe ser una dirección https://")
+    return endpoint
+
+def csp(meta=True):
+    """Política de seguridad de contenidos: solo recursos del propio sitio, sin código
+    en línea. Se publica como <meta> en cada página (GitHub Pages no permite enviar
+    cabeceras) y como cabecera en _headers (Netlify / Cloudflare Pages). Las directivas
+    frame-ancestors y upgrade-insecure-requests solo funcionan como cabecera.
+    Los bloques JSON-LD no son scripts ejecutables y la CSP no los bloquea."""
+    endpoint = form_endpoint()
+    service = f" {urlparse(endpoint).scheme}://{urlparse(endpoint).netloc}" if endpoint else ""
+    rules = ["default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self' data:",
+             "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
+             "base-uri 'self'", "object-src 'none'"]
+    if not meta:
+        rules += ["frame-ancestors 'none'", "upgrade-insecure-requests"]
+    return "; ".join(rules)
+
 
 # --------------------------------------------------------------------------
 # Iconos (trazo, 24x24, heredan el color del texto)
@@ -122,25 +157,34 @@ SEARCH_VALUES = {
     "dormitorios": ["1", "2", "3", "4", "5"],
 }
 
-PROPERTIES = [
-    dict(ref="TRE-001", op="venta", type="casa", zone="norte", price=485000, beds=4, baths=3, area=320, icon="home"),
-    dict(ref="TRE-002", op="venta", type="atico", zone="centro", price=320000, beds=3, baths=2, area=180, icon="penthouse"),
-    dict(ref="TRE-003", op="alquiler", type="piso", zone="sur", price=1350, beds=2, baths=2, area=95, icon="building"),
-    dict(ref="TRE-004", op="venta", type="casa", zone="este", price=1200000, beds=5, baths=4, area=550, icon="villa"),
-    dict(ref="TRE-005", op="venta", type="estudio", zone="oeste", price=195000, beds=1, baths=1, area=75, icon="loft"),
-    dict(ref="TRE-006", op="venta", type="casa", zone="periferia", price=410000, beds=3, baths=2, area=240, icon="tree"),
-    dict(ref="TRE-007", op="venta", type="piso", zone="centro", price=650000, beds=3, baths=3, area=210, icon="building"),
-    dict(ref="TRE-008", op="alquiler", type="casa", zone="norte", price=2900, beds=4, baths=3, area=280, icon="home"),
-    dict(ref="TRE-009", op="venta", type="casa", zone="este", price=890000, beds=4, baths=4, area=390, icon="villa"),
-]
+# Inmuebles publicados. Mientras la lista esté vacía, la web muestra en su lugar
+# la invitación a crear una alerta de búsqueda y a solicitar una valoración, y no
+# se generan el filtro, el buscador de la portada ni los destacados. En cuanto se
+# añada el primer inmueble, todo ello vuelve a aparecer solo. Ejemplo:
+#     dict(ref="TRE-001", op="venta", type="piso", zone="igualada", price=185000,
+#          beds=3, baths=2, area=90, icon="building"),
+# op: "venta" o "alquiler"; type: uno de SEARCH_VALUES["tipo"]; zone: clave de TOWNS;
+# icon: "home", "building", "penthouse", "villa", "tree" o "loft". Su título,
+# ubicación y etiqueta van en «properties» de los tres archivos de textos.
+PROPERTIES = []
 
-# Localidades reales, con su nombre oficial (igual en los tres idiomas). Para publicar un
-# inmueble en una localidad nueva, añádala aquí y úsela en su campo «zone», por ejemplo:
+# Localidades donde trabajamos, con su nombre oficial (igual en los tres idiomas). La
+# clave se usa en la dirección de su página y en el campo «zone» de los inmuebles:
 #     "igualada": "Igualada",
-#     "montbui": "Santa Margarida de Montbui",
-# El filtro «Localidad» solo muestra las localidades que tienen algún inmueble publicado.
-# Los nombres de las zonas de ejemplo están traducidos en «places» de _textos_*.py.
+#     "santa-margarida-de-montbui": "Santa Margarida de Montbui",
+# Cada localidad tiene su página («Vender o comprar vivienda en …») en los tres idiomas,
+# con el texto propio que se escriba en «towns» de _textos_*.py, y aparece en el pie,
+# en el sitemap y como sugerencia en la valoración y la alerta. El filtro «Localidad»
+# de «Inmuebles» solo muestra las que tienen algún inmueble publicado.
 TOWNS = {}
+
+# Fotos reales del equipo para «Nosotros» (nunca de bancos de imágenes). Mientras la
+# lista esté vacía, la página mantiene su diseño actual. Para añadir una:
+#   1. Prepare la foto con «python3 _fotos.py original.jpg equipo», que guarda en fotos/
+#      equipo.webp y equipo.jpg optimizadas e indica su tamaño.
+#   2. Añádala aquí: ("equipo", ancho, alto).
+#   3. Escriba su texto alternativo y su pie en «nosotros» → «photos» de los tres archivos de textos.
+TEAM_PHOTOS = []
 
 SERVICES = [("compraventa", "key"), ("alquiler", "home"), ("gestion-alquileres", "clipboard"),
             ("inversion", "chart"), ("valoracion", "search"), ("asesoramiento-juridico", "shield")]
@@ -151,7 +195,10 @@ PILLAR_ICONS = ["shield", "eye", "users"]
 
 SUBJECTS = ["compra", "venta", "alquiler", "gestion", "valoracion", "inversion", "visita", "otro"]
 
-POSTS = [  # (slug, icono, fecha ISO, minutos de lectura)
+POSTS = [  # (slug, icono, fecha ISO, minutos de lectura); el primero es el destacado del blog
+    ("gastos-impuestos-vender-piso-cataluna", "euro", "2026-10-07", 7),
+    ("documentos-vender-vivienda", "document", "2026-10-07", 6),
+    ("preparar-vivienda-vender", "home", "2026-10-07", 5),
     ("comprar-o-alquilar-en-2026", "compass", "2026-01-15", 6),
     ("senales-revalorizacion-zona", "chart", "2026-01-12", 5),
     ("guia-primera-vivienda", "document", "2026-01-08", 7),
@@ -165,6 +212,48 @@ POSTS = [  # (slug, icono, fecha ISO, minutos de lectura)
 # --------------------------------------------------------------------------
 # Nombres de archivo y contexto de página
 # --------------------------------------------------------------------------
+def minify_css(css):
+    """Versión compacta de styles.css: sin comentarios ni espacios innecesarios. Es
+    conservadora a propósito: no toca «:» (en «a :hover» el espacio importa) ni los
+    textos entre comillas que contengan comas."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    css = re.sub(r"\s+", " ", css)
+    css = re.sub(r"\s*([{};])\s*", r"\1", css)
+    css = re.sub(r",\s+(?=[^\"']*(?:[\"'][^\"']*[\"'][^\"']*)*$)", ",", css)
+    return css.replace(";}", "}").strip() + "\n"
+
+
+def minify_js(js):
+    """Versión compacta de main.js: quita los comentarios que ocupan líneas enteras, la
+    sangría y las líneas vacías. No reescribe el código, así que no puede alterarlo."""
+    out, in_comment = [], False
+    for line in js.splitlines():
+        stripped = line.strip()
+        if in_comment:
+            in_comment = "*/" not in stripped
+            continue
+        if stripped.startswith("/*"):
+            in_comment = "*/" not in stripped
+            continue
+        if not stripped or stripped.startswith("//"):
+            continue
+        out.append(stripped)
+    text = "\n".join(out) + "\n"
+    if "`" in text:
+        raise SystemExit("main.js: las plantillas con ` no están previstas en minify_js()")
+    return text
+
+
+def build_assets():
+    """Genera styles.min.css y main.min.js, que son los que enlazan las páginas.
+    Se editan siempre styles.css y main.js."""
+    for source, target, minify in (("styles.css", "styles.min.css", minify_css), ("main.js", "main.min.js", minify_js)):
+        with open(os.path.join(SITE_DIR, source), encoding="utf-8") as fh:
+            text = minify(fh.read())
+        with open(os.path.join(SITE_DIR, target), "w", encoding="utf-8") as fh:
+            fh.write(text)
+
+
 def versioned(asset):
     """Añade una huella del contenido para que el navegador no use copias antiguas en caché."""
     with open(os.path.join(SITE_DIR, asset), "rb") as fh:
@@ -179,6 +268,8 @@ def filename(lang, page):
     name = page[:-len(".html")]
     if name.startswith("blog/"):
         slug = "blog-" + lang["posts"][name[len("blog/"):]]["slug"]
+    elif name.startswith("zona/"):  # página de una localidad de TOWNS
+        slug = lang["slugs"]["zona"] + "-" + name[len("zona/"):]
     else:
         slug = lang["slugs"][name]
     if lang["code"] == "es" and name == "index":
@@ -212,6 +303,11 @@ class Ctx:
 def url(file):
     """Dirección absoluta de un archivo del sitio; la portada se publica como «/»."""
     return f"{SITE_URL}/" + ("" if file == "index.html" else file)
+
+
+def form_legal(ctx, purpose):
+    """Información básica de protección de datos de un formulario, con su finalidad."""
+    return resolve(ctx, ctx.L["contacto"]["legal_html"].replace("%%PURPOSE%%", purpose))
 
 
 def resolve(ctx, text):
@@ -253,25 +349,23 @@ def options(values, labels, placeholder):
     return "".join(out)
 
 
-def place_name(L, slug):
-    """Nombre de una localidad: traducido si es una zona de ejemplo, oficial si está en TOWNS."""
-    if slug in L["places"]:
-        return L["places"][slug]
+def place_name(slug):
+    """Nombre oficial de una localidad de TOWNS."""
     if slug in TOWNS:
         return TOWNS[slug]
     raise SystemExit(f"Localidad «{slug}» sin nombre: añádala a TOWNS en _build.py")
 
 
-def places(L):
+def places():
     """Localidades con algún inmueble publicado, por orden alfabético."""
     slugs = {p["zone"] for p in PROPERTIES}
-    return sorted(((s, place_name(L, s)) for s in slugs), key=lambda item: item[1].casefold())
+    return sorted(((s, place_name(s)) for s in slugs), key=lambda item: item[1].casefold())
 
 
 def field_options(L, name):
     """Valores y textos de un desplegable del buscador."""
     if name == "zona":
-        found = places(L)
+        found = places()
         return [s for s, _ in found], [label for _, label in found]
     return SEARCH_VALUES[name], L["search"]["options"][name]
 
@@ -281,7 +375,10 @@ def field_options(L, name):
 # --------------------------------------------------------------------------
 def head(ctx, title, description, noindex=False, extra=""):
     L = ctx.L
-    full_title = title if title.startswith("Twins") else f"{title} | Twins Real Estate"
+    # La marca se añade al final del título salvo que lo haga superar los 60 caracteres
+    # que suelen mostrar los buscadores (p. ej. en los títulos largos del blog).
+    branded = f"{title} | Twins Real Estate"
+    full_title = title if title.startswith("Twins") or len(branded) > 60 else branded
     alternates = ""
     if SITE_URL and not ctx.is_404:
         links = [f'\n    <meta property="og:url" content="{url(ctx.file)}">',
@@ -291,11 +388,19 @@ def head(ctx, title, description, noindex=False, extra=""):
         links.append(f'\n    <link rel="alternate" hreflang="x-default" href="{url(ctx.translation(LANGS[0]))}">')
         alternates = "".join(links)
     og_type = "article" if ctx.current.startswith("blog/") else "website"
+    og_image = ""
+    if SITE_URL:
+        og_image = (f'\n    <meta property="og:image" content="{url(OG_IMAGE)}">'
+                    '\n    <meta property="og:image:type" content="image/jpeg">'
+                    '\n    <meta property="og:image:width" content="1200">'
+                    '\n    <meta property="og:image:height" content="630">'
+                    f'\n    <meta property="og:image:alt" content="{esc(L["ui"]["og_image_alt"])}">')
     robots = "noindex" if noindex else "index, follow"
     return f"""<!DOCTYPE html>
 <html lang="{L['lang']}">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="{csp()}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>{esc(full_title)}</title>
@@ -309,22 +414,33 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="{esc(full_title)}">
     <meta property="og:description" content="{esc(description)}">
-    <meta name="twitter:card" content="summary">{alternates}
+    <meta name="twitter:card" content="summary_large_image">{og_image}{alternates}
     <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
     <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <link rel="preload" href="{ctx.asset('fonts/inter-latin.woff2')}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{ctx.asset('fonts/playfair-display-600-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <script src="{ctx.asset(versioned('theme.js'))}"></script>
-    <link rel="stylesheet" href="{ctx.asset(versioned('styles.css'))}">
-    <script src="{ctx.asset(versioned('main.js'))}" defer></script>{extra}
+    <link rel="stylesheet" href="{ctx.asset(versioned('styles.min.css'))}">
+    <script src="{ctx.asset(versioned('main.min.js'))}" defer></script>{extra}
 </head>"""
+
+
+def logos(ctx, small, extra=""):
+    """Logotipo para fondo oscuro y para fondo claro (el CSS muestra el del tema
+    activo), en WebP con PNG como alternativa. «small»: versión de 52 px para la
+    cabecera y el pie."""
+    suffix, size = ("-sm", 'width="26" height="34"') if small else ("", 'width="151" height="200"')
+    out = []
+    for cls, name in (("logo--on-dark", "logo-icon"), ("logo--on-light", "logo-icon-dark")):
+        out.append(f'<picture class="{cls}"><source srcset="{ctx.asset(f"{name}{suffix}.webp")}" type="image/webp">'
+                   f'<img src="{ctx.asset(f"{name}{suffix}.png")}" alt="" {size}{extra}></picture>')
+    return "".join(out)
 
 
 def brand(ctx):
     return f"""<a class="brand" href="{ctx.page('index.html')}" aria-label="{esc(ctx.L['ui']['home_aria'])}">
-                <img class="logo--on-dark" src="{ctx.asset('logo-icon.png')}" alt="" width="26" height="34"><img class="logo--on-light" src="{ctx.asset('logo-icon-dark.png')}" alt="" width="26" height="34">
+                {logos(ctx, small=True)}
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>"""
 
@@ -370,6 +486,20 @@ def site_header(ctx, active):
 """
 
 
+def footer_areas(ctx):
+    """Enlaces del pie a las páginas de cada localidad."""
+    if not TOWNS:
+        return ""
+    T = ctx.L["town_page"]
+    links = "".join(f'\n                    <li><a href="{ctx.page(f"zona/{slug}.html")}">{esc(name)}</a></li>'
+                    for slug, name in sorted(TOWNS.items(), key=lambda item: item[1].casefold()))
+    return f"""            <nav class="footer-areas" aria-labelledby="zonas-title">
+                <h2 class="footer-title" id="zonas-title">{T['footer_title']}</h2>
+                <ul>{links}
+                </ul>
+            </nav>"""
+
+
 def site_footer(ctx):
     L, ui = ctx.L, ctx.L["ui"]
     nav_links = "".join(f'\n                        <li><a href="{ctx.page(n)}">{ui["nav"][n]}</a></li>' for n in PAGES)
@@ -408,6 +538,7 @@ def site_footer(ctx):
                     </ul>
                 </div>
             </div>
+{footer_areas(ctx)}
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. {ui['rights']}</p>
                 <nav class="footer-legal" aria-label="{esc(ui['legal_aria'])}">{legal_links}
@@ -481,6 +612,11 @@ def write(ctx, title, description, active, body, extra_head="", noindex=False):
 # --------------------------------------------------------------------------
 # Componentes
 # --------------------------------------------------------------------------
+def valuation_link(ctx):
+    """Destino de los botones «Solicitar una valoración»: el formulario de la portada."""
+    return "#valoracion" if ctx.current == "index.html" else ctx.page("index.html") + "#valoracion"
+
+
 def search_fields(ctx, prefix, names=None, indent=20):
     """Desplegables del buscador (todos o solo los indicados en «names»)."""
     S = ctx.L["search"]
@@ -620,7 +756,7 @@ def sell_section(ctx, alt=True):
                     <ul class="check-list">{checks}
                     </ul>
                     <div class="sell__actions">
-                        <a class="btn btn--primary" href="{ctx.page('contacto.html')}?asunto=venta#formulario">{T['btn']} {ARROW}</a>
+                        <a class="btn btn--primary" href="{valuation_link(ctx)}">{T['btn']} {ARROW}</a>
                         <a class="btn btn--outline" href="mailto:{EMAIL}">{ui['cta_mail']}</a>
                     </div>
                 </div>
@@ -635,7 +771,7 @@ def alert_section(ctx):
     T, C, ui = L["alert"], L["contacto"], L["ui"]
     lab = C["labels"]
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
-    towns = "".join(f'<option value="{esc(name)}"></option>' for _, name in places(L) if _ in TOWNS)
+    towns = "".join(f'<option value="{esc(name)}"></option>' for name in sorted(TOWNS.values(), key=str.casefold))
 
     def error(name):
         return f'<p class="field__error" id="alerta-error-{name}" aria-live="polite"></p>'
@@ -685,7 +821,7 @@ def alert_section(ctx):
                             </div>
                             <div class="field field--hp" aria-hidden="true">
                                 <label for="alerta-web">{C['honeypot']}</label>
-                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                                <input id="alerta-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
                             </div>
                             <div class="field field--full">
                                 <label class="checkbox" for="alerta-privacidad">
@@ -695,7 +831,102 @@ def alert_section(ctx):
                                 {error('privacidad')}
                             </div>
                         </div>
-                        <p class="form-legal">{resolve(ctx, C['legal_html'])}</p>
+                        <p class="form-legal">{form_legal(ctx, T['purpose'])}</p>
+                        <div class="form-actions">
+                            <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
+                        </div>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def valuation_section(ctx):
+    """Formulario de valoración gratuita para propietarios (portada)."""
+    L = ctx.L
+    T, C = L["valuation"], L["contacto"]
+    lab, clab = T["labels"], C["labels"]
+    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
+    towns = "".join(f'<option value="{esc(name)}"></option>' for name in sorted(TOWNS.values(), key=str.casefold))
+    types = options(SEARCH_VALUES["tipo"], L["search"]["options"]["tipo"], T["tipo_placeholder"])
+
+    def error(name):
+        return f'<p class="field__error" id="valoracion-error-{name}" aria-live="polite"></p>'
+
+    return f"""
+        <section class="section valuation" id="valoracion" aria-labelledby="valoracion-title">
+            <div class="container split">
+                <div class="reveal">
+                    <span class="eyebrow">{T['eyebrow']}</span>
+                    <h2 class="section-title" id="valoracion-title">{T['title']}</h2>
+                    <div class="prose-block">
+                        <p>{T['text']}</p>
+                    </div>
+                    <ul class="check-list">{checks}
+                    </ul>
+                    <p class="valuation__note">{T['note']}</p>
+                </div>
+
+                <div class="card form-card reveal">
+                    <h3 class="form-card__title">{T['form_title']}</h3>
+                    <p class="form-card__lead">{C['form_lead']}</p>
+                    <form class="lead-form" id="formulario-valoracion" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="valoracion-localidad">{lab['localidad']}</label>
+                                <input id="valoracion-localidad" name="localidad" type="text" list="valoracion-localidades" autocomplete="address-level2" maxlength="80" required placeholder="{esc(T['localidad_placeholder'])}" aria-describedby="valoracion-error-localidad">
+                                <datalist id="valoracion-localidades">{towns}</datalist>
+                                {error('localidad')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-direccion">{lab['direccion']}</label>
+                                <input id="valoracion-direccion" name="direccion" type="text" autocomplete="street-address" maxlength="150" placeholder="{esc(T['direccion_placeholder'])}">
+                            </div>
+                            <div class="field field--full">
+                                <label for="valoracion-tipo">{lab['tipo']}</label>
+                                <select id="valoracion-tipo" name="tipo" required aria-describedby="valoracion-error-tipo">{types}</select>
+                                {error('tipo')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-metros">{lab['metros']}</label>
+                                <input id="valoracion-metros" name="metros" type="number" inputmode="numeric" min="10" max="100000" step="1" required aria-describedby="valoracion-error-metros">
+                                {error('metros')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-dormitorios">{lab['dormitorios']}</label>
+                                <input id="valoracion-dormitorios" name="dormitorios" type="number" inputmode="numeric" min="0" max="50" step="1" aria-describedby="valoracion-error-dormitorios">
+                                {error('dormitorios')}
+                            </div>
+                            <div class="field field--full">
+                                <label for="valoracion-nombre">{clab['nombre']}</label>
+                                <input id="valoracion-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required aria-describedby="valoracion-error-nombre">
+                                {error('nombre')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-telefono">{lab['telefono']}</label>
+                                <input id="valoracion-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" required aria-describedby="valoracion-error-telefono">
+                                {error('telefono')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-email">{clab['email']}</label>
+                                <input id="valoracion-email" name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="valoracion-error-email">
+                                {error('email')}
+                            </div>
+                            <div class="field field--hp" aria-hidden="true">
+                                <label for="valoracion-web">{C['honeypot']}</label>
+                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
+                            </div>
+                            <div class="field field--full">
+                                <label class="checkbox" for="valoracion-privacidad">
+                                    <input id="valoracion-privacidad" name="privacidad" type="checkbox" required aria-describedby="valoracion-error-privacidad">
+                                    <span>{resolve(ctx, C['privacy_html'])}</span>
+                                </label>
+                                {error('privacidad')}
+                            </div>
+                        </div>
+                        <p class="form-legal">{form_legal(ctx, T['purpose'])}</p>
                         <div class="form-actions">
                             <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
                         </div>
@@ -758,56 +989,33 @@ def post_card(ctx, slug, icon_name, date, minutes):
 # --------------------------------------------------------------------------
 # Páginas
 # --------------------------------------------------------------------------
-def build_index(L):
-    ctx = Ctx(L, "index.html")
-    T, ui = L["index"], L["ui"]
-    featured = "".join(property_card(ctx, p) for p in PROPERTIES[:6])
-    services = "".join(feature_card(
-        ic, L["services"][sid][0], L["services"][sid][1],
-        f'\n                    <p class="feature__more"><a class="link-arrow" href="{ctx.page("servicios.html")}#{sid}">'
-        f'{ui["more_info"]} {icon("arrow-right")}<span class="visually-hidden"> {ui["about"]} {L["services"][sid][0].lower()}</span></a></p>'
-    ) for sid, ic in SERVICES[:4])
-    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
-    ld = json_ld({
-        "@context": "https://schema.org",
-        "@type": "RealEstateAgent",
-        "name": "Twins Real Estate",
-        "slogan": T["slogan"],
-        "email": EMAIL,
-        "sameAs": [INSTAGRAM_URL],
-        **({"url": url(ctx.file), "logo": url("logo-icon.png")} if SITE_URL else {}),
-        "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
-        "knowsLanguage": [lang["lang"] for lang in LANGS],
-    })
-
-    callouts = "".join(
-        f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
-        for i, (ic, text) in enumerate(zip(PILLAR_ICONS, T["pillars"]), start=1))
-
-    body = f"""
-        <section class="hero3d" data-scroll="sticky" aria-labelledby="hero-title">
-            <div class="hero3d__sticky">
-                <div class="hero3d__glow" aria-hidden="true"></div>
-                <div class="container hero3d__grid">
-                    <div class="hero3d__copy">
-                        <p class="eyebrow">{T['eyebrow']}</p>
-                        <h1 class="hero3d__title" id="hero-title">{T['h1']}</h1>
-                        <p class="hero3d__text">{T['text']}</p>
-                        <div class="hero3d__actions">
-                            <a class="btn btn--primary" href="{ctx.page('propiedades.html')}">{T['btn_props']} {ARROW}</a>
-                            <a class="btn btn--glass" href="{ctx.page('contacto.html')}#formulario">{T['btn_advice']}</a>
-                        </div>
-                    </div>
-                    <div class="hero3d__stage">{model_3d()}
-                        <ul class="callouts">{callouts}
-                        </ul>
-                    </div>
+def home_paths(ctx):
+    """Portada sin inmuebles: un camino para propietarios (valoración) y otro para
+    compradores (alerta de búsqueda), en lugar de los destacados."""
+    T = ctx.L["index"]
+    targets = [("key", valuation_link(ctx)), ("search", ctx.page("propiedades.html") + "#alerta")]
+    cards = "".join(feature_card(
+        ic, title, text,
+        f'\n                    <p class="feature__more"><a class="btn btn--outline" href="{href}">{btn} {ARROW}</a></p>')
+        for (ic, href), (title, text, btn) in zip(targets, T["paths"]))
+    return f"""
+        <section class="section paths" aria-labelledby="caminos-title">
+            <div class="container">{section_header(T['paths_eyebrow'], T['paths_title'], 'caminos-title', T['paths_lead'])}
+                <div class="grid grid--2">{cards}
                 </div>
-                <p class="scroll-hint" aria-hidden="true"><span>{ui['scroll_hint']}</span></p>
             </div>
         </section>
+"""
 
-        <section class="search" aria-labelledby="buscador-title">
+
+def home_portfolio(ctx):
+    """Buscador e inmuebles destacados de la portada. Sin inmuebles publicados no se
+    muestran: el buscador llevaría a un listado vacío."""
+    L, T = ctx.L, ctx.L["index"]
+    if not PROPERTIES:
+        return home_paths(ctx)
+    featured = "".join(property_card(ctx, p) for p in PROPERTIES[:6])
+    return f"""        <section class="search" aria-labelledby="buscador-title">
             <div class="container">
                 <div class="search__panel reveal">
                     <h2 class="search__title" id="buscador-title">{L['search']['title_home']}</h2>
@@ -826,8 +1034,64 @@ def build_index(L):
                     <a class="btn btn--outline" href="{ctx.page('propiedades.html')}">{T['featured_all']} {ARROW}</a>
                 </div>
             </div>
+        </section>"""
+
+
+def build_index(L):
+    ctx = Ctx(L, "index.html")
+    T, ui = L["index"], L["ui"]
+    services = "".join(feature_card(
+        ic, L["services"][sid][0], L["services"][sid][1],
+        f'\n                    <p class="feature__more"><a class="link-arrow" href="{ctx.page("servicios.html")}#{sid}">'
+        f'{ui["more_info"]} {icon("arrow-right")}<span class="visually-hidden"> {ui["about"]} {L["services"][sid][0].lower()}</span></a></p>'
+    ) for sid, ic in SERVICES[:4])
+    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
+    ld = json_ld({
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "name": "Twins Real Estate",
+        "slogan": T["slogan"],
+        "email": EMAIL,
+        "sameAs": [INSTAGRAM_URL],
+        **({"url": url(ctx.file), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
+        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
+        "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
+        "knowsLanguage": [lang["lang"] for lang in LANGS],
+    })
+
+    portfolio = home_portfolio(ctx)
+    if PROPERTIES:
+        hero_button = f'<a class="btn btn--primary" href="{ctx.page("propiedades.html")}">{T["btn_props"]} {ARROW}</a>'
+    else:
+        hero_button = f'<a class="btn btn--primary" href="#valoracion">{T["btn_valuation"]} {ARROW}</a>'
+    callouts = "".join(
+        f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
+        for i, (ic, text) in enumerate(zip(PILLAR_ICONS, T["pillars"]), start=1))
+
+    body = f"""
+        <section class="hero3d" data-scroll="sticky" aria-labelledby="hero-title">
+            <div class="hero3d__sticky">
+                <div class="hero3d__glow" aria-hidden="true"></div>
+                <div class="container hero3d__grid">
+                    <div class="hero3d__copy">
+                        <p class="eyebrow">{T['eyebrow']}</p>
+                        <h1 class="hero3d__title" id="hero-title">{T['h1']}</h1>
+                        <p class="hero3d__text">{T['text']}</p>
+                        <div class="hero3d__actions">
+                            {hero_button}
+                            <a class="btn btn--glass" href="{ctx.page('contacto.html')}#formulario">{T['btn_advice']}</a>
+                        </div>
+                    </div>
+                    <div class="hero3d__stage">{model_3d()}
+                        <ul class="callouts">{callouts}
+                        </ul>
+                    </div>
+                </div>
+                <p class="scroll-hint" aria-hidden="true"><span>{ui['scroll_hint']}</span></p>
+            </div>
         </section>
 
+{portfolio}{valuation_section(ctx)}
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
@@ -842,7 +1106,7 @@ def build_index(L):
             <div class="container split">
                 <div class="split__visual reveal tilt">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
+                        {logos(ctx, small=False, extra=' loading="lazy" decoding="async"')}
                         <p class="split__quote">{T['quote']}</p>
                     </div>
                 </div>
@@ -875,6 +1139,9 @@ def build_index(L):
 def build_properties(L):
     ctx = Ctx(L, "propiedades.html")
     T, S = L["propiedades"], L["search"]
+    if not PROPERTIES:
+        build_properties_soon(ctx)
+        return
     cards = "".join(property_card(ctx, p) for p in PROPERTIES)
     body = page_hero(ctx, T["h1"], T["text"], [(L["ui"]["nav"]["propiedades.html"], "propiedades.html")], obj="house") + f"""
         <section class="filters" aria-labelledby="filtros-title">
@@ -909,6 +1176,56 @@ def build_properties(L):
     write(ctx, T["title"], T["description"], "propiedades.html", body)
 
 
+def build_properties_soon(ctx):
+    """«Inmuebles» mientras no hay ninguno publicado: invita a crear una alerta de
+    búsqueda y a solicitar una valoración. Sin inmuebles no tiene sentido mostrar
+    el filtro, así que tampoco se genera el desplegable «Localidad» vacío."""
+    L = ctx.L
+    T, soon = L["propiedades"], L["propiedades"]["soon"]
+    body = page_hero(ctx, T["h1"], soon["text"], [(L["ui"]["nav"]["propiedades.html"], "propiedades.html")], obj="house") + f"""
+        <section class="section" aria-labelledby="cartera-title">
+            <div class="container">
+                <div class="empty-state portfolio-soon reveal">
+                    <span class="eyebrow">{soon['eyebrow']}</span>
+                    <h2 id="cartera-title">{soon['title']}</h2>
+                    <p>{soon['body']}</p>
+                    <div class="empty-state__actions">
+                        <a class="btn btn--primary" href="#alerta">{soon['btn_alert']} {ARROW}</a>
+                        <a class="btn btn--outline" href="{valuation_link(ctx)}">{soon['btn_sell']}</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+{alert_section(ctx)}{sell_section(ctx, alt=False)}"""
+    write(ctx, T["title"], soon["description"], "propiedades.html", body)
+
+
+def team_photos(ctx):
+    """Galería de fotos reales del equipo; no se genera si no hay ninguna."""
+    T = ctx.L["nosotros"]
+    if not TEAM_PHOTOS:
+        return ""
+    figures = []
+    for name, width, height in TEAM_PHOTOS:
+        alt, caption = T["photos"][name]
+        figures.append(f"""
+                <figure class="photo reveal">
+                    <picture>
+                        <source srcset="{ctx.asset(f'fotos/{name}.webp')}" type="image/webp">
+                        <img src="{ctx.asset(f'fotos/{name}.jpg')}" alt="{esc(alt)}" width="{width}" height="{height}" loading="lazy" decoding="async">
+                    </picture>
+                    <figcaption>{caption}</figcaption>
+                </figure>""")
+    return f"""
+        <section class="section" aria-labelledby="equipo-title">
+            <div class="container">{section_header(T['photos_eyebrow'], T['photos_title'], 'equipo-title')}
+                <div class="photos">{''.join(figures)}
+                </div>
+            </div>
+        </section>
+"""
+
+
 def build_about(L):
     ctx = Ctx(L, "nosotros.html")
     T = L["nosotros"]
@@ -919,7 +1236,7 @@ def build_about(L):
             <div class="container split">
                 <div class="split__visual reveal">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
+                        {logos(ctx, small=False, extra=' loading="lazy" decoding="async"')}
                         <p class="split__quote">{L['index']['slogan']}</p>
                     </div>
                 </div>
@@ -933,6 +1250,7 @@ def build_about(L):
             </div>
         </section>
 
+{team_photos(ctx)}
         <section class="section section--alt" aria-labelledby="mision-title">
             <div class="container">{section_header(T['purpose_eyebrow'], T['purpose_title'], 'mision-title')}
                 <div class="grid grid--2">{feature_card('compass', *T['mission'])}{feature_card('lightbulb', *T['vision'])}
@@ -1034,12 +1352,18 @@ def build_blog(L):
             "headline": post["title"],
             "description": post["excerpt"],
             "datePublished": date,
+            "dateModified": date,
+            **({"image": url(OG_IMAGE)} if SITE_URL else {}),
             "inLanguage": L["lang"],
             **({"url": url(ctx.file), "mainEntityOfPage": url(ctx.file)} if SITE_URL else {}),
             "author": {"@type": "Organization", "name": "Twins Real Estate"},
             "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
         })
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
+        if slug in OWNER_POSTS:  # artículos para propietarios: llevan a la valoración gratuita
+            action = f'<a class="btn btn--primary" href="{valuation_link(ctx)}">{L["sell"]["btn"]} {ARROW}</a>'
+        else:
+            action = f'<a class="btn btn--primary" href="{ctx.page("contacto.html")}#formulario">{ui["consult"]} {ARROW}</a>'
         body = page_hero(ctx, post["title"], "", [(ui["nav"]["blog.html"], "blog.html"), (post["title"], "")], meta, obj="pages") + f"""
         <article class="article">
             <div class="container">
@@ -1048,7 +1372,7 @@ def build_blog(L):
                 </div>
                 <footer class="article__footer">
                     <a class="link-arrow" href="{ctx.page('blog.html')}">{icon('arrow-left')} {ui['back_blog']}</a>
-                    <a class="btn btn--primary" href="{ctx.page('contacto.html')}#formulario">{ui['consult']} {ARROW}</a>
+                    {action}
                 </footer>
             </div>
         </article>
@@ -1063,6 +1387,80 @@ def build_blog(L):
               extra_head=ld)
 
 
+def build_towns(L):
+    """Una página por localidad: cómo trabajamos allí, servicios, valoración gratuita,
+    alerta de búsqueda y, si los hay, los inmuebles publicados en ella."""
+    T, ui = L["town_page"], L["ui"]
+    for slug, town in TOWNS.items():
+        ctx = Ctx(L, f"zona/{slug}.html")
+
+        def f(text):
+            return text.replace("{town}", esc(town))
+
+        own = "".join(f"\n                        <p>{p}</p>" for p in L["towns"].get(slug, []))
+        paras = own + "".join(f"\n                        <p>{f(p)}</p>" for p in T["paras"])
+        query = "?" + urlencode({"localidad": town})
+        valuation = ctx.page("index.html") + query + "#valoracion"
+        alert = ctx.page("propiedades.html") + query + "#alerta"
+        paths = "".join(feature_card(
+            ic, f(title), f(text),
+            f'\n                    <p class="feature__more"><a class="btn btn--outline" href="{href}">{btn} {ARROW}</a></p>')
+            for ic, title, text, btn, href in (
+                ("key", T["owners_title"], T["owners_text"], L["sell"]["btn"], valuation),
+                ("search", T["buyers_title"], T["buyers_text"], L["propiedades"]["soon"]["btn_alert"], alert)))
+        services = "".join(
+            f'\n                        <li>{icon("check")}<a href="{ctx.page("servicios.html")}#{sid}">{L["services"][sid][0]}</a></li>'
+            for sid, _ in SERVICES)
+        listed = [p for p in PROPERTIES if p["zone"] == slug]
+        listings = ""
+        if listed:
+            cards = "".join(property_card(ctx, p) for p in listed)
+            listings = f"""
+        <section class="section" aria-labelledby="inmuebles-zona-title">
+            <div class="container">{section_header(None, f(T['listings_title']), 'inmuebles-zona-title')}
+                <div class="grid grid--3">{cards}
+                </div>
+            </div>
+        </section>
+"""
+        ld = json_ld({
+            "@context": "https://schema.org",
+            "@type": "RealEstateAgent",
+            "name": "Twins Real Estate",
+            "description": f(T["description"]),
+            "email": EMAIL,
+            **({"url": url(filename(L, "index.html")), "image": url(OG_IMAGE)} if SITE_URL else {}),
+            "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
+            "areaServed": {"@type": "City", "name": town},
+            "knowsLanguage": [lang["lang"] for lang in LANGS],
+        })
+        body = page_hero(ctx, f(T["h1"]), f(T["text"]), [(f(T["h1"]), ctx.current)], obj="house") + f"""
+        <section class="section" aria-labelledby="zona-title">
+            <div class="container split">
+                <div class="reveal">
+                    <span class="eyebrow">{T['eyebrow']}</span>
+                    <h2 class="section-title" id="zona-title">{f(T['h2'])}</h2>
+                    <div class="prose-block">{paras}
+                    </div>
+                </div>
+                <div class="reveal">
+                    <h2 class="section-title section-title--sm" id="zona-servicios-title">{f(T['services_title'])}</h2>
+                    <ul class="check-list">{services}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--alt paths" aria-label="{esc(f(T['h2']))}">
+            <div class="container">
+                <div class="grid grid--2">{paths}
+                </div>
+            </div>
+        </section>
+{listings}{commitments_strip(ctx)}"""
+        write(ctx, f(T["title"]), f(T["description"]), "", body, extra_head=ld)
+
+
 def build_contact(L):
     ctx = Ctx(L, "contacto.html")
     T, ui = L["contacto"], L["ui"]
@@ -1070,6 +1468,14 @@ def build_contact(L):
 
     def error(name):
         return f'<p class="field__error" id="error-{name}" aria-live="polite"></p>'
+
+    # La referencia solo tiene sentido cuando hay inmuebles publicados.
+    reference = f"""                            <div class="field field--full">
+                                <label for="contacto-referencia">{lab['referencia']}</label>
+                                <input id="contacto-referencia" name="referencia" type="text" maxlength="20" placeholder="{esc(T['ref_placeholder'])}" aria-describedby="ayuda-referencia">
+                                <p class="field__hint" id="ayuda-referencia">{T['ref_hint']}</p>
+                            </div>
+""" if PROPERTIES else ""
 
     body = page_hero(ctx, T["h1"], T["text"], [(ui["nav"]["contacto.html"], "contacto.html")]) + f"""
         <section class="section" aria-label="{esc(T['section_aria'])}">
@@ -1129,19 +1535,14 @@ def build_contact(L):
                                 <label for="contacto-asunto">{lab['asunto']}</label>
                                 <select id="contacto-asunto" name="asunto">{options(SUBJECTS, T['subjects'], T['subject_placeholder'])}</select>
                             </div>
-                            <div class="field field--full">
-                                <label for="contacto-referencia">{lab['referencia']}</label>
-                                <input id="contacto-referencia" name="referencia" type="text" maxlength="20" placeholder="{esc(T['ref_placeholder'])}" aria-describedby="ayuda-referencia">
-                                <p class="field__hint" id="ayuda-referencia">{T['ref_hint']}</p>
-                            </div>
-                            <div class="field field--full">
+{reference}                            <div class="field field--full">
                                 <label for="contacto-mensaje">{lab['mensaje']}</label>
                                 <textarea id="contacto-mensaje" name="mensaje" maxlength="2000" required aria-describedby="error-mensaje"></textarea>
                                 {error('mensaje')}
                             </div>
                             <div class="field field--hp" aria-hidden="true">
                                 <label for="contacto-web">{T['honeypot']}</label>
-                                <input id="contacto-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                                <input id="contacto-web" name="web" type="text" tabindex="-1" autocomplete="off" maxlength="100">
                             </div>
                             <div class="field field--full">
                                 <label class="checkbox" for="contacto-privacidad">
@@ -1151,7 +1552,7 @@ def build_contact(L):
                                 {error('privacidad')}
                             </div>
                         </div>
-                        <p class="form-legal">{resolve(ctx, T['legal_html'])}</p>
+                        <p class="form-legal">{form_legal(ctx, T['purpose'])}</p>
                         <div class="form-actions">
                             <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
                         </div>
@@ -1184,7 +1585,8 @@ def build_legal(L):
     ui = L["ui"]
     for filename, page in L["legal"].items():
         ctx = Ctx(L, filename)
-        content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)))
+        forms = L["privacy_forms"]["endpoint" if form_endpoint() else "mail"]
+        content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)).replace("%%FORMS%%", forms))
         # Las tablas con desplazamiento horizontal deben poder desplazarse con el teclado.
         content = content.replace('<div class="table-scroll">', '<div class="table-scroll" tabindex="0">')
         body = page_hero(ctx, page["title"], ui["updated"].format(ui["updated_date"]), [(page["title"], filename)]) + f"""
@@ -1215,12 +1617,21 @@ def build_404(L):
     write(ctx, T["title"], T["description"], "", body, noindex=True)
 
 
+# Artículos dirigidos a propietarios: su botón final lleva a la valoración gratuita.
+OWNER_POSTS = {"gastos-impuestos-vender-piso-cataluna", "documentos-vender-vivienda", "preparar-vivienda-vender"}
+
+# Artículos que ya existían con direcciones sin prefijo de idioma (versión anterior del sitio).
+LEGACY_POSTS = {"comprar-o-alquilar-en-2026", "senales-revalorizacion-zona", "guia-primera-vivienda",
+                "preparar-vivienda-alquiler", "que-revisar-contrato-arras", "tendencias-interiorismo-2026",
+                "mitos-hipoteca"}
+
+
 def build_legacy_redirects(L):
     """Redirige las direcciones antiguas sin prefijo de idioma (p. ej. «propiedades.html»),
     publicadas por una versión anterior del sitio, a su página actual en castellano."""
     pages = [(p, L["ui"]["nav"][p]) for p in PAGES if p != "index.html"]
     pages += [(p, page["title"]) for p, page in L["legal"].items()]
-    pages += [(f"blog/{slug}.html", L["posts"][slug]["title"]) for slug, *_ in POSTS]
+    pages += [(f"blog/{slug}.html", L["posts"][slug]["title"]) for slug, *_ in POSTS if slug in LEGACY_POSTS]
     for page, title in pages:
         old = page[len("blog/"):] if page.startswith("blog/") else page
         target = filename(L, page)
@@ -1229,6 +1640,7 @@ def build_legacy_redirects(L):
 <html lang="{L['lang']}">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{esc(title)} | Twins Real Estate</title>
     <meta name="robots" content="noindex, follow">
@@ -1246,7 +1658,8 @@ def build_legacy_redirects(L):
 
 def logical_pages(L):
     """Todas las páginas indexables de un idioma, con su nombre lógico."""
-    return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS])
+    return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS]
+            + [f"zona/{slug}.html" for slug in TOWNS])
 
 
 def build_sitemap():
@@ -1274,6 +1687,49 @@ def build_sitemap():
         fh.write(robots)
 
 
+def build_headers():
+    """_headers: cabeceras de seguridad y de caché para Netlify o Cloudflare Pages.
+    GitHub Pages lo ignora (y no lo publica, porque empieza por «_»)."""
+    text = f"""# Generado por _build.py: no lo edite a mano.
+# Cabeceras de seguridad para Netlify / Cloudflare Pages. GitHub Pages ignora este
+# archivo; allí la política de seguridad (CSP) va en una etiqueta <meta> de cada página.
+/*
+  Content-Security-Policy: {csp(meta=False)}
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+
+# styles.min.css, main.min.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
+# (ver versioned()): cada cambio genera una dirección nueva, así que el navegador
+# puede guardarlos en caché indefinidamente. Las tipografías no cambian nunca.
+/styles.min.css
+  Cache-Control: public, max-age=31536000, immutable
+/main.min.js
+  Cache-Control: public, max-age=31536000, immutable
+/theme.js
+  Cache-Control: public, max-age=31536000, immutable
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+"""
+    with open(os.path.join(SITE_DIR, "_headers"), "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def build_security_txt():
+    """/.well-known/security.txt (RFC 9116): a quién avisar de un problema de seguridad.
+    _config.yml indica a Jekyll (GitHub Pages) que publique la carpeta .well-known."""
+    lines = [f"Contact: mailto:{EMAIL}", f"Expires: {SECURITY_TXT_EXPIRES}", "Preferred-Languages: es, ca, en"]
+    if SITE_URL:
+        lines.append(f"Canonical: {SITE_URL}/.well-known/security.txt")
+    os.makedirs(os.path.join(SITE_DIR, ".well-known"), exist_ok=True)
+    with open(os.path.join(SITE_DIR, ".well-known", "security.txt"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
 def check_translations():
     """Comprueba que todos los idiomas definen exactamente las mismas claves."""
     def keys(value, path=""):
@@ -1295,6 +1751,7 @@ def check_translations():
 
 def main():
     check_translations()
+    build_assets()
     for lang in LANGS:
         build_index(lang)
         build_properties(lang)
@@ -1303,9 +1760,12 @@ def main():
         build_blog(lang)
         build_contact(lang)
         build_legal(lang)
+        build_towns(lang)
     build_404(LANGS[0])
     build_legacy_redirects(LANGS[0])
     build_sitemap()
+    build_headers()
+    build_security_txt()
     print("Sitio generado en", SITE_DIR)
 
 
