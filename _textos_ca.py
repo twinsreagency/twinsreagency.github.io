@@ -59,6 +59,7 @@ C = {
         "theme_to_light": "Canvia al tema clar",
         "theme_to_dark": "Canvia al tema fosc",
         "scroll_hint": "Llisqueu per descobrir",
+        "og_image_alt": "Twins Real Estate: compravenda, lloguer i valoració d’immobles",
         "commitments_title": "Els nostres compromisos",
     },
 
@@ -245,7 +246,7 @@ C = {
         "empty_text": "Modifiqueu els filtres o indiqueu-nos què busqueu: us informarem de les opcions disponibles, incloses les que encara no s’han publicat.",
         "empty_btn": "Comuniqueu-nos la vostra cerca",
         "soon": {
-            "description": "Twins Real Estate està seleccionant els seus primers immobles en venda i lloguer. Creeu una alerta de cerca o sol·liciteu una valoració gratuïta del vostre habitatge.",
+            "description": "Estem seleccionant els nostres primers immobles en venda i lloguer. Creeu una alerta de cerca o sol·liciteu una valoració gratuïta del vostre habitatge.",
             "text": "Estem seleccionant els nostres primers immobles. Indiqueu-nos què busqueu i us avisarem abans que a ningú.",
             "eyebrow": "Cartera en preparació",
             "title": "Estem seleccionant els nostres primers immobles",

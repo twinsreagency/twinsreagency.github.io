@@ -165,6 +165,17 @@ class ContentTest(unittest.TestCase):
                 if name != "404.html":
                     self.assertTrue(page.canonical and page.canonical.startswith(_build.SITE_URL))
 
+    def test_titles_fit_in_search_results(self):
+        long = {n: p.title for n, p in CONTENT.items() if len(p.title) > 60}
+        self.assertEqual(long, {})
+
+    def test_share_image_is_declared_and_exists(self):
+        self.assertTrue(os.path.isfile(os.path.join(SITE_DIR, _build.OG_IMAGE)))
+        for name, page in CONTENT.items():
+            if name != "404.html":
+                image = [m for m in page.metas if m.get("property") == "og:image"]
+                self.assertEqual([m.get("content") for m in image], [f"{_build.SITE_URL}/{_build.OG_IMAGE}"], name)
+
     def test_titles_and_descriptions_are_unique(self):
         titles = [p.title for p in CONTENT.values()]
         descriptions = [p.description for p in CONTENT.values()]

@@ -59,6 +59,7 @@ C = {
         "theme_to_light": "Cambiar a tema claro",
         "theme_to_dark": "Cambiar a tema oscuro",
         "scroll_hint": "Deslice para descubrir",
+        "og_image_alt": "Twins Real Estate: compraventa, alquiler y valoración de inmuebles",
         "commitments_title": "Nuestros compromisos",
     },
 

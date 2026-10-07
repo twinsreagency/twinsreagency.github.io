@@ -49,6 +49,9 @@ SITE_PATH = urlparse(SITE_URL).path.rstrip("/") + "/"
 LANGS = [_textos_es.C, _textos_ca.C, _textos_en.C]
 
 EMAIL = "twinsreagency@gmail.com"
+OG_IMAGE = "og-image.jpg"  # imagen para compartir en redes (1200 × 630); se genera con _og/make.js
+# Agencia en línea con base en Igualada (sin oficina abierta al público).
+LOCALITY = "Igualada"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
@@ -367,7 +370,10 @@ def field_options(L, name):
 # --------------------------------------------------------------------------
 def head(ctx, title, description, noindex=False, extra=""):
     L = ctx.L
-    full_title = title if title.startswith("Twins") else f"{title} | Twins Real Estate"
+    # La marca se añade al final del título salvo que lo haga superar los 60 caracteres
+    # que suelen mostrar los buscadores (p. ej. en los títulos largos del blog).
+    branded = f"{title} | Twins Real Estate"
+    full_title = title if title.startswith("Twins") or len(branded) > 60 else branded
     alternates = ""
     if SITE_URL and not ctx.is_404:
         links = [f'\n    <meta property="og:url" content="{url(ctx.file)}">',
@@ -377,6 +383,13 @@ def head(ctx, title, description, noindex=False, extra=""):
         links.append(f'\n    <link rel="alternate" hreflang="x-default" href="{url(ctx.translation(LANGS[0]))}">')
         alternates = "".join(links)
     og_type = "article" if ctx.current.startswith("blog/") else "website"
+    og_image = ""
+    if SITE_URL:
+        og_image = (f'\n    <meta property="og:image" content="{url(OG_IMAGE)}">'
+                    '\n    <meta property="og:image:type" content="image/jpeg">'
+                    '\n    <meta property="og:image:width" content="1200">'
+                    '\n    <meta property="og:image:height" content="630">'
+                    f'\n    <meta property="og:image:alt" content="{esc(L["ui"]["og_image_alt"])}">')
     robots = "noindex" if noindex else "index, follow"
     return f"""<!DOCTYPE html>
 <html lang="{L['lang']}">
@@ -396,7 +409,7 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta property="og:site_name" content="Twins Real Estate">
     <meta property="og:title" content="{esc(full_title)}">
     <meta property="og:description" content="{esc(description)}">
-    <meta name="twitter:card" content="summary">{alternates}
+    <meta name="twitter:card" content="summary_large_image">{og_image}{alternates}
     <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
     <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
@@ -1020,7 +1033,8 @@ def build_index(L):
         "slogan": T["slogan"],
         "email": EMAIL,
         "sameAs": [INSTAGRAM_URL],
-        **({"url": url(ctx.file), "logo": url("logo-icon.png")} if SITE_URL else {}),
+        **({"url": url(ctx.file), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
+        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
         "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
         "knowsLanguage": [lang["lang"] for lang in LANGS],
     })
@@ -1318,6 +1332,8 @@ def build_blog(L):
             "headline": post["title"],
             "description": post["excerpt"],
             "datePublished": date,
+            "dateModified": date,
+            **({"image": url(OG_IMAGE)} if SITE_URL else {}),
             "inLanguage": L["lang"],
             **({"url": url(ctx.file), "mainEntityOfPage": url(ctx.file)} if SITE_URL else {}),
             "author": {"@type": "Organization", "name": "Twins Real Estate"},

@@ -60,6 +60,7 @@ C = {
         "theme_to_light": "Switch to light theme",
         "theme_to_dark": "Switch to dark theme",
         "scroll_hint": "Scroll to explore",
+        "og_image_alt": "Twins Real Estate: property sales, lettings and valuations",
         "commitments_title": "Our commitments",
     },
 
