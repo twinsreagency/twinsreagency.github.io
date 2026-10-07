@@ -200,6 +200,13 @@ C = {
         "btn_valuation": "Valore su inmueble gratis",
         "btn_advice": "Solicitar asesoramiento",
         "pillars": ["Operaciones con seguridad jurídica", "Honorarios claros desde el inicio", "Atención personalizada"],
+        "paths_eyebrow": "Cómo podemos ayudarle",
+        "paths_title": "Díganos qué necesita",
+        "paths_lead": "Mientras preparamos nuestra cartera, ya podemos ayudarle tanto si desea vender o alquilar su inmueble como si busca uno.",
+        "paths": [
+            ("Quiero vender o alquilar", "Solicite una valoración gratuita y sin compromiso. Estudiaremos su inmueble y le propondremos un precio realista y un plan para comercializarlo.", "Solicitar una valoración"),
+            ("Busco vivienda", "Indíquenos la localidad y el tipo de inmueble que necesita. Le avisaremos en cuanto tengamos una opción que encaje, antes de publicarla.", "Crear una alerta de búsqueda"),
+        ],
         "featured_eyebrow": "Cartera de inmuebles",
         "featured_title": "Inmuebles destacados",
         "featured_lead": "Una selección de viviendas disponibles, revisadas por nuestro equipo en cuanto a documentación, estado y precio de mercado.",

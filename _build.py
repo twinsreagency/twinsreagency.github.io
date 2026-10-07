@@ -859,12 +859,31 @@ def post_card(ctx, slug, icon_name, date, minutes):
 # --------------------------------------------------------------------------
 # Páginas
 # --------------------------------------------------------------------------
+def home_paths(ctx):
+    """Portada sin inmuebles: un camino para propietarios (valoración) y otro para
+    compradores (alerta de búsqueda), en lugar de los destacados."""
+    T = ctx.L["index"]
+    targets = [("key", valuation_link(ctx)), ("search", ctx.page("propiedades.html") + "#alerta")]
+    cards = "".join(feature_card(
+        ic, title, text,
+        f'\n                    <p class="feature__more"><a class="btn btn--outline" href="{href}">{btn} {ARROW}</a></p>')
+        for (ic, href), (title, text, btn) in zip(targets, T["paths"]))
+    return f"""
+        <section class="section paths" aria-labelledby="caminos-title">
+            <div class="container">{section_header(T['paths_eyebrow'], T['paths_title'], 'caminos-title', T['paths_lead'])}
+                <div class="grid grid--2">{cards}
+                </div>
+            </div>
+        </section>
+"""
+
+
 def home_portfolio(ctx):
     """Buscador e inmuebles destacados de la portada. Sin inmuebles publicados no se
     muestran: el buscador llevaría a un listado vacío."""
     L, T = ctx.L, ctx.L["index"]
     if not PROPERTIES:
-        return ""
+        return home_paths(ctx)
     featured = "".join(property_card(ctx, p) for p in PROPERTIES[:6])
     return f"""        <section class="search" aria-labelledby="buscador-title">
             <div class="container">

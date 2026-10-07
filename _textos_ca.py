@@ -199,6 +199,13 @@ C = {
         "btn_valuation": "Valoreu el vostre immoble gratis",
         "btn_advice": "Sol·liciteu assessorament",
         "pillars": ["Operacions amb seguretat jurídica", "Honoraris clars des de l’inici", "Atenció personalitzada"],
+        "paths_eyebrow": "Com us podem ajudar",
+        "paths_title": "Digueu-nos què necessiteu",
+        "paths_lead": "Mentre preparem la nostra cartera, ja us podem ajudar tant si voleu vendre o llogar el vostre immoble com si en busqueu un.",
+        "paths": [
+            ("Vull vendre o llogar", "Sol·liciteu una valoració gratuïta i sense compromís. Estudiarem el vostre immoble i us proposarem un preu realista i un pla per comercialitzar-lo.", "Sol·licitar una valoració"),
+            ("Busco habitatge", "Indiqueu-nos la localitat i el tipus d’immoble que necessiteu. Us avisarem tan bon punt tinguem una opció que hi encaixi, abans de publicar-la.", "Crear una alerta de cerca"),
+        ],
         "featured_eyebrow": "Cartera d’immobles",
         "featured_title": "Immobles destacats",
         "featured_lead": "Una selecció d’habitatges disponibles, revisats pel nostre equip pel que fa a documentació, estat i preu de mercat.",

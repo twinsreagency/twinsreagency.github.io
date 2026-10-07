@@ -87,9 +87,18 @@ test("sin inmuebles publicados, la web invita a crear una alerta y a vender", as
     await close();
 });
 
+test("sin inmuebles, la portada ofrece un camino a propietarios y otro a compradores", async () => {
+    const { page, close } = await open("index.html");
+    const links = await page.locator(".paths .feature__more a").evaluateAll((a) => a.map((x) => x.getAttribute("href")));
+    assert.deepEqual(links, ["#valoracion", "es-inmuebles.html#alerta"]);
+    assert.equal(await page.getAttribute(".hero3d__actions a.btn--primary", "href"), "#valoracion");
+    await close();
+});
+
 test("al publicar inmuebles vuelven el listado, el buscador y los destacados", async () => {
     let { page, close } = await open("index.html", { fixture: true });
     assert.equal(await page.locator(".property").count(), 4);
+    assert.equal(await page.locator(".paths").count(), 0);
     assert.equal(await page.locator(".search__form").count(), 1);
     await close();
 
@@ -302,11 +311,17 @@ test("los favoritos se marcan y se recuerdan", async () => {
 });
 
 test("ninguna página se desborda horizontalmente en móvil, tableta ni escritorio", async () => {
-    for (const width of [320, 768, 1280]) {
-        for (const file of ["index.html", "es-inmuebles.html", "es-servicios.html", "es-contacto.html", "es-cookies.html", "ca-blog.html", "en-about.html"]) {
+    for (const width of [320, 375, 768, 1280]) {
+        for (const file of ["index.html", "ca-inici.html", "en-home.html", "es-inmuebles.html", "es-servicios.html", "es-contacto.html", "es-cookies.html", "ca-blog.html", "en-about.html"]) {
             const { page, close } = await open(file, { width });
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
             assert.ok(overflow <= 0, `${file} a ${width}px se desborda ${overflow}px`);
+            /* Nada visible se sale por la derecha (aunque el desbordamiento esté oculto). */
+            const outside = await page.evaluate(() => Array.from(document.querySelectorAll("header *, main a, main button, main input, main select"))
+                .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.closest(".nav:not(.is-open)") && !el.closest(".field--hp"))
+                .filter((el) => el.getBoundingClientRect().right > document.documentElement.clientWidth + 0.5)
+                .map((el) => el.className || el.tagName));
+            assert.deepEqual(outside, [], `${file} a ${width}px`);
             await close();
         }
     }

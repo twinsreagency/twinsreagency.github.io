@@ -200,6 +200,13 @@ C = {
         "btn_valuation": "Value your property for free",
         "btn_advice": "Request advice",
         "pillars": ["Legally secure transactions", "Clear fees from the outset", "Personal service"],
+        "paths_eyebrow": "How we can help",
+        "paths_title": "Tell us what you need",
+        "paths_lead": "While we prepare our portfolio, we can already help you, whether you wish to sell or let your property or are looking for one.",
+        "paths": [
+            ("I wish to sell or let", "Request a free, no-obligation valuation. We will study your property and propose a realistic price and a plan for marketing it.", "Request a valuation"),
+            ("I am looking for a home", "Tell us the town and the type of property you need. We will let you know as soon as we have a suitable option, before it is published.", "Create a property alert"),
+        ],
         "featured_eyebrow": "Property portfolio",
         "featured_title": "Featured properties",
         "featured_lead": "A selection of available homes, reviewed by our team in terms of documentation, condition and market price.",
