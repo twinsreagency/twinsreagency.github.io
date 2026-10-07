@@ -165,6 +165,27 @@ class ContentTest(unittest.TestCase):
                 if name != "404.html":
                     self.assertTrue(page.canonical and page.canonical.startswith(_build.SITE_URL))
 
+    def test_no_placeholders_are_published(self):
+        for path in glob.glob(os.path.join(SITE_DIR, "*.html")):
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+            self.assertIsNone(re.search(r"\[(pendiente|pendent|to be completed|completar)", text, re.I), path)
+
+    def test_owner_rows_appear_only_when_filled(self):
+        L = _build._textos_es.C
+        table = _build.owner_table(L)
+        self.assertNotIn("NIF", table)
+        saved = dict(_build.OWNER)
+        try:
+            _build.OWNER.update(nif="12345678Z", titular="Nombre <Apellido>")
+            table = _build.owner_table(L)
+            self.assertIn("<td>12345678Z</td>", table)
+            self.assertIn("Nombre &lt;Apellido&gt;", table)
+            self.assertNotIn("Domicilio", table)
+        finally:
+            _build.OWNER.clear()
+            _build.OWNER.update(saved)
+
     def test_titles_fit_in_search_results(self):
         long = {n: p.title for n, p in CONTENT.items() if len(p.title) > 60}
         self.assertEqual(long, {})

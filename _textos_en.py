@@ -611,15 +611,14 @@ C = {
     },
 
     "owner": {
-        "pending": "[to be completed]",
         "rows": [
-            ("Owner", "pending", "(full name or company name)"),
-            ("Trading name", "Twins Real Estate", ""),
-            ("Tax ID (NIF)", "pending", ""),
-            ("Registered address", "pending", ""),
-            ("Email", "email", ""),
-            ("Registration details", "pending", "(Companies Register, if a company)"),
-            ("Real estate agents register", "pending", "(registration number in the Register of Estate Agents of Catalonia)"),
+            ("Owner", "titular"),
+            ("Trading name", "Twins Real Estate"),
+            ("Tax ID (NIF)", "nif"),
+            ("Registered address", "domicilio"),
+            ("Email", "email"),
+            ("Registration details", "registro_mercantil"),
+            ("Real estate agents register", "registro_agentes"),
         ],
     },
 

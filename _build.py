@@ -49,6 +49,18 @@ SITE_PATH = urlparse(SITE_URL).path.rstrip("/") + "/"
 LANGS = [_textos_es.C, _textos_ca.C, _textos_en.C]
 
 EMAIL = "twinsreagency@gmail.com"
+
+# Datos del titular para el aviso legal y la política de privacidad (art. 10 LSSI).
+# Mientras un dato esté vacío, su fila no se muestra. Complételos cuando los tenga:
+# la ley exige el titular, el NIF, el domicilio y, en Cataluña, el número del
+# Registro de Agentes Inmobiliarios; los datos registrales, solo si es una sociedad.
+OWNER = {
+    "titular": "",
+    "nif": "",
+    "domicilio": "",
+    "registro_mercantil": "",
+    "registro_agentes": "",
+}
 OG_IMAGE = "og-image.jpg"  # imagen para compartir en redes (1200 × 630); se genera con _og/make.js
 # Agencia en línea con base en Igualada (sin oficina abierta al público).
 LOCALITY = "Igualada"
@@ -1566,17 +1578,16 @@ def build_contact(L):
 
 
 def owner_table(L):
-    O = L["owner"]
     rows = []
-    for label, value, note in O["rows"]:
-        if value == "pending":
-            cell = f"<strong>{O['pending']}</strong>"
-        elif value == "email":
+    for label, value in L["owner"]["rows"]:
+        if value == "email":
             cell = f'<a href="mailto:{EMAIL}">{EMAIL}</a>'
+        elif value in OWNER:
+            if not OWNER[value]:
+                continue
+            cell = html.escape(OWNER[value])
         else:
             cell = value
-        if note:
-            cell += f" {note}"
         rows.append(f'<tr><th scope="row">{label}</th><td>{cell}</td></tr>')
     return '<div class="table-scroll">\n<table>\n<tbody>\n' + "\n".join(rows) + "\n</tbody>\n</table>\n</div>"
 
