@@ -330,6 +330,76 @@ C = {
     },
 
     "posts": {
+        "gastos-impuestos-vender-piso-cataluna": dict(
+            slug="despeses-impostos-vendre-pis-catalunya", category="Fiscalitat", date_label="7 d’octubre de 2026",
+            title="Despeses i impostos en vendre un pis a Catalunya",
+            excerpt="Plusvàlua municipal, IRPF, cancel·lació de la hipoteca i altres despeses: el que convé preveure abans de posar el vostre habitatge a la venda.",
+            body="""
+<p class="lead">Abans de fixar el preu de venda del vostre habitatge, convé saber quina part d’aquest import es destinarà a impostos i despeses. Aquests són els conceptes més habituals per al venedor a Catalunya. Les quantitats exactes depenen de cada cas, per la qual cosa us recomanem confirmar-les amb el vostre assessor fiscal.</p>
+<h2>1. La plusvàlua municipal</h2>
+<p>L’impost sobre l’increment de valor dels terrenys de naturalesa urbana, conegut com a <strong>plusvàlua municipal</strong>, el cobra l’ajuntament i, en una compravenda, el paga el venedor. Grava l’augment de valor del sòl durant els anys en què n’heu estat propietari.</p>
+<p>Des de la reforma de novembre de 2021, el contribuent pot optar pel càlcul que li resulti més favorable: el mètode objectiu, basat en el valor cadastral del sòl i en uns coeficients que depenen dels anys transcorreguts, o el mètode real, basat en el guany efectiu. Si podeu acreditar que no hi ha hagut increment de valor, no es paga. Cada ajuntament fixa el tipus dins dels límits legals i el termini per declarar-lo, en una venda, és de 30 dies hàbils.</p>
+<h2>2. L’IRPF pel guany patrimonial</h2>
+<p>Si veneu per un import superior al que vau pagar, la diferència tributa en la declaració de la renda de l’any següent com a <strong>guany patrimonial</strong>. Per calcular-lo, al preu de compra s’hi sumen les despeses i els impostos que vau pagar en adquirir l’habitatge i les millores fetes, i del preu de venda se’n resten les despeses de la venda, com els honoraris de l’agència o la plusvàlua municipal.</p>
+<p>El guany s’integra en la base de l’estalvi, que tributa per trams: 19 % fins a 6.000 €, 21 % de 6.000 a 50.000 €, 23 % de 50.000 a 200.000 €, 27 % de 200.000 a 300.000 € i 30 % a partir de 300.000 €.</p>
+<p>Hi ha supòsits en què el guany pot quedar exempt, entre els quals la reinversió de l’import obtingut en un nou habitatge habitual dins dels terminis legals i la venda de l’habitatge habitual per part de persones més grans de 65 anys. Si el venedor no resideix a Espanya, el comprador ha de retenir el 3 % del preu i ingressar-lo a Hisenda a compte de l’impost del venedor.</p>
+<h2>3. La cancel·lació de la hipoteca</h2>
+<p>Si l’habitatge té una hipoteca pendent, el més habitual és cancel·lar-la en el moment de la signatura amb una part del preu. A més del deute pendent, reviseu si el contracte preveu una comissió per amortització anticipada, que la llei limita. Perquè la càrrega desaparegui del Registre de la Propietat també cal cancel·lar-la registralment, cosa que comporta despeses de notaria, de registre i, si escau, de gestoria.</p>
+<h2>4. Notaria, IBI i comunitat</h2>
+<p>Segons el Codi civil, llevat que les parts pactin una altra cosa, les despeses d’atorgament de l’escriptura corresponen al venedor i les de la primera còpia i posteriors, al comprador. A la pràctica és habitual pactar-ne el repartiment, per la qual cosa convé deixar-ho per escrit en el contracte d’arres.</p>
+<p>L’IBI de l’any de la venda l’ha de pagar qui n’era propietari l’1 de gener, tot i que és freqüent acordar repartir-lo en proporció als mesos de cada part. Convé que les quotes de la comunitat de propietaris estiguin al dia en el moment de la venda: el comprador ho pot exigir i l’habitatge respon de determinats deutes amb la comunitat.</p>
+<h2>5. Certificats i honoraris</h2>
+<p>Per vendre necessitareu el <strong>certificat d’eficiència energètica</strong> i, a Catalunya, per regla general, la <strong>cèdula d’habitabilitat</strong> vigent. Si algun dels dos no és vigent, l’haureu d’encarregar a un tècnic. A això s’hi afegeixen els honoraris de l’agència immobiliària, si la contracteu, que s’han d’acordar per escrit abans d’iniciar la venda.</p>
+<h2>Calculeu-ho abans de fixar el preu</h2>
+<p>Conèixer aquestes despeses us permetrà saber quant rebreu realment pel vostre habitatge i negociar amb tranquil·litat. A Twins Real Estate us ajudem a estimar les despeses de la vostra operació i us orientem perquè consulteu amb un assessor fiscal els aspectes que ho requereixin.</p>
+"""),
+        "documentos-vender-vivienda": dict(
+            slug="documents-vendre-habitatge", category="Legal", date_label="7 d’octubre de 2026",
+            title="Documents que necessiteu per vendre el vostre habitatge",
+            excerpt="Escriptura, nota simple, certificat energètic, cèdula d’habitabilitat i altres documents que convé reunir abans d’anunciar la venda.",
+            body="""
+<p class="lead">Tenir la documentació preparada des del principi transmet confiança als compradors i evita endarreriments en la signatura de les arres i de l’escriptura. Aquesta és la llista de documents que se sol demanar per vendre un habitatge a Catalunya.</p>
+<h2>1. Identificació dels propietaris</h2>
+<p>El DNI o NIE vigent de totes les persones que hi figuren com a titulars. Si l’habitatge és la residència familiar, pot ser necessari el consentiment del cònjuge o de la parella encara que no en sigui propietari, per la qual cosa convé comprovar-ho amb antelació.</p>
+<h2>2. Títol de propietat i nota simple</h2>
+<p>L’<strong>escriptura de propietat</strong> acredita com vau adquirir l’habitatge: compravenda, herència, donació o un altre títol. A més, convé demanar una <strong>nota simple</strong> recent al Registre de la Propietat, que mostra qui n’és el titular i si hi ha càrregues, com ara una hipoteca o un embargament. Si vau heretar l’habitatge, també necessitareu l’escriptura d’acceptació de l’herència.</p>
+<h2>3. Certificat d’eficiència energètica</h2>
+<p>És obligatori per vendre i per anunciar l’habitatge: l’etiqueta energètica ha de figurar en els anuncis. L’emet un tècnic competent després de visitar l’immoble i, amb caràcter general, té una validesa de deu anys.</p>
+<h2>4. Cèdula d’habitabilitat</h2>
+<p>A Catalunya, la Llei del dret a l’habitatge exigeix, per regla general, lliurar al comprador la cèdula d’habitabilitat vigent, i el notari ho ha de comprovar. La llei preveu excepcions limitades, per exemple quan l’habitatge es ven per rehabilitar-lo i el comprador ho accepta expressament. Si la cèdula ha caducat, se’n pot sol·licitar una de nova amb el certificat d’un tècnic.</p>
+<h2>5. Rebuts i certificats de pagament</h2>
+<ul>
+<li>L’últim rebut de l’<strong>IBI</strong>, que a més indica la referència cadastral.</li>
+<li>Un <strong>certificat de la comunitat de propietaris</strong> sobre l’estat de pagament de les quotes, que expedeix el secretari o l’administrador de la finca.</li>
+<li>Si hi ha hipoteca pendent, un <strong>certificat de deute</strong> emès per l’entitat financera.</li>
+<li>Els últims rebuts dels subministraments (aigua, llum i gas), útils per al canvi de titularitat.</li>
+</ul>
+<h2>6. Altres documents útils</h2>
+<p>Els plànols de l’habitatge, els estatuts de la comunitat i, si l’edifici ha passat la inspecció tècnica obligatòria, l’informe i el certificat corresponents. No sempre són imprescindibles, però responen preguntes freqüents dels compradors.</p>
+<h2>Us ajudem a reunir-la</h2>
+<p>Revisem la documentació del vostre habitatge abans de posar-lo a la venda, us indiquem què hi falta i us orientem per obtenir-ho. Així l’operació avança sense sorpreses fins a la signatura davant notari.</p>
+"""),
+        "preparar-vivienda-vender": dict(
+            slug="preparar-habitatge-vendre", category="Venda", date_label="7 d’octubre de 2026",
+            title="Com preparar el vostre habitatge per vendre’l abans",
+            excerpt="Ordre, petites reparacions, bona llum i un preu realista: consells pràctics perquè el vostre habitatge atregui compradors des del primer dia.",
+            body="""
+<p class="lead">Els compradors es formen una opinió en pocs segons, primer amb les fotografies i després en la visita. Preparar l’habitatge abans d’anunciar-lo no requereix grans obres, sinó atenció als detalls.</p>
+<h2>1. Ordre i despersonalització</h2>
+<p>Retireu objectes personals, fotografies familiars i mobles que estrenyin els espais. Un habitatge endreçat sembla més ampli i permet que el comprador s’hi imagini vivint. Aprofiteu per buidar armaris i trasters: també es visiten.</p>
+<h2>2. Petites reparacions</h2>
+<p>Arregleu aixetes que degoten, persianes que no pugen, endolls solts o portes que freguen. Són reparacions econòmiques, però un comprador les percep com a senyals de manca de manteniment i tendeix a descomptar-les del preu.</p>
+<h2>3. Neteja, pintura i llum</h2>
+<p>Una neteja a fons i, si cal, una mà de pintura en tons neutres milloren molt la primera impressió. Obriu persianes i cortines, canvieu les bombetes foses i ventileu abans de cada visita.</p>
+<h2>4. Fotografies de qualitat</h2>
+<p>La majoria dels compradors comença la cerca a internet. Unes bones fotografies, fetes amb llum natural i amb les estances endreçades, són decisives per aconseguir visites.</p>
+<h2>5. Documentació preparada</h2>
+<p>Tenir a mà la nota simple, el certificat energètic i la cèdula d’habitabilitat permet respondre amb rapidesa als compradors interessats i evita endarreriments quan arriba una oferta.</p>
+<h2>6. Un preu realista des de l’inici</h2>
+<p>És el factor més important. Un habitatge amb un preu per sobre del mercat rep menys visites i, amb el temps, sol acabar venent-se després de diverses rebaixes. Un preu fonamentat en immobles comparables de la zona atreu els compradors adequats des del primer dia.</p>
+<h2>Sol·liciteu una valoració gratuïta</h2>
+<p>Visitem el vostre habitatge, us indiquem quines millores valen la pena i us proposem un preu de sortida realista, sense compromís.</p>
+"""),
         "comprar-o-alquilar-en-2026": dict(
             slug="comprar-o-llogar-el-2026", category="Mercat", date_label="15 de gener de 2026",
             title="Comprar o llogar habitatge el 2026? Claus per decidir",

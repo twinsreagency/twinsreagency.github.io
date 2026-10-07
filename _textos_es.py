@@ -331,6 +331,76 @@ C = {
     },
 
     "posts": {
+        "gastos-impuestos-vender-piso-cataluna": dict(
+            slug="gastos-impuestos-vender-piso-cataluna", category="Fiscalidad", date_label="7 de octubre de 2026",
+            title="Gastos e impuestos al vender un piso en Cataluña",
+            excerpt="Plusvalía municipal, IRPF, cancelación de la hipoteca y otros gastos: lo que conviene prever antes de poner su vivienda a la venta.",
+            body="""
+<p class="lead">Antes de fijar el precio de venta de su vivienda, conviene saber qué parte de ese importe se destinará a impuestos y gastos. Estos son los conceptos más habituales para el vendedor en Cataluña. Las cantidades exactas dependen de cada caso, por lo que le recomendamos confirmarlas con su asesor fiscal.</p>
+<h2>1. La plusvalía municipal</h2>
+<p>El impuesto sobre el incremento de valor de los terrenos de naturaleza urbana, conocido como <strong>plusvalía municipal</strong>, lo cobra el ayuntamiento y, en una compraventa, lo paga el vendedor. Grava el aumento de valor del suelo durante los años en que ha sido propietario.</p>
+<p>Desde la reforma de noviembre de 2021, el contribuyente puede optar por el cálculo que le resulte más favorable: el método objetivo, basado en el valor catastral del suelo y en unos coeficientes que dependen de los años transcurridos, o el método real, basado en la ganancia efectiva. Si puede acreditar que no ha habido incremento de valor, no se paga. Cada ayuntamiento fija el tipo dentro de los límites legales y el plazo para declararlo, en una venta, es de 30 días hábiles.</p>
+<h2>2. El IRPF por la ganancia patrimonial</h2>
+<p>Si vende por un importe superior al que pagó, la diferencia tributa en la declaración de la renta del año siguiente como <strong>ganancia patrimonial</strong>. Para calcularla, al precio de compra se suman los gastos e impuestos que pagó al adquirir la vivienda y las mejoras realizadas, y al precio de venta se restan los gastos de la venta, como los honorarios de la agencia o la plusvalía municipal.</p>
+<p>La ganancia se integra en la base del ahorro, que tributa por tramos: 19 % hasta 6.000 €, 21 % de 6.000 a 50.000 €, 23 % de 50.000 a 200.000 €, 27 % de 200.000 a 300.000 € y 30 % a partir de 300.000 €.</p>
+<p>Existen supuestos en los que la ganancia puede quedar exenta, entre ellos la reinversión del importe obtenido en una nueva vivienda habitual dentro de los plazos legales y la venta de la vivienda habitual por personas mayores de 65 años. Si el vendedor no reside en España, el comprador debe retener el 3 % del precio e ingresarlo en Hacienda a cuenta del impuesto del vendedor.</p>
+<h2>3. La cancelación de la hipoteca</h2>
+<p>Si la vivienda tiene una hipoteca pendiente, lo habitual es cancelarla en el momento de la firma con parte del precio. Además de la deuda pendiente, revise si su contrato prevé una comisión por amortización anticipada, que la ley limita. Para que la carga desaparezca del Registro de la Propiedad también hay que cancelarla registralmente, lo que supone gastos de notaría, de registro y, en su caso, de gestoría.</p>
+<h2>4. Notaría, IBI y comunidad</h2>
+<p>Según el Código civil, salvo que las partes pacten otra cosa, los gastos de otorgamiento de la escritura corresponden al vendedor y los de la primera copia y posteriores, al comprador. En la práctica es habitual pactar el reparto, por lo que conviene dejarlo por escrito en el contrato de arras.</p>
+<p>El IBI del año de la venta lo debe la persona que era propietaria el 1 de enero, aunque es frecuente acordar que se reparta en proporción a los meses de cada parte. Conviene que las cuotas de la comunidad de propietarios estén al día en el momento de la venta: el comprador puede exigirlo y la vivienda responde de determinadas deudas con la comunidad.</p>
+<h2>5. Certificados y honorarios</h2>
+<p>Para vender necesitará el <strong>certificado de eficiencia energética</strong> y, en Cataluña, por regla general, la <strong>cédula de habitabilidad</strong> vigente. Si alguno no está en vigor, deberá encargarlo a un técnico. A ello se suman los honorarios de la agencia inmobiliaria, si la contrata, que deben acordarse por escrito antes de iniciar la venta.</p>
+<h2>Calcule antes de fijar el precio</h2>
+<p>Conocer estos gastos le permitirá saber cuánto recibirá realmente por su vivienda y negociar con tranquilidad. En Twins Real Estate le ayudamos a estimar los gastos de su operación y le orientamos para que consulte con un asesor fiscal los aspectos que lo requieran.</p>
+"""),
+        "documentos-vender-vivienda": dict(
+            slug="documentos-vender-vivienda", category="Legal", date_label="7 de octubre de 2026",
+            title="Documentos que necesita para vender su vivienda",
+            excerpt="Escritura, nota simple, certificado energético, cédula de habitabilidad y otros documentos que conviene reunir antes de anunciar la venta.",
+            body="""
+<p class="lead">Tener la documentación preparada desde el principio transmite confianza a los compradores y evita retrasos en la firma de las arras y de la escritura. Esta es la lista de documentos que se suele pedir para vender una vivienda en Cataluña.</p>
+<h2>1. Identificación de los propietarios</h2>
+<p>El DNI o NIE vigente de todas las personas que figuran como titulares. Si la vivienda es la residencia familiar, puede ser necesario el consentimiento del cónyuge o de la pareja aunque no figure como propietario, por lo que conviene comprobarlo con antelación.</p>
+<h2>2. Título de propiedad y nota simple</h2>
+<p>La <strong>escritura de propiedad</strong> acredita cómo adquirió la vivienda: compraventa, herencia, donación u otro título. Además, conviene solicitar una <strong>nota simple</strong> reciente al Registro de la Propiedad, que muestra quién es el titular y si existen cargas, como una hipoteca o un embargo. Si heredó la vivienda, necesitará también la escritura de aceptación de la herencia.</p>
+<h2>3. Certificado de eficiencia energética</h2>
+<p>Es obligatorio para vender y para anunciar la vivienda: la etiqueta energética debe figurar en los anuncios. Lo emite un técnico competente después de visitar el inmueble y con carácter general tiene una validez de diez años.</p>
+<h2>4. Cédula de habitabilidad</h2>
+<p>En Cataluña, la Ley del derecho a la vivienda exige, por regla general, entregar al comprador la cédula de habitabilidad vigente, y el notario debe comprobarlo. La ley prevé excepciones limitadas, por ejemplo cuando la vivienda se vende para rehabilitarla y el comprador lo acepta expresamente. Si la cédula ha caducado, puede solicitarse una nueva con el certificado de un técnico.</p>
+<h2>5. Recibos y certificados de pago</h2>
+<ul>
+<li>El último recibo del <strong>IBI</strong>, que además indica la referencia catastral.</li>
+<li>Un <strong>certificado de la comunidad de propietarios</strong> sobre el estado de pago de las cuotas, que expide el secretario o el administrador de la finca.</li>
+<li>Si hay hipoteca pendiente, un <strong>certificado de deuda</strong> emitido por la entidad financiera.</li>
+<li>Los últimos recibos de los suministros (agua, luz y gas), útiles para el cambio de titularidad.</li>
+</ul>
+<h2>6. Otros documentos útiles</h2>
+<p>Los planos de la vivienda, los estatutos de la comunidad y, si el edificio ha pasado la inspección técnica obligatoria, el informe y el certificado correspondientes. No siempre son imprescindibles, pero responden a preguntas frecuentes de los compradores.</p>
+<h2>Le ayudamos a reunirla</h2>
+<p>Revisamos la documentación de su vivienda antes de ponerla a la venta, le indicamos qué falta y le orientamos para obtenerlo. Así la operación avanza sin sorpresas hasta la firma ante notario.</p>
+"""),
+        "preparar-vivienda-vender": dict(
+            slug="preparar-vivienda-vender", category="Venta", date_label="7 de octubre de 2026",
+            title="Cómo preparar su vivienda para venderla antes",
+            excerpt="Orden, pequeñas reparaciones, buena luz y un precio realista: consejos prácticos para que su vivienda atraiga compradores desde el primer día.",
+            body="""
+<p class="lead">Los compradores se forman una opinión en pocos segundos, primero con las fotografías y después en la visita. Preparar la vivienda antes de anunciarla no requiere grandes obras, sino atención a los detalles.</p>
+<h2>1. Orden y despersonalización</h2>
+<p>Retire objetos personales, fotografías familiares y muebles que estrechen los espacios. Una vivienda despejada parece más amplia y permite que el comprador se imagine viviendo en ella. Aproveche para vaciar armarios y trasteros: también se visitan.</p>
+<h2>2. Pequeñas reparaciones</h2>
+<p>Arregle grifos que gotean, persianas que no suben, enchufes sueltos o puertas que rozan. Son reparaciones económicas, pero un comprador las percibe como señales de falta de mantenimiento y tiende a descontarlas del precio.</p>
+<h2>3. Limpieza, pintura y luz</h2>
+<p>Una limpieza a fondo y, si hace falta, una mano de pintura en tonos neutros mejoran mucho la primera impresión. Abra persianas y cortinas, cambie las bombillas fundidas y ventile antes de cada visita.</p>
+<h2>4. Fotografías de calidad</h2>
+<p>La mayoría de los compradores empieza su búsqueda en internet. Unas buenas fotografías, tomadas con luz natural y con las estancias ordenadas, son decisivas para conseguir visitas.</p>
+<h2>5. Documentación preparada</h2>
+<p>Tener a mano la nota simple, el certificado energético y la cédula de habitabilidad permite responder con rapidez a los compradores interesados y evita retrasos cuando llega una oferta.</p>
+<h2>6. Un precio realista desde el inicio</h2>
+<p>Es el factor más importante. Una vivienda con un precio por encima del mercado recibe menos visitas y, con el tiempo, suele acabar vendiéndose después de varias rebajas. Un precio fundamentado en inmuebles comparables de la zona atrae a los compradores adecuados desde el primer día.</p>
+<h2>Solicite una valoración gratuita</h2>
+<p>Visitamos su vivienda, le indicamos qué mejoras merecen la pena y le proponemos un precio de salida realista, sin compromiso.</p>
+"""),
         "comprar-o-alquilar-en-2026": dict(
             slug="comprar-o-alquilar-en-2026", category="Mercado", date_label="15 de enero de 2026",
             title="¿Comprar o alquilar vivienda en 2026? Claves para decidir",

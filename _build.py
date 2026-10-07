@@ -149,7 +149,10 @@ PILLAR_ICONS = ["shield", "eye", "users"]
 
 SUBJECTS = ["compra", "venta", "alquiler", "gestion", "valoracion", "inversion", "visita", "otro"]
 
-POSTS = [  # (slug, icono, fecha ISO, minutos de lectura)
+POSTS = [  # (slug, icono, fecha ISO, minutos de lectura); el primero es el destacado del blog
+    ("gastos-impuestos-vender-piso-cataluna", "euro", "2026-10-07", 7),
+    ("documentos-vender-vivienda", "document", "2026-10-07", 6),
+    ("preparar-vivienda-vender", "home", "2026-10-07", 5),
     ("comprar-o-alquilar-en-2026", "compass", "2026-01-15", 6),
     ("senales-revalorizacion-zona", "chart", "2026-01-12", 5),
     ("guia-primera-vivienda", "document", "2026-01-08", 7),
@@ -1200,6 +1203,10 @@ def build_blog(L):
             "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
         })
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
+        if slug in OWNER_POSTS:  # artículos para propietarios: llevan a la valoración gratuita
+            action = f'<a class="btn btn--primary" href="{valuation_link(ctx)}">{L["sell"]["btn"]} {ARROW}</a>'
+        else:
+            action = f'<a class="btn btn--primary" href="{ctx.page("contacto.html")}#formulario">{ui["consult"]} {ARROW}</a>'
         body = page_hero(ctx, post["title"], "", [(ui["nav"]["blog.html"], "blog.html"), (post["title"], "")], meta, obj="pages") + f"""
         <article class="article">
             <div class="container">
@@ -1208,7 +1215,7 @@ def build_blog(L):
                 </div>
                 <footer class="article__footer">
                     <a class="link-arrow" href="{ctx.page('blog.html')}">{icon('arrow-left')} {ui['back_blog']}</a>
-                    <a class="btn btn--primary" href="{ctx.page('contacto.html')}#formulario">{ui['consult']} {ARROW}</a>
+                    {action}
                 </footer>
             </div>
         </article>
@@ -1378,12 +1385,21 @@ def build_404(L):
     write(ctx, T["title"], T["description"], "", body, noindex=True)
 
 
+# Artículos dirigidos a propietarios: su botón final lleva a la valoración gratuita.
+OWNER_POSTS = {"gastos-impuestos-vender-piso-cataluna", "documentos-vender-vivienda", "preparar-vivienda-vender"}
+
+# Artículos que ya existían con direcciones sin prefijo de idioma (versión anterior del sitio).
+LEGACY_POSTS = {"comprar-o-alquilar-en-2026", "senales-revalorizacion-zona", "guia-primera-vivienda",
+                "preparar-vivienda-alquiler", "que-revisar-contrato-arras", "tendencias-interiorismo-2026",
+                "mitos-hipoteca"}
+
+
 def build_legacy_redirects(L):
     """Redirige las direcciones antiguas sin prefijo de idioma (p. ej. «propiedades.html»),
     publicadas por una versión anterior del sitio, a su página actual en castellano."""
     pages = [(p, L["ui"]["nav"][p]) for p in PAGES if p != "index.html"]
     pages += [(p, page["title"]) for p, page in L["legal"].items()]
-    pages += [(f"blog/{slug}.html", L["posts"][slug]["title"]) for slug, *_ in POSTS]
+    pages += [(f"blog/{slug}.html", L["posts"][slug]["title"]) for slug, *_ in POSTS if slug in LEGACY_POSTS]
     for page, title in pages:
         old = page[len("blog/"):] if page.startswith("blog/") else page
         target = filename(L, page)

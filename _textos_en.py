@@ -331,6 +331,76 @@ C = {
     },
 
     "posts": {
+        "gastos-impuestos-vender-piso-cataluna": dict(
+            slug="costs-taxes-selling-flat-catalonia", category="Tax", date_label="7 October 2026",
+            title="Costs and taxes when selling a flat in Catalonia",
+            excerpt="Municipal capital gains tax, income tax, mortgage cancellation and other costs: what to plan for before putting your home on the market.",
+            body="""
+<p class="lead">Before setting the asking price for your home, it is worth knowing how much of that amount will go on taxes and costs. These are the items sellers most commonly face in Catalonia. The exact amounts depend on each case, so we recommend confirming them with your tax adviser.</p>
+<h2>1. Municipal capital gains tax (plusvalía)</h2>
+<p>The tax on the increase in value of urban land, known as the <strong>plusvalía municipal</strong>, is levied by the town council and, in a sale, is paid by the seller. It taxes the increase in the value of the land during the years you have owned the property.</p>
+<p>Since the reform of November 2021, the taxpayer may choose whichever calculation is more favourable: the objective method, based on the cadastral value of the land and coefficients that depend on the number of years elapsed, or the actual method, based on the real gain. If you can show that there has been no increase in value, no tax is payable. Each council sets the rate within the legal limits, and in a sale the deadline for filing is 30 working days.</p>
+<h2>2. Income tax on the capital gain</h2>
+<p>If you sell for more than you paid, the difference is taxed as a <strong>capital gain</strong> in the following year’s income tax return. To calculate it, the costs and taxes you paid when buying the home and any improvements made are added to the purchase price, and the costs of the sale, such as agency fees or the municipal capital gains tax, are deducted from the sale price.</p>
+<p>The gain forms part of the savings tax base, which is taxed in bands: 19% up to €6,000, 21% from €6,000 to €50,000, 23% from €50,000 to €200,000, 27% from €200,000 to €300,000 and 30% above €300,000.</p>
+<p>In some cases the gain may be exempt, including when the proceeds are reinvested in a new main residence within the legal time limits and when people over 65 sell their main residence. If the seller is not resident in Spain, the buyer must withhold 3% of the price and pay it to the tax authorities on account of the seller’s tax.</p>
+<h2>3. Cancelling the mortgage</h2>
+<p>If there is an outstanding mortgage on the property, it is usually repaid on signing with part of the price. In addition to the outstanding debt, check whether your agreement includes an early repayment fee, which the law limits. For the charge to be removed from the Land Registry, the mortgage must also be cancelled in the register, which involves notary, registry and, where applicable, agency fees.</p>
+<h2>4. Notary, property tax and community fees</h2>
+<p>Under the Civil Code, unless the parties agree otherwise, the cost of executing the deed is borne by the seller and that of the first and subsequent copies by the buyer. In practice the split is often negotiated, so it is advisable to set it out in writing in the deposit contract (arras).</p>
+<p>Property tax (IBI) for the year of sale is owed by whoever owned the property on 1 January, although it is common to agree to share it in proportion to the months owned by each party. Community fees should be up to date at the time of sale: the buyer may require it, and the property is liable for certain debts owed to the community.</p>
+<h2>5. Certificates and fees</h2>
+<p>To sell you will need an <strong>energy performance certificate</strong> and, in Catalonia, as a general rule, a valid <strong>certificate of occupancy</strong> (cédula de habitabilidad). If either has expired, you will need to commission a qualified professional to issue a new one. In addition, there are the estate agency’s fees, if you engage one, which should be agreed in writing before the sale begins.</p>
+<h2>Work out the figures before setting the price</h2>
+<p>Knowing these costs will tell you how much you will actually receive for your home and allow you to negotiate with peace of mind. At Twins Real Estate we help you estimate the costs of your sale and advise you on which points to discuss with a tax adviser.</p>
+"""),
+        "documentos-vender-vivienda": dict(
+            slug="documents-selling-home", category="Legal", date_label="7 October 2026",
+            title="The documents you need to sell your home",
+            excerpt="Title deeds, land registry extract, energy certificate, certificate of occupancy and other documents worth gathering before advertising the sale.",
+            body="""
+<p class="lead">Having your paperwork ready from the outset reassures buyers and avoids delays in signing the deposit contract and the deed of sale. This is the list of documents usually requested to sell a home in Catalonia.</p>
+<h2>1. Identification of the owners</h2>
+<p>A valid DNI or NIE for every person registered as an owner. If the property is the family home, the consent of the spouse or partner may be required even if they are not an owner, so it is advisable to check this in advance.</p>
+<h2>2. Title deeds and land registry extract</h2>
+<p>The <strong>title deeds</strong> show how you acquired the property: by purchase, inheritance, gift or another title. It is also advisable to request a recent <strong>land registry extract</strong> (nota simple), which shows who the registered owner is and whether there are any charges, such as a mortgage or an attachment. If you inherited the property, you will also need the deed of acceptance of the inheritance.</p>
+<h2>3. Energy performance certificate</h2>
+<p>It is compulsory both to sell and to advertise the property: the energy rating must appear in listings. It is issued by a qualified professional after visiting the property and, as a general rule, is valid for ten years.</p>
+<h2>4. Certificate of occupancy</h2>
+<p>In Catalonia, the Right to Housing Act generally requires the seller to hand over a valid certificate of occupancy (cédula de habitabilidad) to the buyer, and the notary must check this. The law provides for limited exceptions, for example when the property is sold for refurbishment and the buyer expressly agrees. If the certificate has expired, a new one can be requested with a certificate from a qualified professional.</p>
+<h2>5. Receipts and payment certificates</h2>
+<ul>
+<li>The latest <strong>property tax (IBI)</strong> receipt, which also shows the cadastral reference.</li>
+<li>A <strong>certificate from the owners’ community</strong> on the status of fee payments, issued by the secretary or the property manager.</li>
+<li>If there is an outstanding mortgage, a <strong>statement of the outstanding debt</strong> from the lender.</li>
+<li>The latest utility bills (water, electricity and gas), useful for transferring the accounts.</li>
+</ul>
+<h2>6. Other useful documents</h2>
+<p>Floor plans of the property, the community by-laws and, if the building has undergone the compulsory technical inspection, the corresponding report and certificate. They are not always essential, but they answer questions buyers frequently ask.</p>
+<h2>We help you gather them</h2>
+<p>We review your property’s documents before putting it on the market, tell you what is missing and guide you in obtaining it, so that the sale proceeds without surprises through to signing before a notary.</p>
+"""),
+        "preparar-vivienda-vender": dict(
+            slug="prepare-home-for-sale", category="Selling", date_label="7 October 2026",
+            title="How to prepare your home to sell it sooner",
+            excerpt="Tidiness, minor repairs, good light and a realistic price: practical advice to help your home attract buyers from day one.",
+            body="""
+<p class="lead">Buyers form an opinion within seconds, first from the photographs and then during the viewing. Preparing your home before advertising it does not require major works, only attention to detail.</p>
+<h2>1. Declutter and depersonalise</h2>
+<p>Remove personal items, family photographs and furniture that makes rooms feel smaller. An uncluttered home looks more spacious and allows buyers to picture themselves living there. Take the opportunity to clear wardrobes and storage rooms: they are viewed too.</p>
+<h2>2. Minor repairs</h2>
+<p>Fix dripping taps, stuck blinds, loose sockets and doors that catch. These repairs are inexpensive, but buyers see them as signs of poor maintenance and tend to deduct them from the price.</p>
+<h2>3. Cleaning, paint and light</h2>
+<p>A thorough clean and, if necessary, a coat of paint in neutral tones greatly improve the first impression. Open blinds and curtains, replace any blown bulbs and air the rooms before each viewing.</p>
+<h2>4. Quality photographs</h2>
+<p>Most buyers begin their search online. Good photographs, taken in natural light with tidy rooms, are decisive in securing viewings.</p>
+<h2>5. Documents to hand</h2>
+<p>Having the land registry extract, the energy certificate and the certificate of occupancy ready allows you to respond quickly to interested buyers and avoids delays when an offer arrives.</p>
+<h2>6. A realistic price from the start</h2>
+<p>This is the most important factor. A home priced above the market receives fewer viewings and, over time, usually ends up selling after several price reductions. A price based on comparable properties in the area attracts the right buyers from day one.</p>
+<h2>Request a free valuation</h2>
+<p>We visit your home, tell you which improvements are worthwhile and propose a realistic asking price, with no obligation.</p>
+"""),
         "comprar-o-alquilar-en-2026": dict(
             slug="buy-or-rent-in-2026", category="Market", date_label="15 January 2026",
             title="Buying or renting a home in 2026? Key factors to decide",
