@@ -55,7 +55,7 @@ C = {
         "consult": "Consultar con un asesor",
         "article_notice": "Este artículo tiene carácter meramente informativo y no constituye asesoramiento jurídico, fiscal ni financiero. La normativa puede variar según la comunidad autónoma; consulte su caso con un profesional.",
         "updated": "Última actualización: {}",
-        "updated_date": "27 de septiembre de 2026",
+        "updated_date": "7 de octubre de 2026",
         "theme_to_light": "Cambiar a tema claro",
         "theme_to_dark": "Cambiar a tema oscuro",
         "scroll_hint": "Deslice para descubrir",
@@ -584,6 +584,11 @@ C = {
         "submit": "Enviar consulta",
     },
 
+    "privacy_forms": {
+        "mail": '<p><strong>Cómo se envían los formularios.</strong> Al enviar un formulario se abre su programa de correo electrónico con el mensaje preparado, que solo se envía si usted lo confirma. La web no guarda ni transmite por sí misma los datos de los formularios.</p>',
+        "endpoint": '<p><strong>Cómo se envían los formularios.</strong> Los datos de los formularios se envían de forma cifrada al servicio Formspree (Formspree, Inc., EE. UU.), que los reenvía a nuestro correo electrónico y actúa como encargado del tratamiento.</p>',
+    },
+
     "owner": {
         "pending": "[pendiente de completar]",
         "rows": [
@@ -631,18 +636,20 @@ C = {
 <h2>1. Responsable del tratamiento</h2>
 %%OWNER%%
 <h2>2. Datos que tratamos</h2>
-<p>Tratamos los datos que usted nos facilita a través del formulario de contacto, por correo electrónico o mediante nuestras redes sociales: nombre y apellidos, datos de contacto, el contenido de su consulta y, en su caso, la información necesaria para la prestación de nuestros servicios.</p>
+<p>Tratamos los datos que usted nos facilita a través de los formularios de la web (contacto, valoración gratuita y alerta de búsqueda), por correo electrónico o mediante nuestras redes sociales: nombre y apellidos, correo electrónico y teléfono, la localidad, la dirección y las características del inmueble que desea valorar o que busca, el contenido de su consulta y, en su caso, la información necesaria para la prestación de nuestros servicios.</p>
+%%FORMS%%
 <h2>3. Finalidades y base jurídica</h2>
 <ul>
 <li><strong>Atender sus consultas</strong> y remitirle la información solicitada. Base jurídica: su consentimiento (art. 6.1.a RGPD).</li>
 <li><strong>Gestionar la relación precontractual y contractual</strong> derivada de nuestros servicios de intermediación y asesoramiento inmobiliario. Base jurídica: la ejecución de un contrato o de medidas precontractuales (art. 6.1.b RGPD).</li>
 <li><strong>Cumplir las obligaciones legales</strong> aplicables, entre ellas las derivadas de la Ley 10/2010, de prevención del blanqueo de capitales y de la financiación del terrorismo, y de la normativa fiscal. Base jurídica: obligación legal (art. 6.1.c RGPD).</li>
+<li><strong>Garantizar la seguridad y el funcionamiento del sitio web.</strong> El proveedor de alojamiento registra técnicamente la dirección IP de los visitantes. Base jurídica: interés legítimo (art. 6.1.f RGPD).</li>
 </ul>
 <p>No se adoptan decisiones automatizadas ni se elaboran perfiles con sus datos.</p>
 <h2>4. Plazo de conservación</h2>
 <p>Los datos de las consultas se conservarán durante el tiempo necesario para atenderlas y, como máximo, durante un año si no se inicia una relación contractual. Los datos vinculados a un contrato se conservarán mientras dure la relación y, posteriormente, durante los plazos de prescripción de las responsabilidades legales.</p>
 <h2>5. Destinatarios</h2>
-<p>No cedemos sus datos a terceros, salvo obligación legal. Pueden acceder a ellos los proveedores que nos prestan servicios de correo electrónico y de alojamiento web, en calidad de encargados del tratamiento y con las garantías exigidas por el RGPD. Cuando alguno de estos proveedores se encuentre fuera del Espacio Económico Europeo, la transferencia se ampara en una decisión de adecuación de la Comisión Europea, como el Marco de Privacidad de Datos UE-EE. UU., o en cláusulas contractuales tipo.</p>
+<p>No cedemos sus datos a terceros, salvo obligación legal. Pueden acceder a ellos los proveedores que nos prestan servicios de correo electrónico y de alojamiento web, en calidad de encargados del tratamiento y con las garantías exigidas por el RGPD. Cuando alguno de estos proveedores se encuentre fuera del Espacio Económico Europeo, la transferencia se ampara en una decisión de adecuación de la Comisión Europea, como el Marco de Privacidad de Datos UE-EE. UU., o en cláusulas contractuales tipo. En concreto, el sitio web está alojado en GitHub Pages (GitHub, Inc.) y el correo electrónico lo presta Google (Gmail).</p>
 <h2>6. Sus derechos</h2>
 <p>Puede ejercer sus derechos de acceso, rectificación, supresión, oposición, limitación del tratamiento y portabilidad, así como retirar su consentimiento en cualquier momento, escribiendo a <a href="mailto:%%EMAIL%%">%%EMAIL%%</a> e indicando el derecho que desea ejercer.</p>
 <p>Si considera que el tratamiento de sus datos no se ajusta a la normativa, puede presentar una reclamación ante la Agencia Española de Protección de Datos (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -674,7 +681,7 @@ C = {
 </table>
 </div>
 <h2>3. Recursos de terceros</h2>
-<p>Para mostrar las tipografías del sitio, su navegador descarga archivos del servicio Google Fonts, prestado por Google. Este servicio no instala cookies, aunque, como en cualquier conexión a internet, recibe la dirección IP del dispositivo que realiza la solicitud. Puede consultar la política de privacidad de Google en <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+<p>Las tipografías y el resto de recursos de esta web se sirven desde el propio sitio: no se carga ningún servicio de terceros, como Google Fonts, herramientas de analítica, publicidad, vídeos o mapas.</p>
 <p>Los enlaces a Instagram solo le dirigen a esa red social cuando usted hace clic en ellos; este sitio no incorpora contenidos ni complementos de redes sociales.</p>
 <h2>4. Cambios en esta política</h2>
 <p>Si en el futuro incorporamos cookies que requieran su consentimiento, actualizaremos esta política y habilitaremos el mecanismo de consentimiento correspondiente antes de su instalación.</p>

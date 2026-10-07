@@ -4,44 +4,71 @@
  * Uso (desde la carpeta del sitio; necesita el paquete «playwright»):
  *     node --test _tests/browser.test.js
  *
- * Las páginas se abren directamente desde el disco (file://), igual que al
- * previsualizar el sitio. Las pruebas del listado, el filtro y los favoritos usan
- * una copia del sitio con inmuebles de prueba (_tests/fixture.py), porque la
- * cartera real puede estar vacía.
+ * Las páginas se sirven con un pequeño servidor HTTP local, como en GitHub Pages
+ * (algunas funciones del navegador, como la precarga de las tipografías, no
+ * funcionan al abrir los archivos desde el disco). Las pruebas del listado, el
+ * filtro y los favoritos usan una copia del sitio con inmuebles de prueba
+ * (_tests/fixture.py), porque la cartera real puede estar vacía.
  */
 "use strict";
 
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const http = require("node:http");
 const os = require("node:os");
 const path = require("node:path");
 const { execFileSync } = require("node:child_process");
-const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
 const SITE = path.resolve(__dirname, "..");
 const FIXTURE = fs.mkdtempSync(path.join(os.tmpdir(), "twins-fixture-"));
-const url = (file, site = SITE) => pathToFileURL(path.join(site, file)).href;
+const TYPES = {
+    ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
+    ".png": "image/png", ".webp": "image/webp", ".ico": "image/x-icon", ".woff2": "font/woff2",
+    ".xml": "application/xml", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml",
+};
 
-let browser;
+/** Servidor estático mínimo de una carpeta; devuelve su dirección. */
+function serve(root) {
+    const server = http.createServer((req, res) => {
+        const file = path.join(root, decodeURIComponent(new URL(req.url, "http://x").pathname));
+        if (!file.startsWith(root) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+            res.writeHead(404).end();
+            return;
+        }
+        res.writeHead(200, { "Content-Type": TYPES[path.extname(file)] || "application/octet-stream" });
+        fs.createReadStream(file).pipe(res);
+    });
+    return new Promise((resolve) => server.listen(0, "127.0.0.1", () => {
+        resolve({ server, origin: `http://127.0.0.1:${server.address().port}` });
+    }));
+}
+
+let browser, site, fixture;
+const url = (file, root = site) => `${root.origin}/${file}`;
 
 before(async () => {
     execFileSync("python3", [path.join(__dirname, "fixture.py"), path.join(FIXTURE, "site")]);
+    site = await serve(SITE);
+    fixture = await serve(path.join(FIXTURE, "site"));
     browser = await chromium.launch();
 });
 
 after(async () => {
     await browser.close();
+    site.server.close();
+    fixture.server.close();
     fs.rmSync(FIXTURE, { recursive: true, force: true });
 });
 
 /** Abre una página y recoge los errores de JavaScript y de consola. */
-async function open(file, { width = 1280, search = "", fixture = false } = {}) {
+async function open(file, { width = 1280, search = "", fixture: useFixture = false } = {}) {
+    const root = useFixture ? fixture : site;
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     /* Ninguna página debe pedir nada fuera del sitio. */
     const external = [];
-    await context.route(/^https?:/, (route) => {
+    await context.route((target) => !target.href.startsWith(root.origin) && /^https?:/.test(target.href), (route) => {
         external.push(route.request().url());
         route.abort();
     });
@@ -49,18 +76,23 @@ async function open(file, { width = 1280, search = "", fixture = false } = {}) {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (msg) => {
-        if (msg.type() === "error" && !/ERR_FAILED/.test(msg.text())) errors.push(msg.text());
+        if (msg.type() === "error" || (msg.type() === "warning" && /preload|Content Security Policy/i.test(msg.text()))) {
+            errors.push(msg.text());
+        }
     });
-    await page.goto(url(file, fixture ? path.join(FIXTURE, "site") : SITE) + search);
+    await page.goto(url(file, root) + search);
     return { page, errors, external, close: () => context.close() };
 }
 
 const visibleCards = (page) => page.locator("#listado-inmuebles .property:not([hidden])").count();
 
-test("las páginas principales cargan sin errores de JavaScript", async () => {
-    for (const file of ["index.html", "es-inmuebles.html", "es-contacto.html", "ca-inici.html", "en-home.html", "es-blog-mitos-hipoteca.html"]) {
-        const { errors, close } = await open(file);
+test("las páginas principales cargan sin errores ni recursos externos", async () => {
+    for (const file of ["index.html", "es-inmuebles.html", "es-contacto.html", "ca-inici.html", "en-home.html", "es-blog-mitos-hipoteca.html", "es-nosotros.html", "en-privacy.html"]) {
+        const { page, errors, external, close } = await open(file);
+        await page.waitForLoadState("load");
         assert.deepEqual(errors, [], file);
+        assert.deepEqual(external, [], file);
+        assert.ok(await page.evaluate(() => document.fonts.check("16px Inter") && document.fonts.check("600 16px 'Playfair Display'")), `${file}: tipografías`);
         await close();
     }
 });

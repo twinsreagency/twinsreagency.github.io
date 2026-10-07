@@ -9,6 +9,34 @@
                8. Movimiento · 9. Responsive
    ========================================================================== */
 
+/* 0. Tipografías ------------------------------------------------------------ */
+/* Servidas desde la propia web (sin Google Fonts: no se envía la IP del visitante a
+   terceros). Solo el juego de caracteres latino, que cubre el castellano, el catalán
+   y el inglés, y solo los pesos que se usan. Licencia SIL OFL 1.1 (fonts/OFL-*.txt). */
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url("fonts/inter-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Playfair Display";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("fonts/playfair-display-600-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Playfair Display";
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url("fonts/playfair-display-500-italic-latin.woff2") format("woff2");
+}
+
 /* 1. Tokens ---------------------------------------------------------------- */
 /* Valores base: tema oscuro. El tema crema (predeterminado) los redefine abajo.
    theme.js fija data-theme en <html> antes de pintar; sin JavaScript se ve el crema. */

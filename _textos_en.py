@@ -56,7 +56,7 @@ C = {
         "consult": "Speak to an adviser",
         "article_notice": "This article is for information purposes only and does not constitute legal, tax or financial advice. Regulations may vary between Spanish regions; please consult a professional about your specific case.",
         "updated": "Last updated: {}",
-        "updated_date": "27 September 2026",
+        "updated_date": "7 October 2026",
         "theme_to_light": "Switch to light theme",
         "theme_to_dark": "Switch to dark theme",
         "scroll_hint": "Scroll to explore",
@@ -582,6 +582,11 @@ C = {
         "submit": "Send enquiry",
     },
 
+    "privacy_forms": {
+        "mail": '<p><strong>How the forms are sent.</strong> When you submit a form, your email application opens with the message ready, and it is only sent if you confirm it. The website itself does not store or transmit the data entered in the forms.</p>',
+        "endpoint": '<p><strong>How the forms are sent.</strong> Form data is sent in encrypted form to the Formspree service (Formspree, Inc., USA), which forwards it to our email address and acts as a data processor.</p>',
+    },
+
     "owner": {
         "pending": "[to be completed]",
         "rows": [
@@ -629,18 +634,20 @@ C = {
 <h2>1. Data controller</h2>
 %%OWNER%%
 <h2>2. Data we process</h2>
-<p>We process the data you provide through the contact form, by email or via our social media channels: your full name, contact details, the content of your enquiry and, where applicable, the information required to provide our services.</p>
+<p>We process the data you provide through the forms on this website (contact, free valuation and property alert), by email or via our social media channels: your full name, email address and telephone number, the town, address and features of the property you wish to have valued or are looking for, the content of your enquiry and, where applicable, the information required to provide our services.</p>
+%%FORMS%%
 <h2>3. Purposes and legal basis</h2>
 <ul>
 <li><strong>Handling your enquiries</strong> and sending you the information requested. Legal basis: your consent (Art. 6(1)(a) GDPR).</li>
 <li><strong>Managing the pre-contractual and contractual relationship</strong> arising from our real estate brokerage and advisory services. Legal basis: performance of a contract or pre-contractual measures (Art. 6(1)(b) GDPR).</li>
 <li><strong>Complying with applicable legal obligations</strong>, including those arising from Spanish Law 10/2010 on the prevention of money laundering and terrorist financing, and from tax regulations. Legal basis: legal obligation (Art. 6(1)(c) GDPR).</li>
+<li><strong>Ensuring the security and operation of the website.</strong> The hosting provider technically logs visitors’ IP addresses. Legal basis: legitimate interest (Art. 6(1)(f) GDPR).</li>
 </ul>
 <p>No automated decisions are made and no profiles are created using your data.</p>
 <h2>4. Retention period</h2>
 <p>Enquiry data will be kept for as long as necessary to handle the enquiry and, at most, for one year if no contractual relationship begins. Data linked to a contract will be kept for the duration of the relationship and thereafter for the applicable statutory limitation periods.</p>
 <h2>5. Recipients</h2>
-<p>We do not disclose your data to third parties unless required by law. Providers of email and web hosting services may access it as data processors, with the safeguards required by the GDPR. Where any of these providers is located outside the European Economic Area, the transfer is based on a European Commission adequacy decision, such as the EU-US Data Privacy Framework, or on standard contractual clauses.</p>
+<p>We do not disclose your data to third parties unless required by law. Providers of email and web hosting services may access it as data processors, with the safeguards required by the GDPR. Where any of these providers is located outside the European Economic Area, the transfer is based on a European Commission adequacy decision, such as the EU-US Data Privacy Framework, or on standard contractual clauses. Specifically, the website is hosted on GitHub Pages (GitHub, Inc.) and our email service is provided by Google (Gmail).</p>
 <h2>6. Your rights</h2>
 <p>You may exercise your rights of access, rectification, erasure, objection, restriction of processing and portability, and withdraw your consent at any time, by writing to <a href="mailto:%%EMAIL%%">%%EMAIL%%</a> and stating the right you wish to exercise.</p>
 <p>If you consider that the processing of your data does not comply with the regulations, you may lodge a complaint with the Spanish Data Protection Agency (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -672,7 +679,7 @@ C = {
 </table>
 </div>
 <h2>3. Third-party resources</h2>
-<p>To display the website’s typefaces, your browser downloads files from the Google Fonts service, provided by Google. This service does not set cookies, although, as with any internet connection, it receives the IP address of the device making the request. You can read Google’s privacy policy at <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+<p>The typefaces and all other resources on this website are served from the website itself: no third-party services are loaded, such as Google Fonts, analytics tools, advertising, videos or maps.</p>
 <p>Links to Instagram only take you to that social network when you click on them; this website does not embed any social media content or plug-ins.</p>
 <h2>4. Changes to this policy</h2>
 <p>If we introduce cookies that require your consent in the future, we will update this policy and enable the corresponding consent mechanism before they are set.</p>

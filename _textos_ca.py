@@ -55,7 +55,7 @@ C = {
         "consult": "Consulteu un assessor",
         "article_notice": "Aquest article té caràcter merament informatiu i no constitueix assessorament jurídic, fiscal ni financer. La normativa pot variar segons la comunitat autònoma; consulteu el vostre cas amb un professional.",
         "updated": "Darrera actualització: {}",
-        "updated_date": "27 de setembre de 2026",
+        "updated_date": "7 d’octubre de 2026",
         "theme_to_light": "Canvia al tema clar",
         "theme_to_dark": "Canvia al tema fosc",
         "scroll_hint": "Llisqueu per descobrir",
@@ -581,6 +581,11 @@ C = {
         "submit": "Envia la consulta",
     },
 
+    "privacy_forms": {
+        "mail": '<p><strong>Com s’envien els formularis.</strong> En enviar un formulari s’obre el vostre programa de correu electrònic amb el missatge preparat, que només s’envia si vós ho confirmeu. El web no desa ni transmet per si mateix les dades dels formularis.</p>',
+        "endpoint": '<p><strong>Com s’envien els formularis.</strong> Les dades dels formularis s’envien de manera xifrada al servei Formspree (Formspree, Inc., EUA), que les reenvia al nostre correu electrònic i actua com a encarregat del tractament.</p>',
+    },
+
     "owner": {
         "pending": "[pendent de completar]",
         "rows": [
@@ -628,18 +633,20 @@ C = {
 <h2>1. Responsable del tractament</h2>
 %%OWNER%%
 <h2>2. Dades que tractem</h2>
-<p>Tractem les dades que ens faciliteu a través del formulari de contacte, per correu electrònic o mitjançant les nostres xarxes socials: nom i cognoms, dades de contacte, el contingut de la vostra consulta i, si escau, la informació necessària per a la prestació dels nostres serveis.</p>
+<p>Tractem les dades que ens faciliteu a través dels formularis del web (contacte, valoració gratuïta i alerta de cerca), per correu electrònic o mitjançant les nostres xarxes socials: nom i cognoms, correu electrònic i telèfon, la localitat, l’adreça i les característiques de l’immoble que voleu valorar o que busqueu, el contingut de la vostra consulta i, si escau, la informació necessària per a la prestació dels nostres serveis.</p>
+%%FORMS%%
 <h2>3. Finalitats i base jurídica</h2>
 <ul>
 <li><strong>Atendre les vostres consultes</strong> i trametre-us la informació sol·licitada. Base jurídica: el vostre consentiment (art. 6.1.a RGPD).</li>
 <li><strong>Gestionar la relació precontractual i contractual</strong> derivada dels nostres serveis d’intermediació i assessorament immobiliari. Base jurídica: l’execució d’un contracte o de mesures precontractuals (art. 6.1.b RGPD).</li>
 <li><strong>Complir les obligacions legals</strong> aplicables, entre les quals les derivades de la Llei 10/2010, de prevenció del blanqueig de capitals i del finançament del terrorisme, i de la normativa fiscal. Base jurídica: obligació legal (art. 6.1.c RGPD).</li>
+<li><strong>Garantir la seguretat i el funcionament del lloc web.</strong> El proveïdor d’allotjament registra tècnicament l’adreça IP dels visitants. Base jurídica: interès legítim (art. 6.1.f RGPD).</li>
 </ul>
 <p>No es prenen decisions automatitzades ni s’elaboren perfils amb les vostres dades.</p>
 <h2>4. Termini de conservació</h2>
 <p>Les dades de les consultes es conservaran durant el temps necessari per atendre-les i, com a màxim, durant un any si no s’inicia una relació contractual. Les dades vinculades a un contracte es conservaran mentre duri la relació i, posteriorment, durant els terminis de prescripció de les responsabilitats legals.</p>
 <h2>5. Destinataris</h2>
-<p>No cedim les vostres dades a tercers, llevat d’obligació legal. Hi poden accedir els proveïdors que ens presten serveis de correu electrònic i d’allotjament web, en qualitat d’encarregats del tractament i amb les garanties exigides pel RGPD. Quan algun d’aquests proveïdors es trobi fora de l’Espai Econòmic Europeu, la transferència s’empara en una decisió d’adequació de la Comissió Europea, com el Marc de Privacitat de Dades UE-EUA, o en clàusules contractuals tipus.</p>
+<p>No cedim les vostres dades a tercers, llevat d’obligació legal. Hi poden accedir els proveïdors que ens presten serveis de correu electrònic i d’allotjament web, en qualitat d’encarregats del tractament i amb les garanties exigides pel RGPD. Quan algun d’aquests proveïdors es trobi fora de l’Espai Econòmic Europeu, la transferència s’empara en una decisió d’adequació de la Comissió Europea, com el Marc de Privacitat de Dades UE-EUA, o en clàusules contractuals tipus. En concret, el lloc web està allotjat a GitHub Pages (GitHub, Inc.) i el correu electrònic el presta Google (Gmail).</p>
 <h2>6. Els vostres drets</h2>
 <p>Podeu exercir els drets d’accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, així com retirar el vostre consentiment en qualsevol moment, escrivint a <a href="mailto:%%EMAIL%%">%%EMAIL%%</a> i indicant el dret que voleu exercir.</p>
 <p>Si considereu que el tractament de les vostres dades no s’ajusta a la normativa, podeu presentar una reclamació davant l’Agència Espanyola de Protecció de Dades (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>).</p>
@@ -671,7 +678,7 @@ C = {
 </table>
 </div>
 <h2>3. Recursos de tercers</h2>
-<p>Per mostrar les tipografies del lloc, el vostre navegador descarrega fitxers del servei Google Fonts, prestat per Google. Aquest servei no instal·la galetes, tot i que, com en qualsevol connexió a internet, rep l’adreça IP del dispositiu que fa la sol·licitud. Podeu consultar la política de privacitat de Google a <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.</p>
+<p>Les tipografies i la resta de recursos d’aquest web se serveixen des del mateix lloc: no es carrega cap servei de tercers, com ara Google Fonts, eines d’analítica, publicitat, vídeos o mapes.</p>
 <p>Els enllaços a Instagram només us dirigeixen a aquesta xarxa social quan hi feu clic; aquest lloc no incorpora continguts ni complements de xarxes socials.</p>
 <h2>4. Canvis en aquesta política</h2>
 <p>Si en el futur incorporem galetes que requereixin el vostre consentiment, actualitzarem aquesta política i habilitarem el mecanisme de consentiment corresponent abans d’instal·lar-les.</p>

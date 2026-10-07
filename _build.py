@@ -19,6 +19,7 @@ import hashlib
 import html
 import json
 import os
+import re
 import sys
 from urllib.parse import urlparse
 
@@ -51,10 +52,20 @@ EMAIL = "twinsreagency@gmail.com"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
-# La política de seguridad (CSP) se envía como cabecera HTTP desde .htaccess
-# (Apache) o _headers (Netlify / Cloudflare Pages). No se incluye como <meta>
-# en el HTML porque bloquearía styles.css y main.js al abrir las páginas desde
-# el disco (file://) o desde previsualizadores externos.
+
+
+def form_endpoint():
+    """Dirección del servicio de formularios (CONFIG.endpoint de main.js), o "" si los
+    formularios abren el programa de correo. main.js es la única fuente de este dato:
+    de él dependen la CSP y el texto de la política de privacidad."""
+    with open(os.path.join(SITE_DIR, "main.js"), encoding="utf-8") as fh:
+        match = re.search(r'^\s*endpoint:\s*"([^"]*)"', fh.read(), re.M)
+    if not match:
+        raise SystemExit("No se encuentra CONFIG.endpoint en main.js")
+    endpoint = match.group(1)
+    if endpoint and urlparse(endpoint).scheme != "https":
+        raise SystemExit("CONFIG.endpoint debe ser una dirección https://")
+    return endpoint
 
 # --------------------------------------------------------------------------
 # Iconos (trazo, 24x24, heredan el color del texto)
@@ -325,9 +336,8 @@ def head(ctx, title, description, noindex=False, extra=""):
     <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
     <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
+    <link rel="preload" href="{ctx.asset('fonts/inter-latin.woff2')}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{ctx.asset('fonts/playfair-display-600-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <script src="{ctx.asset(versioned('theme.js'))}"></script>
     <link rel="stylesheet" href="{ctx.asset(versioned('styles.css'))}">
     <script src="{ctx.asset(versioned('main.js'))}" defer></script>{extra}
@@ -1389,7 +1399,8 @@ def build_legal(L):
     ui = L["ui"]
     for filename, page in L["legal"].items():
         ctx = Ctx(L, filename)
-        content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)))
+        forms = L["privacy_forms"]["endpoint" if form_endpoint() else "mail"]
+        content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)).replace("%%FORMS%%", forms))
         # Las tablas con desplazamiento horizontal deben poder desplazarse con el teclado.
         content = content.replace('<div class="table-scroll">', '<div class="table-scroll" tabindex="0">')
         body = page_hero(ctx, page["title"], ui["updated"].format(ui["updated_date"]), [(page["title"], filename)]) + f"""
