@@ -266,8 +266,13 @@ C = {
         "paras": [
             "Twins Real Estate nace de una convicción sencilla: comprar, vender o alquilar una vivienda es una de las decisiones más importantes en la vida de una persona, y merece un acompañamiento profesional, honesto y cercano.",
             "Por ello hemos construido una agencia centrada en las personas, en la que cada cliente cuenta con un asesor de referencia, información clara en todo momento y un proceso ordenado desde la primera reunión hasta la entrega de llaves.",
-            "Trabajamos con una cartera cuidadosamente seleccionada y con una red de profesionales colaboradores —notarías, abogados, gestorías y entidades financieras— que nos permite ofrecer un servicio integral.",
+            "Seleccionamos con cuidado cada inmueble que comercializamos y coordinamos cada operación con notarías, abogados, gestorías y entidades financieras, para ofrecerle un servicio integral.",
         ],
+        "photos_eyebrow": "En persona",
+        "photos_title": "Conozca al equipo",
+        # Texto alternativo y pie de cada foto de TEAM_PHOTOS (_build.py), por nombre de archivo:
+        #     "equipo": ("Gerard y … en una reunión con clientes", "El equipo de Twins Real Estate"),
+        "photos": {},
         "btn": "Hablar con un asesor",
         "purpose_eyebrow": "Propósito",
         "purpose_title": "Misión y visión",
@@ -588,7 +593,7 @@ C = {
             ("Domicilio", "pending", ""),
             ("Correo electrónico", "email", ""),
             ("Datos registrales", "pending", "(Registro Mercantil, si se trata de una sociedad)"),
-            ("Registro de agentes inmobiliarios", "pending", "(número de inscripción, cuando la normativa autonómica lo exija)"),
+            ("Registro de agentes inmobiliarios", "pending", "(número de inscripción en el Registro de Agentes Inmobiliarios de Cataluña)"),
         ],
     },
 

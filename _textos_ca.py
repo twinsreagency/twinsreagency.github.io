@@ -265,8 +265,11 @@ C = {
         "paras": [
             "Twins Real Estate neix d’una convicció senzilla: comprar, vendre o llogar un habitatge és una de les decisions més importants de la vida d’una persona, i mereix un acompanyament professional, honest i proper.",
             "Per això hem construït una agència centrada en les persones, en què cada client té un assessor de referència, informació clara en tot moment i un procés ordenat des de la primera reunió fins al lliurament de claus.",
-            "Treballem amb una cartera seleccionada acuradament i amb una xarxa de professionals col·laboradors —notaries, advocats, gestories i entitats financeres— que ens permet oferir un servei integral.",
+            "Seleccionem amb cura cada immoble que comercialitzem i coordinem cada operació amb notaries, advocats, gestories i entitats financeres, per oferir-vos un servei integral.",
         ],
+        "photos_eyebrow": "En persona",
+        "photos_title": "Coneixeu l’equip",
+        "photos": {},
         "btn": "Parleu amb un assessor",
         "purpose_eyebrow": "Propòsit",
         "purpose_title": "Missió i visió",
@@ -587,7 +590,7 @@ C = {
             ("Domicili", "pending", ""),
             ("Correu electrònic", "email", ""),
             ("Dades registrals", "pending", "(Registre Mercantil, si es tracta d’una societat)"),
-            ("Registre d’agents immobiliaris", "pending", "(número d’inscripció, quan la normativa autonòmica ho exigeixi)"),
+            ("Registre d’agents immobiliaris", "pending", "(número d’inscripció al Registre d’Agents Immobiliaris de Catalunya)"),
         ],
     },
 

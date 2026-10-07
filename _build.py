@@ -140,6 +140,14 @@ PROPERTIES = []
 # El filtro «Localidad» solo muestra las localidades que tienen algún inmueble publicado.
 TOWNS = {}
 
+# Fotos reales del equipo para «Nosotros» (nunca de bancos de imágenes). Mientras la
+# lista esté vacía, la página mantiene su diseño actual. Para añadir una:
+#   1. Prepare la foto con «python3 _fotos.py original.jpg equipo», que guarda en fotos/
+#      equipo.webp y equipo.jpg optimizadas e indica su tamaño.
+#   2. Añádala aquí: ("equipo", ancho, alto).
+#   3. Escriba su texto alternativo y su pie en «nosotros» → «photos» de los tres archivos de textos.
+TEAM_PHOTOS = []
+
 SERVICES = [("compraventa", "key"), ("alquiler", "home"), ("gestion-alquileres", "clipboard"),
             ("inversion", "chart"), ("valoracion", "search"), ("asesoramiento-juridico", "shield")]
 
@@ -1072,6 +1080,32 @@ def build_properties_soon(ctx):
     write(ctx, T["title"], soon["description"], "propiedades.html", body)
 
 
+def team_photos(ctx):
+    """Galería de fotos reales del equipo; no se genera si no hay ninguna."""
+    T = ctx.L["nosotros"]
+    if not TEAM_PHOTOS:
+        return ""
+    figures = []
+    for name, width, height in TEAM_PHOTOS:
+        alt, caption = T["photos"][name]
+        figures.append(f"""
+                <figure class="photo reveal">
+                    <picture>
+                        <source srcset="{ctx.asset(f'fotos/{name}.webp')}" type="image/webp">
+                        <img src="{ctx.asset(f'fotos/{name}.jpg')}" alt="{esc(alt)}" width="{width}" height="{height}" loading="lazy" decoding="async">
+                    </picture>
+                    <figcaption>{caption}</figcaption>
+                </figure>""")
+    return f"""
+        <section class="section" aria-labelledby="equipo-title">
+            <div class="container">{section_header(T['photos_eyebrow'], T['photos_title'], 'equipo-title')}
+                <div class="photos">{''.join(figures)}
+                </div>
+            </div>
+        </section>
+"""
+
+
 def build_about(L):
     ctx = Ctx(L, "nosotros.html")
     T = L["nosotros"]
@@ -1096,6 +1130,7 @@ def build_about(L):
             </div>
         </section>
 
+{team_photos(ctx)}
         <section class="section section--alt" aria-labelledby="mision-title">
             <div class="container">{section_header(T['purpose_eyebrow'], T['purpose_title'], 'mision-title')}
                 <div class="grid grid--2">{feature_card('compass', *T['mission'])}{feature_card('lightbulb', *T['vision'])}

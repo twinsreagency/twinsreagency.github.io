@@ -266,8 +266,11 @@ C = {
         "paras": [
             "Twins Real Estate was born from a simple conviction: buying, selling or renting a home is one of the most important decisions in a person’s life, and it deserves professional, honest and personal support.",
             "That is why we have built a people-focused agency, where every client has a dedicated adviser, clear information at all times and an orderly process from the first meeting to the handover of keys.",
-            "We work with a carefully selected portfolio and a network of trusted professionals —notaries, lawyers, administrative agents and lenders— that allows us to offer a comprehensive service.",
+            "We carefully select every property we market and coordinate each transaction with notaries, lawyers, administrative agents and lenders, so as to offer you a comprehensive service.",
         ],
+        "photos_eyebrow": "In person",
+        "photos_title": "Meet the team",
+        "photos": {},
         "btn": "Speak to an adviser",
         "purpose_eyebrow": "Purpose",
         "purpose_title": "Mission and vision",
@@ -588,7 +591,7 @@ C = {
             ("Registered address", "pending", ""),
             ("Email", "email", ""),
             ("Registration details", "pending", "(Companies Register, if a company)"),
-            ("Real estate agents register", "pending", "(registration number, where required by regional law)"),
+            ("Real estate agents register", "pending", "(registration number in the Register of Estate Agents of Catalonia)"),
         ],
     },
 
