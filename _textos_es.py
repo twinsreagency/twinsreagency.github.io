@@ -6,7 +6,7 @@ C = {
     "locale": "es_ES",
     "label": "Español",
     "abbr": "ES",
-    "slugs": {"index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
+    "slugs": {"zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
 
     "ui": {
         "skip": "Saltar al contenido principal",
@@ -153,6 +153,30 @@ C = {
         "purpose": "gestionar su alerta de búsqueda y avisarle de los inmuebles que encajen con ella",
         "filter_link": "Cree una alerta de búsqueda",
     },
+
+    # Páginas por localidad (una por cada localidad de TOWNS en _build.py). {town} es el
+    # nombre de la localidad. El texto propio de cada una va en «towns», por clave de TOWNS.
+    "town_page": {
+        "title": "Vender o comprar vivienda en {town}",
+        "description": "Twins Real Estate le ayuda a vender, comprar o alquilar vivienda en {town}: valoración gratuita, alerta de búsqueda y acompañamiento hasta la firma.",
+        "h1": "Vender o comprar vivienda en {town}",
+        "text": "Le acompañamos en la venta, la compra y el alquiler de inmuebles en {town}, con un asesoramiento cercano, riguroso y transparente.",
+        "crumb": "Zonas",
+        "eyebrow": "Cómo trabajamos",
+        "h2": "Su agencia inmobiliaria en {town}",
+        "paras": [
+            "Somos una agencia inmobiliaria con base en Igualada que trabaja sin oficina abierta al público: le atendemos con cita previa, en persona o por videollamada, y nos desplazamos a {town} para visitar su inmueble y acompañarle en las visitas.",
+            "Antes de comercializar un inmueble revisamos su documentación y su situación registral, y fijamos el precio a partir de inmuebles comparables. Las condiciones de nuestro trabajo se acuerdan por escrito desde el principio.",
+        ],
+        "services_title": "Qué podemos hacer por usted en {town}",
+        "owners_title": "Si desea vender o alquilar",
+        "owners_text": "Solicite una valoración gratuita y sin compromiso de su vivienda, local o terreno en {town}. Le propondremos un precio realista y un plan para comercializarlo.",
+        "buyers_title": "Si busca vivienda",
+        "buyers_text": "Cree una alerta de búsqueda para {town}: le avisaremos en cuanto tengamos un inmueble que encaje con lo que necesita, antes de publicarlo.",
+        "listings_title": "Inmuebles en {town}",
+        "footer_title": "Dónde trabajamos",
+    },
+    "towns": {},
 
     "valuation": {
         "eyebrow": "Valoración gratuita",

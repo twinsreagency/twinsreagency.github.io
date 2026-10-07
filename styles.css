@@ -863,6 +863,28 @@ h4 {
     border-bottom: 1px solid var(--stroke);
 }
 
+.footer-areas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--stroke);
+}
+
+.footer-areas .footer-title {
+    margin: 0;
+}
+
+.footer-areas ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .footer-brand .brand {
     margin-bottom: 1.25rem;
 }
@@ -886,6 +908,7 @@ h4 {
 }
 
 .footer-links a:hover,
+.footer-areas a:hover,
 .footer-contact a:hover,
 .footer-legal a:hover {
     color: var(--text);
@@ -1849,6 +1872,10 @@ h4 {
     margin-top: 0.75rem;
     font-size: 0.9rem;
     color: var(--text-2);
+}
+
+.section-title--sm {
+    font-size: clamp(1.4rem, 2.6vw, 1.9rem);
 }
 
 /* Cartera en preparación (página «Inmuebles» sin inmuebles publicados) */

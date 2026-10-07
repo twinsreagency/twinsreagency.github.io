@@ -6,7 +6,7 @@ C = {
     "locale": "en_GB",
     "label": "English",
     "abbr": "EN",
-    "slugs": {"index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
+    "slugs": {"zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
               "contacto": "contact", "aviso-legal": "legal-notice", "privacidad": "privacy", "cookies": "cookies"},
 
     "ui": {
@@ -153,6 +153,28 @@ C = {
         "purpose": "to manage your property alert and notify you of properties that match it",
         "filter_link": "Create a property alert",
     },
+
+    "town_page": {
+        "title": "Selling or buying a home in {town}",
+        "description": "Twins Real Estate helps you sell, buy or let a home in {town}: a free valuation, property alerts and support through to completion.",
+        "h1": "Selling or buying a home in {town}",
+        "text": "We support you in selling, buying and letting property in {town}, with personal, rigorous and transparent advice.",
+        "crumb": "Areas",
+        "eyebrow": "How we work",
+        "h2": "Your estate agent in {town}",
+        "paras": [
+            "We are an estate agency based in Igualada that works without an office open to the public: we see clients by appointment, in person or by video call, and we travel to {town} to visit your property and accompany you on viewings.",
+            "Before marketing a property, we review its documentation and land registry status and set the price on the basis of comparable properties. The terms of our work are agreed in writing from the outset.",
+        ],
+        "services_title": "How we can help you in {town}",
+        "owners_title": "If you wish to sell or let",
+        "owners_text": "Request a free, no-obligation valuation of your home, commercial premises or land in {town}. We will propose a realistic price and a plan for marketing it.",
+        "buyers_title": "If you are looking for a home",
+        "buyers_text": "Create a property alert for {town}: we will let you know as soon as we have a property that matches your needs, before it is published.",
+        "listings_title": "Properties in {town}",
+        "footer_title": "Where we work",
+    },
+    "towns": {},
 
     "valuation": {
         "eyebrow": "Free valuation",

@@ -21,7 +21,7 @@ import json
 import os
 import re
 import sys
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 sys.dont_write_bytecode = True  # no crear la carpeta __pycache__ en el sitio
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -168,11 +168,14 @@ SEARCH_VALUES = {
 # ubicación y etiqueta van en «properties» de los tres archivos de textos.
 PROPERTIES = []
 
-# Localidades reales, con su nombre oficial (igual en los tres idiomas). Para publicar un
-# inmueble en una localidad nueva, añádala aquí y úsela en su campo «zone», por ejemplo:
+# Localidades donde trabajamos, con su nombre oficial (igual en los tres idiomas). La
+# clave se usa en la dirección de su página y en el campo «zone» de los inmuebles:
 #     "igualada": "Igualada",
-#     "montbui": "Santa Margarida de Montbui",
-# El filtro «Localidad» solo muestra las localidades que tienen algún inmueble publicado.
+#     "santa-margarida-de-montbui": "Santa Margarida de Montbui",
+# Cada localidad tiene su página («Vender o comprar vivienda en …») en los tres idiomas,
+# con el texto propio que se escriba en «towns» de _textos_*.py, y aparece en el pie,
+# en el sitemap y como sugerencia en la valoración y la alerta. El filtro «Localidad»
+# de «Inmuebles» solo muestra las que tienen algún inmueble publicado.
 TOWNS = {}
 
 # Fotos reales del equipo para «Nosotros» (nunca de bancos de imágenes). Mientras la
@@ -265,6 +268,8 @@ def filename(lang, page):
     name = page[:-len(".html")]
     if name.startswith("blog/"):
         slug = "blog-" + lang["posts"][name[len("blog/"):]]["slug"]
+    elif name.startswith("zona/"):  # página de una localidad de TOWNS
+        slug = lang["slugs"]["zona"] + "-" + name[len("zona/"):]
     else:
         slug = lang["slugs"][name]
     if lang["code"] == "es" and name == "index":
@@ -481,6 +486,20 @@ def site_header(ctx, active):
 """
 
 
+def footer_areas(ctx):
+    """Enlaces del pie a las páginas de cada localidad."""
+    if not TOWNS:
+        return ""
+    T = ctx.L["town_page"]
+    links = "".join(f'\n                    <li><a href="{ctx.page(f"zona/{slug}.html")}">{esc(name)}</a></li>'
+                    for slug, name in sorted(TOWNS.items(), key=lambda item: item[1].casefold()))
+    return f"""            <nav class="footer-areas" aria-labelledby="zonas-title">
+                <h2 class="footer-title" id="zonas-title">{T['footer_title']}</h2>
+                <ul>{links}
+                </ul>
+            </nav>"""
+
+
 def site_footer(ctx):
     L, ui = ctx.L, ctx.L["ui"]
     nav_links = "".join(f'\n                        <li><a href="{ctx.page(n)}">{ui["nav"][n]}</a></li>' for n in PAGES)
@@ -519,6 +538,7 @@ def site_footer(ctx):
                     </ul>
                 </div>
             </div>
+{footer_areas(ctx)}
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. {ui['rights']}</p>
                 <nav class="footer-legal" aria-label="{esc(ui['legal_aria'])}">{legal_links}
@@ -1367,6 +1387,80 @@ def build_blog(L):
               extra_head=ld)
 
 
+def build_towns(L):
+    """Una página por localidad: cómo trabajamos allí, servicios, valoración gratuita,
+    alerta de búsqueda y, si los hay, los inmuebles publicados en ella."""
+    T, ui = L["town_page"], L["ui"]
+    for slug, town in TOWNS.items():
+        ctx = Ctx(L, f"zona/{slug}.html")
+
+        def f(text):
+            return text.replace("{town}", esc(town))
+
+        own = "".join(f"\n                        <p>{p}</p>" for p in L["towns"].get(slug, []))
+        paras = own + "".join(f"\n                        <p>{f(p)}</p>" for p in T["paras"])
+        query = "?" + urlencode({"localidad": town})
+        valuation = ctx.page("index.html") + query + "#valoracion"
+        alert = ctx.page("propiedades.html") + query + "#alerta"
+        paths = "".join(feature_card(
+            ic, f(title), f(text),
+            f'\n                    <p class="feature__more"><a class="btn btn--outline" href="{href}">{btn} {ARROW}</a></p>')
+            for ic, title, text, btn, href in (
+                ("key", T["owners_title"], T["owners_text"], L["sell"]["btn"], valuation),
+                ("search", T["buyers_title"], T["buyers_text"], L["propiedades"]["soon"]["btn_alert"], alert)))
+        services = "".join(
+            f'\n                        <li>{icon("check")}<a href="{ctx.page("servicios.html")}#{sid}">{L["services"][sid][0]}</a></li>'
+            for sid, _ in SERVICES)
+        listed = [p for p in PROPERTIES if p["zone"] == slug]
+        listings = ""
+        if listed:
+            cards = "".join(property_card(ctx, p) for p in listed)
+            listings = f"""
+        <section class="section" aria-labelledby="inmuebles-zona-title">
+            <div class="container">{section_header(None, f(T['listings_title']), 'inmuebles-zona-title')}
+                <div class="grid grid--3">{cards}
+                </div>
+            </div>
+        </section>
+"""
+        ld = json_ld({
+            "@context": "https://schema.org",
+            "@type": "RealEstateAgent",
+            "name": "Twins Real Estate",
+            "description": f(T["description"]),
+            "email": EMAIL,
+            **({"url": url(filename(L, "index.html")), "image": url(OG_IMAGE)} if SITE_URL else {}),
+            "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
+            "areaServed": {"@type": "City", "name": town},
+            "knowsLanguage": [lang["lang"] for lang in LANGS],
+        })
+        body = page_hero(ctx, f(T["h1"]), f(T["text"]), [(f(T["h1"]), ctx.current)], obj="house") + f"""
+        <section class="section" aria-labelledby="zona-title">
+            <div class="container split">
+                <div class="reveal">
+                    <span class="eyebrow">{T['eyebrow']}</span>
+                    <h2 class="section-title" id="zona-title">{f(T['h2'])}</h2>
+                    <div class="prose-block">{paras}
+                    </div>
+                </div>
+                <div class="reveal">
+                    <h2 class="section-title section-title--sm" id="zona-servicios-title">{f(T['services_title'])}</h2>
+                    <ul class="check-list">{services}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--alt paths" aria-label="{esc(f(T['h2']))}">
+            <div class="container">
+                <div class="grid grid--2">{paths}
+                </div>
+            </div>
+        </section>
+{listings}{commitments_strip(ctx)}"""
+        write(ctx, f(T["title"]), f(T["description"]), "", body, extra_head=ld)
+
+
 def build_contact(L):
     ctx = Ctx(L, "contacto.html")
     T, ui = L["contacto"], L["ui"]
@@ -1564,7 +1658,8 @@ def build_legacy_redirects(L):
 
 def logical_pages(L):
     """Todas las páginas indexables de un idioma, con su nombre lógico."""
-    return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS])
+    return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS]
+            + [f"zona/{slug}.html" for slug in TOWNS])
 
 
 def build_sitemap():
@@ -1665,6 +1760,7 @@ def main():
         build_blog(lang)
         build_contact(lang)
         build_legal(lang)
+        build_towns(lang)
     build_404(LANGS[0])
     build_legacy_redirects(LANGS[0])
     build_sitemap()

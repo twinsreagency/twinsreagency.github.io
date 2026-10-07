@@ -6,7 +6,7 @@ C = {
     "locale": "ca_ES",
     "label": "Català",
     "abbr": "CA",
-    "slugs": {"index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
+    "slugs": {"zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
 
     "ui": {
         "skip": "Salta al contingut principal",
@@ -152,6 +152,28 @@ C = {
         "purpose": "gestionar la vostra alerta de cerca i avisar-vos dels immobles que hi encaixin",
         "filter_link": "Creeu una alerta de cerca",
     },
+
+    "town_page": {
+        "title": "Vendre o comprar habitatge a {town}",
+        "description": "Twins Real Estate us ajuda a vendre, comprar o llogar habitatge a {town}: valoració gratuïta, alerta de cerca i acompanyament fins a la signatura.",
+        "h1": "Vendre o comprar habitatge a {town}",
+        "text": "Us acompanyem en la venda, la compra i el lloguer d’immobles a {town}, amb un assessorament proper, rigorós i transparent.",
+        "crumb": "Zones",
+        "eyebrow": "Com treballem",
+        "h2": "La vostra agència immobiliària a {town}",
+        "paras": [
+            "Som una agència immobiliària amb base a Igualada que treballa sense oficina oberta al públic: us atenem amb cita prèvia, en persona o per videotrucada, i ens desplacem a {town} per visitar el vostre immoble i acompanyar-vos a les visites.",
+            "Abans de comercialitzar un immoble en revisem la documentació i la situació registral, i en fixem el preu a partir d’immobles comparables. Les condicions de la nostra feina s’acorden per escrit des del principi.",
+        ],
+        "services_title": "Què podem fer per vós a {town}",
+        "owners_title": "Si voleu vendre o llogar",
+        "owners_text": "Sol·liciteu una valoració gratuïta i sense compromís del vostre habitatge, local o terreny a {town}. Us proposarem un preu realista i un pla per comercialitzar-lo.",
+        "buyers_title": "Si busqueu habitatge",
+        "buyers_text": "Creeu una alerta de cerca per a {town}: us avisarem tan bon punt tinguem un immoble que encaixi amb el que necessiteu, abans de publicar-lo.",
+        "listings_title": "Immobles a {town}",
+        "footer_title": "On treballem",
+    },
+    "towns": {},
 
     "valuation": {
         "eyebrow": "Valoració gratuïta",

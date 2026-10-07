@@ -488,7 +488,8 @@
         var fields = ["operacion", "tipo", "zona", "precio", "dormitorios"];
         var params = new URLSearchParams(window.location.search);
         var alertForm = document.getElementById("formulario-alerta");
-        var townEdited = false;
+        /* Una localidad que ya viene rellenada (enlace de una página por localidad) cuenta como elegida. */
+        var townEdited = Boolean(alertForm && alertForm.elements.localidad.value);
 
         if (alertForm) {
             alertForm.elements.localidad.addEventListener("input", function () {
@@ -775,6 +776,20 @@
         });
     }
 
+    /**
+     * Rellena la localidad de la valoración y de la alerta con el parámetro «localidad»
+     * de la URL (enlaces de las páginas por localidad), solo si es una de las
+     * localidades sugeridas en su lista.
+     */
+    function initLocalityPreset() {
+        var town = new URLSearchParams(window.location.search).get("localidad");
+        if (!town) return;
+        $$("form.lead-form input[name='localidad'][list]").forEach(function (field) {
+            var list = document.getElementById(field.getAttribute("list"));
+            if (list && optionValues(list).indexOf(town) !== -1) field.value = town;
+        });
+    }
+
     function initLeadForms() {
         initContactPreset();
         $$("form.lead-form").forEach(initLeadForm);
@@ -799,6 +814,7 @@
     initTilt();
     initHeroPointer();
     initFavorites();
+    initLocalityPreset(); /* antes del filtro, que reescribe la URL */
     initPropertyFilter();
     initLeadForms();
     initYear();

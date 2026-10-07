@@ -331,6 +331,36 @@ test("sin resultados, el aviso lleva a la alerta de búsqueda", async () => {
     await close();
 });
 
+test("cada localidad tiene su página en los tres idiomas, enlazada desde el pie y el sitemap", async () => {
+    const root = path.join(FIXTURE, "site");
+    const sitemap = fs.readFileSync(path.join(root, "sitemap.xml"), "utf8");
+    for (const file of ["es-inmobiliaria-montbui.html", "ca-immobiliaria-montbui.html", "en-estate-agent-montbui.html"]) {
+        assert.ok(fs.existsSync(path.join(root, file)), file);
+        assert.match(sitemap, new RegExp(file.replace(".", "\\.")), file);
+    }
+    const { page, errors, close } = await open("es-inmobiliaria-montbui.html", { fixture: true });
+    assert.match(await page.textContent("h1"), /Santa Margarida de Montbui/);
+    assert.equal(await page.locator(".footer-areas a[href='es-inmobiliaria-igualada.html']").count(), 1);
+    const areas = await page.$$eval("script[type='application/ld+json']", (nodes) => nodes.map((n) => JSON.stringify(JSON.parse(n.textContent))));
+    assert.ok(areas.some((json) => /"areaServed":\{"@type":"City","name":"Santa Margarida de Montbui"/.test(json)));
+    /* Solo los inmuebles de la localidad. */
+    assert.equal(await page.locator(".property").count(), 2);
+
+    /* Los dos caminos llevan la localidad a la valoración y a la alerta. */
+    await page.click("a[href^='index.html?localidad=']");
+    await page.waitForURL(/#valoracion$/);
+    assert.equal(await page.inputValue("#valoracion-localidad"), "Santa Margarida de Montbui");
+    await page.goto(url("es-inmuebles.html?localidad=Igualada#alerta", fixture));
+    assert.equal(await page.inputValue("#alerta-localidad"), "Igualada");
+    assert.deepEqual(errors, []);
+    await close();
+
+    /* Una localidad que no está en la lista no se copia en el formulario. */
+    const other = await open("index.html", { search: "?localidad=%3Cb%3EX%3C%2Fb%3E", fixture: true });
+    assert.equal(await other.page.inputValue("#valoracion-localidad"), "");
+    await other.close();
+});
+
 test("el menú móvil se abre, se cierra con Escape y devuelve el foco", async () => {
     const { page, close } = await open("index.html", { width: 375 });
     const toggle = page.locator(".nav-toggle");
