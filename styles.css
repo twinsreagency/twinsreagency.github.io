@@ -673,6 +673,7 @@ h4 {
 }
 
 .brand img {
+    display: block;
     width: 22px;
     height: 29px;
 }
@@ -2203,8 +2204,13 @@ h4 {
         linear-gradient(180deg, var(--media-a), var(--media-b));
 }
 
-.split__frame img {
+.split__frame picture {
     width: 30%;
+}
+
+.split__frame img {
+    width: 100%;
+    height: auto;
     filter: drop-shadow(0 0 30px rgba(199, 169, 125, 0.5));
 }
 

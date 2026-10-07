@@ -171,7 +171,8 @@
             }
         }, { passive: true });
 
-        update();
+        /* En el siguiente fotograma, para no forzar un recálculo del diseño al cargar. */
+        window.requestAnimationFrame(update);
 
         if (backToTop) {
             backToTop.addEventListener("click", function () {

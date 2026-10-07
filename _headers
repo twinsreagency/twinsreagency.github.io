@@ -11,12 +11,12 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
 
-# styles.css, main.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
+# styles.min.css, main.min.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
 # (ver versioned()): cada cambio genera una dirección nueva, así que el navegador
 # puede guardarlos en caché indefinidamente. Las tipografías no cambian nunca.
-/styles.css
+/styles.min.css
   Cache-Control: public, max-age=31536000, immutable
-/main.js
+/main.min.js
   Cache-Control: public, max-age=31536000, immutable
 /theme.js
   Cache-Control: public, max-age=31536000, immutable

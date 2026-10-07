@@ -119,7 +119,7 @@ class BuildTest(unittest.TestCase):
             subprocess.run([sys.executable, "_build.py"], cwd=copy, check=True, capture_output=True,
                            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
             generated = [os.path.basename(f) for f in glob.glob(os.path.join(copy, "*"))
-                         if f.endswith((".html", ".xml", ".txt"))] + ["_headers", ".well-known/security.txt"]
+                         if f.endswith((".html", ".xml", ".txt", ".min.css", ".min.js"))] + ["_headers", ".well-known/security.txt"]
             match, mismatch, errors = filecmp.cmpfiles(SITE_DIR, copy, generated, shallow=False)
             self.assertEqual(mismatch + errors, [], "Vuelva a ejecutar «python3 _build.py» y publique el resultado")
 
@@ -194,7 +194,13 @@ def published_files():
     """Archivos que publica GitHub Pages (Jekyll): todo salvo lo que empieza por «_» o «.»,
     más lo indicado en «include» de _config.yml."""
     with open(os.path.join(SITE_DIR, "_config.yml"), encoding="utf-8") as fh:
-        included = re.findall(r'^\s*-\s*"?([^"\s]+)"?\s*$', fh.read(), re.M)
+        config = fh.read()
+
+    def listed(key):
+        block = re.search(rf"^{key}:\n((?:\s+-.*\n?)+)", config, re.M)
+        return re.findall(r'-\s*"?([^"\s]+)"?', block.group(1)) if block else []
+
+    included, excluded = listed("include"), listed("exclude")
     out = []
     for root, dirs, files in os.walk(SITE_DIR):
         rel = os.path.relpath(root, SITE_DIR)
@@ -202,8 +208,9 @@ def published_files():
         if any(p.startswith(("_", ".")) and p not in included for p in parts):
             continue
         for name in files:
-            if not name.startswith(("_", ".")) or name in included:
-                out.append(os.path.join(*parts, name) if parts else name)
+            rel_name = os.path.join(*parts, name) if parts else name
+            if (not name.startswith(("_", ".")) or name in included) and rel_name not in excluded:
+                out.append(rel_name)
     return sorted(out)
 
 
@@ -248,7 +255,7 @@ class SecurityTest(unittest.TestCase):
             self.assertTrue(file.endswith(allowed), f"Se publicaría {file}")
             self.assertFalse(file.startswith(("_", ".git")) or "/_" in file, f"Se publicaría {file}")
         self.assertIn(os.path.join(".well-known", "security.txt"), published_files())
-        for internal in ("_build.py", "_textos_es.py", "_headers", "_config.yml", "_tests/test_site.py"):
+        for internal in ("_build.py", "_textos_es.py", "_headers", "_config.yml", "_tests/test_site.py", "styles.css", "main.js"):
             self.assertNotIn(internal, published_files())
 
     def test_published_code_has_no_secrets_or_internal_notes(self):

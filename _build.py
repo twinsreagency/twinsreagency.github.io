@@ -206,6 +206,48 @@ POSTS = [  # (slug, icono, fecha ISO, minutos de lectura); el primero es el dest
 # --------------------------------------------------------------------------
 # Nombres de archivo y contexto de página
 # --------------------------------------------------------------------------
+def minify_css(css):
+    """Versión compacta de styles.css: sin comentarios ni espacios innecesarios. Es
+    conservadora a propósito: no toca «:» (en «a :hover» el espacio importa) ni los
+    textos entre comillas que contengan comas."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    css = re.sub(r"\s+", " ", css)
+    css = re.sub(r"\s*([{};])\s*", r"\1", css)
+    css = re.sub(r",\s+(?=[^\"']*(?:[\"'][^\"']*[\"'][^\"']*)*$)", ",", css)
+    return css.replace(";}", "}").strip() + "\n"
+
+
+def minify_js(js):
+    """Versión compacta de main.js: quita los comentarios que ocupan líneas enteras, la
+    sangría y las líneas vacías. No reescribe el código, así que no puede alterarlo."""
+    out, in_comment = [], False
+    for line in js.splitlines():
+        stripped = line.strip()
+        if in_comment:
+            in_comment = "*/" not in stripped
+            continue
+        if stripped.startswith("/*"):
+            in_comment = "*/" not in stripped
+            continue
+        if not stripped or stripped.startswith("//"):
+            continue
+        out.append(stripped)
+    text = "\n".join(out) + "\n"
+    if "`" in text:
+        raise SystemExit("main.js: las plantillas con ` no están previstas en minify_js()")
+    return text
+
+
+def build_assets():
+    """Genera styles.min.css y main.min.js, que son los que enlazan las páginas.
+    Se editan siempre styles.css y main.js."""
+    for source, target, minify in (("styles.css", "styles.min.css", minify_css), ("main.js", "main.min.js", minify_js)):
+        with open(os.path.join(SITE_DIR, source), encoding="utf-8") as fh:
+            text = minify(fh.read())
+        with open(os.path.join(SITE_DIR, target), "w", encoding="utf-8") as fh:
+            fh.write(text)
+
+
 def versioned(asset):
     """Añade una huella del contenido para que el navegador no use copias antiguas en caché."""
     with open(os.path.join(SITE_DIR, asset), "rb") as fh:
@@ -361,14 +403,26 @@ def head(ctx, title, description, noindex=False, extra=""):
     <link rel="preload" href="{ctx.asset('fonts/inter-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{ctx.asset('fonts/playfair-display-600-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <script src="{ctx.asset(versioned('theme.js'))}"></script>
-    <link rel="stylesheet" href="{ctx.asset(versioned('styles.css'))}">
-    <script src="{ctx.asset(versioned('main.js'))}" defer></script>{extra}
+    <link rel="stylesheet" href="{ctx.asset(versioned('styles.min.css'))}">
+    <script src="{ctx.asset(versioned('main.min.js'))}" defer></script>{extra}
 </head>"""
+
+
+def logos(ctx, small, extra=""):
+    """Logotipo para fondo oscuro y para fondo claro (el CSS muestra el del tema
+    activo), en WebP con PNG como alternativa. «small»: versión de 52 px para la
+    cabecera y el pie."""
+    suffix, size = ("-sm", 'width="26" height="34"') if small else ("", 'width="151" height="200"')
+    out = []
+    for cls, name in (("logo--on-dark", "logo-icon"), ("logo--on-light", "logo-icon-dark")):
+        out.append(f'<picture class="{cls}"><source srcset="{ctx.asset(f"{name}{suffix}.webp")}" type="image/webp">'
+                   f'<img src="{ctx.asset(f"{name}{suffix}.png")}" alt="" {size}{extra}></picture>')
+    return "".join(out)
 
 
 def brand(ctx):
     return f"""<a class="brand" href="{ctx.page('index.html')}" aria-label="{esc(ctx.L['ui']['home_aria'])}">
-                <img class="logo--on-dark" src="{ctx.asset('logo-icon.png')}" alt="" width="26" height="34"><img class="logo--on-light" src="{ctx.asset('logo-icon-dark.png')}" alt="" width="26" height="34">
+                {logos(ctx, small=True)}
                 <span>Twins <span class="brand__sub">Real Estate</span></span>
             </a>"""
 
@@ -1018,7 +1072,7 @@ def build_index(L):
             <div class="container split">
                 <div class="split__visual reveal tilt">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
+                        {logos(ctx, small=False, extra=' loading="lazy" decoding="async"')}
                         <p class="split__quote">{T['quote']}</p>
                     </div>
                 </div>
@@ -1148,7 +1202,7 @@ def build_about(L):
             <div class="container split">
                 <div class="split__visual reveal">
                     <div class="split__frame">
-                        <img class="logo--on-dark" src="logo-icon.png" alt="" width="151" height="200" loading="lazy" decoding="async"><img class="logo--on-light" src="logo-icon-dark.png" alt="" width="151" height="200" loading="lazy" decoding="async">
+                        {logos(ctx, small=False, extra=' loading="lazy" decoding="async"')}
                         <p class="split__quote">{L['index']['slogan']}</p>
                     </div>
                 </div>
@@ -1538,12 +1592,12 @@ def build_headers():
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
 
-# styles.css, main.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
+# styles.min.css, main.min.js y theme.js se enlazan siempre con «?v=<huella del contenido>»
 # (ver versioned()): cada cambio genera una dirección nueva, así que el navegador
 # puede guardarlos en caché indefinidamente. Las tipografías no cambian nunca.
-/styles.css
+/styles.min.css
   Cache-Control: public, max-age=31536000, immutable
-/main.js
+/main.min.js
   Cache-Control: public, max-age=31536000, immutable
 /theme.js
   Cache-Control: public, max-age=31536000, immutable
@@ -1586,6 +1640,7 @@ def check_translations():
 
 def main():
     check_translations()
+    build_assets()
     for lang in LANGS:
         build_index(lang)
         build_properties(lang)

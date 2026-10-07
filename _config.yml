@@ -4,3 +4,9 @@
 # .github…); aquí se añade solo la carpeta .well-known, que contiene security.txt.
 include:
   - ".well-known"
+
+# Fuentes de styles.min.css y main.min.js (las genera _build.py): las páginas
+# solo enlazan las versiones compactas.
+exclude:
+  - "styles.css"
+  - "main.js"
