@@ -1,0 +1,10 @@
+# Dependabot (gratuito) propone cada semana un pull request cuando hay versiones
+# nuevas de las acciones de GitHub usadas en .github/workflows.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
