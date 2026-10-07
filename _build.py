@@ -212,6 +212,11 @@ def url(file):
     return f"{SITE_URL}/" + ("" if file == "index.html" else file)
 
 
+def form_legal(ctx, purpose):
+    """Información básica de protección de datos de un formulario, con su finalidad."""
+    return resolve(ctx, ctx.L["contacto"]["legal_html"].replace("%%PURPOSE%%", purpose))
+
+
 def resolve(ctx, text):
     """Sustituye las marcas de los textos por enlaces y datos reales."""
     return (text.replace("%%PRIVACY%%", ctx.page("privacidad.html"))
@@ -478,8 +483,8 @@ def write(ctx, title, description, active, body, extra_head="", noindex=False):
 # Componentes
 # --------------------------------------------------------------------------
 def valuation_link(ctx):
-    """Destino de los botones «Solicitar una valoración»."""
-    return f"{ctx.page('contacto.html')}?asunto=venta#formulario"
+    """Destino de los botones «Solicitar una valoración»: el formulario de la portada."""
+    return "#valoracion" if ctx.current == "index.html" else ctx.page("index.html") + "#valoracion"
 
 
 def search_fields(ctx, prefix, names=None, indent=20):
@@ -696,7 +701,102 @@ def alert_section(ctx):
                                 {error('privacidad')}
                             </div>
                         </div>
-                        <p class="form-legal">{resolve(ctx, C['legal_html'])}</p>
+                        <p class="form-legal">{form_legal(ctx, T['purpose'])}</p>
+                        <div class="form-actions">
+                            <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
+                        </div>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def valuation_section(ctx):
+    """Formulario de valoración gratuita para propietarios (portada)."""
+    L = ctx.L
+    T, C = L["valuation"], L["contacto"]
+    lab, clab = T["labels"], C["labels"]
+    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["checks"])
+    towns = "".join(f'<option value="{esc(name)}"></option>' for name in sorted(TOWNS.values(), key=str.casefold))
+    types = options(SEARCH_VALUES["tipo"], L["search"]["options"]["tipo"], T["tipo_placeholder"])
+
+    def error(name):
+        return f'<p class="field__error" id="valoracion-error-{name}" aria-live="polite"></p>'
+
+    return f"""
+        <section class="section valuation" id="valoracion" aria-labelledby="valoracion-title">
+            <div class="container split">
+                <div class="reveal">
+                    <span class="eyebrow">{T['eyebrow']}</span>
+                    <h2 class="section-title" id="valoracion-title">{T['title']}</h2>
+                    <div class="prose-block">
+                        <p>{T['text']}</p>
+                    </div>
+                    <ul class="check-list">{checks}
+                    </ul>
+                    <p class="valuation__note">{T['note']}</p>
+                </div>
+
+                <div class="card form-card reveal">
+                    <h3 class="form-card__title">{T['form_title']}</h3>
+                    <p class="form-card__lead">{C['form_lead']}</p>
+                    <form class="lead-form" id="formulario-valoracion" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="valoracion-localidad">{lab['localidad']}</label>
+                                <input id="valoracion-localidad" name="localidad" type="text" list="valoracion-localidades" autocomplete="address-level2" maxlength="80" required placeholder="{esc(T['localidad_placeholder'])}" aria-describedby="valoracion-error-localidad">
+                                <datalist id="valoracion-localidades">{towns}</datalist>
+                                {error('localidad')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-direccion">{lab['direccion']}</label>
+                                <input id="valoracion-direccion" name="direccion" type="text" autocomplete="street-address" maxlength="150" placeholder="{esc(T['direccion_placeholder'])}">
+                            </div>
+                            <div class="field field--full">
+                                <label for="valoracion-tipo">{lab['tipo']}</label>
+                                <select id="valoracion-tipo" name="tipo" required aria-describedby="valoracion-error-tipo">{types}</select>
+                                {error('tipo')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-metros">{lab['metros']}</label>
+                                <input id="valoracion-metros" name="metros" type="number" inputmode="numeric" min="10" max="100000" step="1" required aria-describedby="valoracion-error-metros">
+                                {error('metros')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-dormitorios">{lab['dormitorios']}</label>
+                                <input id="valoracion-dormitorios" name="dormitorios" type="number" inputmode="numeric" min="0" max="50" step="1" aria-describedby="valoracion-error-dormitorios">
+                                {error('dormitorios')}
+                            </div>
+                            <div class="field field--full">
+                                <label for="valoracion-nombre">{clab['nombre']}</label>
+                                <input id="valoracion-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required aria-describedby="valoracion-error-nombre">
+                                {error('nombre')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-telefono">{lab['telefono']}</label>
+                                <input id="valoracion-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" required aria-describedby="valoracion-error-telefono">
+                                {error('telefono')}
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-email">{clab['email']}</label>
+                                <input id="valoracion-email" name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="valoracion-error-email">
+                                {error('email')}
+                            </div>
+                            <div class="field field--hp" aria-hidden="true">
+                                <label for="valoracion-web">{C['honeypot']}</label>
+                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="field field--full">
+                                <label class="checkbox" for="valoracion-privacidad">
+                                    <input id="valoracion-privacidad" name="privacidad" type="checkbox" required aria-describedby="valoracion-error-privacidad">
+                                    <span>{resolve(ctx, C['privacy_html'])}</span>
+                                </label>
+                                {error('privacidad')}
+                            </div>
+                        </div>
+                        <p class="form-legal">{form_legal(ctx, T['purpose'])}</p>
                         <div class="form-actions">
                             <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
                         </div>
@@ -810,6 +910,10 @@ def build_index(L):
     })
 
     portfolio = home_portfolio(ctx)
+    if PROPERTIES:
+        hero_button = f'<a class="btn btn--primary" href="{ctx.page("propiedades.html")}">{T["btn_props"]} {ARROW}</a>'
+    else:
+        hero_button = f'<a class="btn btn--primary" href="#valoracion">{T["btn_valuation"]} {ARROW}</a>'
     callouts = "".join(
         f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
         for i, (ic, text) in enumerate(zip(PILLAR_ICONS, T["pillars"]), start=1))
@@ -824,7 +928,7 @@ def build_index(L):
                         <h1 class="hero3d__title" id="hero-title">{T['h1']}</h1>
                         <p class="hero3d__text">{T['text']}</p>
                         <div class="hero3d__actions">
-                            <a class="btn btn--primary" href="{ctx.page('propiedades.html')}">{T['btn_props']} {ARROW}</a>
+                            {hero_button}
                             <a class="btn btn--glass" href="{ctx.page('contacto.html')}#formulario">{T['btn_advice']}</a>
                         </div>
                     </div>
@@ -837,7 +941,7 @@ def build_index(L):
             </div>
         </section>
 
-{portfolio}
+{portfolio}{valuation_section(ctx)}
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
@@ -1191,7 +1295,7 @@ def build_contact(L):
                                 {error('privacidad')}
                             </div>
                         </div>
-                        <p class="form-legal">{resolve(ctx, T['legal_html'])}</p>
+                        <p class="form-legal">{form_legal(ctx, T['purpose'])}</p>
                         <div class="form-actions">
                             <button class="btn btn--primary btn--block" type="submit">{T['submit']} {ARROW}</button>
                         </div>

@@ -29,8 +29,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&amp;display=swap">
     <script src="theme.js?v=fd1966f6e2"></script>
-    <link rel="stylesheet" href="styles.css?v=bf7896d607">
-    <script src="main.js?v=d4ee48206f" defer></script>
+    <link rel="stylesheet" href="styles.css?v=f3dd8f1176">
+    <script src="main.js?v=1b63cfcc5a" defer></script>
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "name": "Twins Real Estate", "slogan": "Perquè cada nova etapa mereix un lloc al qual anomenar llar.", "email": "twinsreagency@gmail.com", "sameAs": ["https://www.instagram.com/twins.real.estate.agency/"], "url": "https://twinsreagency.github.io/ca-inici.html", "logo": "https://twinsreagency.github.io/logo-icon.png", "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"], "knowsLanguage": ["es", "ca", "en"]}</script>
 </head>
 <body>
@@ -71,7 +71,7 @@
                         <h1 class="hero3d__title" id="hero-title">Perquè cada nova etapa mereix un lloc al qual anomenar <em>llar</em>.</h1>
                         <p class="hero3d__text">Acompanyem particulars, famílies i inversors en la compra, la venda i el lloguer d’immobles, amb un assessorament proper, rigorós i transparent en cada fase de l’operació.</p>
                         <div class="hero3d__actions">
-                            <a class="btn btn--primary" href="ca-immobles.html">Vegeu els immobles <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                            <a class="btn btn--primary" href="#valoracion">Valoreu el vostre immoble gratis <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                             <a class="btn btn--glass" href="ca-contacte.html#formulario">Sol·liciteu assessorament</a>
                         </div>
                     </div>
@@ -98,6 +98,89 @@
             </div>
         </section>
 
+
+        <section class="section valuation" id="valoracion" aria-labelledby="valoracion-title">
+            <div class="container split">
+                <div class="reveal">
+                    <span class="eyebrow">Valoració gratuïta</span>
+                    <h2 class="section-title" id="valoracion-title">Valoració gratuïta del vostre immoble</h2>
+                    <div class="prose-block">
+                        <p>Voleu saber quant val el vostre habitatge abans de vendre’l o llogar-lo? Faciliteu-nos unes dades bàsiques i us trucarem per conèixer el vostre immoble. Després d’estudiar-lo, us donarem una valoració de mercat raonada, gratuïta i sense compromís.</p>
+                    </div>
+                    <ul class="check-list">
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Sense cost i sense compromís de venda</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Basada en l’estat de l’immoble i en l’oferta de la zona</li>
+                        <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Les vostres dades només s’utilitzen per preparar la valoració</li>
+                    </ul>
+                    <p class="valuation__note">No és una taxació oficial: les taxacions amb validesa hipotecària només les poden emetre les societats de taxació homologades.</p>
+                </div>
+
+                <div class="card form-card reveal">
+                    <h3 class="form-card__title">Sol·liciteu la vostra valoració</h3>
+                    <p class="form-card__lead">Els camps marcats amb * són obligatoris.</p>
+                    <form class="lead-form" id="formulario-valoracion" action="mailto:twinsreagency@gmail.com" method="post" enctype="text/plain" novalidate data-mail-subject="Valoració gratuïta" data-subject-field="localidad">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="valoracion-localidad">Localitat *</label>
+                                <input id="valoracion-localidad" name="localidad" type="text" list="valoracion-localidades" autocomplete="address-level2" maxlength="80" required placeholder="Per exemple, Igualada" aria-describedby="valoracion-error-localidad">
+                                <datalist id="valoracion-localidades"></datalist>
+                                <p class="field__error" id="valoracion-error-localidad" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-direccion">Adreça (opcional)</label>
+                                <input id="valoracion-direccion" name="direccion" type="text" autocomplete="street-address" maxlength="150" placeholder="Carrer i número">
+                            </div>
+                            <div class="field field--full">
+                                <label for="valoracion-tipo">Tipus d’immoble *</label>
+                                <select id="valoracion-tipo" name="tipo" required aria-describedby="valoracion-error-tipo"><option value="">Seleccioneu una opció</option><option value="piso">Pis o apartament</option><option value="atico">Àtic</option><option value="duplex">Dúplex</option><option value="casa">Casa o xalet</option><option value="rustica">Casa rústica</option><option value="estudio">Estudi o loft</option><option value="oficina">Oficina</option><option value="local">Local o nau</option><option value="garaje">Garatge</option><option value="trastero">Traster</option><option value="terreno">Terreny</option><option value="edificio">Edifici</option></select>
+                                <p class="field__error" id="valoracion-error-tipo" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-metros">Superfície (m²) *</label>
+                                <input id="valoracion-metros" name="metros" type="number" inputmode="numeric" min="10" max="100000" step="1" required aria-describedby="valoracion-error-metros">
+                                <p class="field__error" id="valoracion-error-metros" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-dormitorios">Dormitoris</label>
+                                <input id="valoracion-dormitorios" name="dormitorios" type="number" inputmode="numeric" min="0" max="50" step="1" aria-describedby="valoracion-error-dormitorios">
+                                <p class="field__error" id="valoracion-error-dormitorios" aria-live="polite"></p>
+                            </div>
+                            <div class="field field--full">
+                                <label for="valoracion-nombre">Nom i cognoms *</label>
+                                <input id="valoracion-nombre" name="nombre" type="text" autocomplete="name" maxlength="100" required aria-describedby="valoracion-error-nombre">
+                                <p class="field__error" id="valoracion-error-nombre" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-telefono">Telèfon *</label>
+                                <input id="valoracion-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" required aria-describedby="valoracion-error-telefono">
+                                <p class="field__error" id="valoracion-error-telefono" aria-live="polite"></p>
+                            </div>
+                            <div class="field">
+                                <label for="valoracion-email">Correu electrònic *</label>
+                                <input id="valoracion-email" name="email" type="email" autocomplete="email" maxlength="120" required aria-describedby="valoracion-error-email">
+                                <p class="field__error" id="valoracion-error-email" aria-live="polite"></p>
+                            </div>
+                            <div class="field field--hp" aria-hidden="true">
+                                <label for="valoracion-web">No ompliu aquest camp</label>
+                                <input id="valoracion-web" name="web" type="text" tabindex="-1" autocomplete="off">
+                            </div>
+                            <div class="field field--full">
+                                <label class="checkbox" for="valoracion-privacidad">
+                                    <input id="valoracion-privacidad" name="privacidad" type="checkbox" required aria-describedby="valoracion-error-privacidad">
+                                    <span>He llegit i accepto la <a href="ca-privacitat.html">política de privacitat</a>. *</span>
+                                </label>
+                                <p class="field__error" id="valoracion-error-privacidad" aria-live="polite"></p>
+                            </div>
+                        </div>
+                        <p class="form-legal"><strong>Informació bàsica sobre protecció de dades.</strong> Responsable: Twins Real Estate. Finalitat: posar-nos en contacte amb vós per valorar el vostre immoble i trametre-us la valoració. Legitimació: el vostre consentiment. Destinataris: no se cediran dades a tercers, llevat d’obligació legal. Drets: accés, rectificació, supressió, oposició, limitació del tractament i portabilitat, tal com es detalla a la <a href="ca-privacitat.html">política de privacitat</a>.</p>
+                        <div class="form-actions">
+                            <button class="btn btn--primary btn--block" type="submit">Sol·licitar la valoració <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                        </div>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
 
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
@@ -194,7 +277,7 @@
                         <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Acompanyament en la negociació, les arres i l’escriptura</li>
                     </ul>
                     <div class="sell__actions">
-                        <a class="btn btn--primary" href="ca-contacte.html?asunto=venta#formulario">Sol·liciteu una valoració <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                        <a class="btn btn--primary" href="#valoracion">Sol·liciteu una valoració <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                         <a class="btn btn--outline" href="mailto:twinsreagency@gmail.com">Escriviu-nos per correu</a>
                     </div>
                 </div>

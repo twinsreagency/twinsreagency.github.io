@@ -22,6 +22,7 @@
         endpoint: "",
         fallbackEmail: "twinsreagency@gmail.com",
         minFillTimeMs: 3000,
+        maxMailBody: 3000,
         favoritesKey: "twins:favoritos",
         themeKey: "twins:tema"
     };
@@ -32,6 +33,10 @@
             nombre: "Indique su nombre y apellidos.",
             email: "Indique una dirección de correo electrónico válida.",
             telefono: "Indique un teléfono válido o deje el campo vacío.",
+            telefonoRequired: "Indique un teléfono de contacto válido.",
+            tipo: "Seleccione el tipo de inmueble.",
+            metros: "Indique la superficie en metros cuadrados (entre 10 y 100.000).",
+            dormitorios: "Indique un número de dormitorios entre 0 y 50, o deje el campo vacío.",
             mensaje: "El mensaje debe contener al menos 10 caracteres.",
             privacidad: "Debe aceptar la política de privacidad para continuar.",
             invalid: "Revise los campos indicados antes de enviar el formulario.",
@@ -49,6 +54,10 @@
             nombre: "Indiqueu el vostre nom i cognoms.",
             email: "Indiqueu una adreça de correu electrònic vàlida.",
             telefono: "Indiqueu un telèfon vàlid o deixeu el camp buit.",
+            telefonoRequired: "Indiqueu un telèfon de contacte vàlid.",
+            tipo: "Seleccioneu el tipus d’immoble.",
+            metros: "Indiqueu la superfície en metres quadrats (entre 10 i 100.000).",
+            dormitorios: "Indiqueu un nombre de dormitoris entre 0 i 50, o deixeu el camp buit.",
             mensaje: "El missatge ha de contenir almenys 10 caràcters.",
             privacidad: "Heu d’acceptar la política de privacitat per continuar.",
             invalid: "Reviseu els camps indicats abans d’enviar el formulari.",
@@ -66,6 +75,10 @@
             nombre: "Please enter your full name.",
             email: "Please enter a valid email address.",
             telefono: "Please enter a valid phone number or leave the field blank.",
+            telefonoRequired: "Please enter a valid contact telephone number.",
+            tipo: "Please select the property type.",
+            metros: "Please enter the floor area in square metres (between 10 and 100,000).",
+            dormitorios: "Please enter a number of bedrooms between 0 and 50, or leave the field blank.",
             mensaje: "Your message must contain at least 10 characters.",
             privacidad: "You must accept the privacy policy to continue.",
             invalid: "Please review the highlighted fields before submitting the form.",
@@ -572,6 +585,12 @@
         }
     }
 
+    function isInteger(value, min, max) {
+        if (!/^\d{1,6}$/.test(value)) return false;
+        var number = Number(value);
+        return number >= min && number <= max;
+    }
+
     /** Reglas de validación por nombre de campo; solo se aplican a los campos presentes. */
     var RULES = {
         localidad: function (value) {
@@ -583,8 +602,18 @@
         email: function (value) {
             return EMAIL.test(value) ? "" : T.email;
         },
-        telefono: function (value) {
-            return !value || PHONE.test(value) ? "" : T.telefono;
+        telefono: function (value, field) {
+            if (!value) return field.required ? T.telefonoRequired : "";
+            return PHONE.test(value) ? "" : (field.required ? T.telefonoRequired : T.telefono);
+        },
+        tipo: function (value, field) {
+            return !field.required || value ? "" : T.tipo;
+        },
+        metros: function (value) {
+            return isInteger(value, 10, 100000) ? "" : T.metros;
+        },
+        dormitorios: function (value) {
+            return !value || isInteger(value, 0, 50) ? "" : T.dormitorios;
         },
         mensaje: function (value) {
             return value.length >= 10 ? "" : T.mensaje;
@@ -648,9 +677,19 @@
             });
         }
 
+        /**
+         * Valor de un campo como texto plano: respeta su maxlength (el navegador no lo
+         * aplica a los valores puestos por script) y elimina los caracteres de control,
+         * incluidos los saltos de línea en los campos de una sola línea.
+         */
         function valueOf(field) {
             if (field.tagName === "SELECT") return field.value ? field.options[field.selectedIndex].text : "";
-            return field.value.trim();
+            var value = field.value.trim();
+            var max = Number(field.getAttribute("maxlength")) || 2000;
+            value = field.tagName === "TEXTAREA"
+                ? value.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "")
+                : value.replace(/[\u0000-\u001F\u007F]+/g, " ");
+            return value.slice(0, max);
         }
 
         function collect() {
@@ -679,9 +718,12 @@
             var subject = (form.getAttribute("data-mail-subject") || T.mailSubject) +
                 " — " + (data[subjectField] || T.mailDefaultSubject);
 
+            /* El destinatario es fijo y todo lo que escribe el visitante va codificado
+               (encodeURIComponent), así que no puede añadir destinatarios ni cabeceras.
+               El cuerpo se limita para que ningún cliente de correo corte el enlace. */
             window.location.href = "mailto:" + CONFIG.fallbackEmail +
-                "?subject=" + encodeURIComponent(subject) +
-                "&body=" + encodeURIComponent(lines.join("\n"));
+                "?subject=" + encodeURIComponent(subject.slice(0, 150)) +
+                "&body=" + encodeURIComponent(lines.join("\n").slice(0, CONFIG.maxMailBody));
         }
 
         form.addEventListener("submit", function (event) {

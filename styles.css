@@ -1568,12 +1568,20 @@ h4 {
     scroll-margin-top: var(--header-h);
 }
 
-.alert {
+.alert,
+.valuation .split {
     align-items: start;
 }
 
+.valuation__note {
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-2);
+}
+
 @media (min-width: 861px) {
-    .alert > :first-child {
+    .alert > :first-child,
+    .valuation .split > :first-child {
         position: sticky;
         top: calc(var(--header-h) + 2rem);
     }

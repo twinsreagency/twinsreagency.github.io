@@ -154,6 +154,77 @@ test("el formulario de contacto valida los campos obligatorios", async () => {
     await close();
 });
 
+test("la valoración gratuita valida sus campos y prepara el correo", async () => {
+    const { page, errors, close } = await open("index.html");
+    await page.click("#formulario-valoracion button[type='submit']");
+    for (const id of ["localidad", "tipo", "metros", "nombre", "telefono", "email", "privacidad"]) {
+        assert.equal(await page.getAttribute("#valoracion-" + id, "aria-invalid"), "true", id);
+    }
+    assert.equal(await page.getAttribute("#valoracion-dormitorios", "aria-invalid"), "false");
+    assert.equal(await page.locator("#valoracion-direccion[aria-invalid]").count(), 0);
+    assert.equal(await page.evaluate(() => document.activeElement.id), "valoracion-localidad");
+
+    await page.fill("#valoracion-metros", "5");
+    await page.fill("#valoracion-dormitorios", "99");
+    await page.click("#formulario-valoracion button[type='submit']");
+    assert.equal(await page.getAttribute("#valoracion-metros", "aria-invalid"), "true");
+    assert.equal(await page.getAttribute("#valoracion-dormitorios", "aria-invalid"), "true");
+
+    /* El correo se prepara con el texto escrito, codificado, sin interpretarlo como HTML. */
+    await page.fill("#valoracion-localidad", "Igualada<img src=x onerror=alert(1)>");
+    await page.fill("#valoracion-direccion", "Carrer Major, 1\r\nBcc: spam@example.com");
+    await page.selectOption("#valoracion-tipo", "piso");
+    await page.fill("#valoracion-metros", "90");
+    await page.fill("#valoracion-dormitorios", "3");
+    await page.fill("#valoracion-nombre", "Persona de Prueba");
+    await page.fill("#valoracion-telefono", "+34 600 000 000");
+    await page.fill("#valoracion-email", "cliente@example.com");
+    /* Clic por script: la cabecera fija puede tapar la casilla tras desplazarse. */
+    await page.$eval("#valoracion-privacidad", (box) => box.click());
+    await page.waitForTimeout(3100);
+    /* Se captura la dirección mailto: (Chromium la anuncia por CDP) sin abrir el correo. */
+    let mailtoUrl = "";
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Page.enable");
+    cdp.on("Page.frameRequestedNavigation", (event) => {
+        if (event.url.startsWith("mailto:")) mailtoUrl = event.url;
+    });
+    await page.$eval("#formulario-valoracion button[type='submit']", (b) => b.click());
+    await page.waitForFunction(() => /correo/.test(document.querySelector("#formulario-valoracion .form-status").textContent), null, { timeout: 3000 });
+    assert.ok(mailtoUrl, "No se ha preparado el enlace mailto:");
+    assert.equal(await page.locator("img[src='x']").count(), 0);
+    const mail = new URL(mailtoUrl);
+    assert.equal(mail.pathname, "twinsreagency@gmail.com");
+    assert.deepEqual([...mail.searchParams.keys()], ["subject", "body"]);
+    assert.match(mail.searchParams.get("subject"), /^Valoración gratuita — Igualada/);
+    /* Los saltos de línea de un campo de una línea no pueden crear líneas ni cabeceras nuevas. */
+    assert.match(mail.searchParams.get("body"), /Dirección \(opcional\): Carrer Major, 1 Bcc: spam@example\.com/);
+    assert.match(mail.searchParams.get("body"), /Tipo de inmueble: Piso o apartamento/);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("los botones de valoración llevan al formulario de la portada", async () => {
+    const { page, close } = await open("es-inmuebles.html");
+    for (const href of await page.locator(".sell__actions a.btn--primary").evaluateAll((a) => a.map((x) => x.getAttribute("href")))) {
+        assert.equal(href, "index.html#valoracion");
+    }
+    await close();
+});
+
+test("el campo trampa bloquea el envío", async () => {
+    const { page, close } = await open("es-contacto.html");
+    await page.fill("#contacto-nombre", "Persona de Prueba");
+    await page.fill("#contacto-email", "cliente@example.com");
+    await page.fill("#contacto-mensaje", "Mensaje de prueba suficientemente largo.");
+    await page.$eval("#contacto-privacidad", (box) => box.click());
+    await page.evaluate(() => { document.getElementById("contacto-web").value = "spam"; });
+    await page.waitForTimeout(3100);
+    await page.click("#formulario-contacto button[type='submit']");
+    assert.match(await page.textContent("#formulario-contacto .form-status"), /No ha sido posible enviar/);
+    await close();
+});
+
 test("el formulario se rellena con la referencia del inmueble solo si es válida", async () => {
     let { page, close } = await open("es-contacto.html", { search: "?ref=TRE-003", fixture: true });
     assert.equal(await page.inputValue("#contacto-referencia"), "TRE-003");
