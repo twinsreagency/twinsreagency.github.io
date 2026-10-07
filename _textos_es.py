@@ -615,15 +615,14 @@ C = {
     },
 
     "owner": {
-        "pending": "[pendiente de completar]",
         "rows": [
-            ("Titular", "pending", "(nombre y apellidos o razón social)"),
-            ("Nombre comercial", "Twins Real Estate", ""),
-            ("NIF", "pending", ""),
-            ("Domicilio", "pending", ""),
-            ("Correo electrónico", "email", ""),
-            ("Datos registrales", "pending", "(Registro Mercantil, si se trata de una sociedad)"),
-            ("Registro de agentes inmobiliarios", "pending", "(número de inscripción en el Registro de Agentes Inmobiliarios de Cataluña)"),
+            ("Titular", "titular"),
+            ("Nombre comercial", "Twins Real Estate"),
+            ("NIF", "nif"),
+            ("Domicilio", "domicilio"),
+            ("Correo electrónico", "email"),
+            ("Datos registrales", "registro_mercantil"),
+            ("Registro de agentes inmobiliarios", "registro_agentes"),
         ],
     },
 
