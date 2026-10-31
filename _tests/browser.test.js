@@ -623,3 +623,26 @@ test("se sugiere el idioma del navegador una sola vez", async () => {
     await fresh.close();
     await context.close();
 });
+
+test("en el móvil: botón de menú completo, zonas de toque cómodas y cristal que desenfoca", async () => {
+    /* Sin animaciones: la aparición de los bloques los escala un instante (97 %). */
+    const context = await browser.newContext({ viewport: { width: 360, height: 780 }, isMobile: true, hasTouch: true, reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    /* El botón del menú no se aplasta aunque haya otros botones en la cabecera. */
+    const toggle = await page.locator(".nav-toggle").boundingBox();
+    assert.ok(toggle.width >= 44 && toggle.height >= 44, `menú de ${toggle.width}×${toggle.height}`);
+    /* Enlaces sueltos y del pie con al menos 44 px de alto (recomendación de Apple). */
+    const heights = await page.evaluate(() => [...document.querySelectorAll(".footer-links a, .footer-legal a, .link-arrow")]
+        .filter((a) => a.getClientRects().length && !a.closest("[hidden]"))
+        .map((a) => a.getBoundingClientRect().height));
+    assert.ok(heights.length > 10);
+    assert.ok(Math.min(...heights) >= 43.5, `zona de toque mínima: ${Math.min(...heights)} px`);
+    /* Un view-transition-name en la cabecera impediría que su cristal desenfoque la página. */
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".site-header")).viewTransitionName), "none");
+    /* Ningún campo del formulario por debajo de 16 px: el iPhone ampliaría la pantalla al tocarlo. */
+    const small = await page.evaluate(() => [...document.querySelectorAll("input:not([type=checkbox]):not([type=radio]), select, textarea")]
+        .filter((el) => el.getClientRects().length && parseFloat(getComputedStyle(el).fontSize) < 16).map((el) => el.id));
+    assert.deepEqual(small, []);
+    await context.close();
+});

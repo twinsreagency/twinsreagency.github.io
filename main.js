@@ -585,6 +585,7 @@
         });
         dismiss.addEventListener("click", function () {
             remember(LANG);
+            document.body.classList.remove("has-toast");
             toast.classList.remove("is-visible");
             window.setTimeout(function () {
                 toast.remove();
@@ -597,6 +598,8 @@
         document.body.appendChild(toast);
         window.setTimeout(function () {
             toast.classList.add("is-visible");
+            /* El botón «volver arriba» sube para no quedar debajo del aviso. */
+            document.body.classList.add("has-toast");
         }, 1200);
     }
 
@@ -1146,10 +1149,10 @@
             }
 
             function update() {
-                var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+                var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 8;
                 var index = atEnd ? cards.length - 1 : Math.round(track.scrollLeft / Math.max(1, stepWidth()));
                 if (current) current.textContent = String(Math.min(cards.length, index + 1)).padStart(2, "0");
-                prev.disabled = track.scrollLeft <= 2;
+                prev.disabled = track.scrollLeft <= 8;
                 next.disabled = atEnd;
                 ticking = false;
             }

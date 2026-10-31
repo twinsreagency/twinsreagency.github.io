@@ -913,6 +913,7 @@ html.is-theme-switch::view-transition-new(root) {
 
 .nav-toggle {
     display: none;
+    flex-shrink: 0;            /* si no, los demás botones lo aplastan en el móvil */
     width: 44px;
     height: 44px;
     align-items: center;
@@ -2242,6 +2243,25 @@ html.is-theme-switch::view-transition-new(root) {
     border-radius: var(--pill);
 }
 
+/* Siempre en una línea: si no cabe, el título de la página actual se recorta con «…»
+   (se lee completo justo debajo, en el título). */
+.breadcrumb ol {
+    flex-wrap: nowrap;
+    max-width: 100%;
+}
+
+.breadcrumb li {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.breadcrumb li[aria-current] {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .breadcrumb li + li::before {
     content: "›";
     margin-right: 0.5rem;
@@ -3056,7 +3076,7 @@ html.is-theme-switch::view-transition-new(root) {
     background: var(--chip-2);
     border: 1px solid rgba(199, 169, 125, 0.45);
     border-radius: var(--pill);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--accent-2);
@@ -3699,6 +3719,13 @@ html.is-theme-switch::view-transition-new(root) {
     scroll-snap-align: start;
 }
 
+/* En el carril horizontal, las tarjetas solo aparecen con un fundido: si se movieran o
+   se escalaran, el navegador recolocaría el carril al terminar la animación. */
+.js-reveal .gallery__track .reveal:not(.is-visible) {
+    filter: none;
+    transform: none;
+}
+
 .gallery__foot {
     margin-top: 2rem;
 }
@@ -3738,19 +3765,14 @@ html.is-theme-switch::view-transition-new(root) {
 }
 
 /* Transición suave entre páginas (View Transitions entre documentos): la página se
-   desvanece y la nueva aparece nítida; la cabecera se mantiene. El cambio de tema usa
+   desvanece y la nueva aparece nítida. El cambio de tema usa
    su propio efecto circular (main.js añade .is-theme-switch durante el cambio). */
 @view-transition {
     navigation: auto;
 }
 
-.site-header {
-    view-transition-name: site-header;
-}
-
-html.is-theme-switch .site-header {
-    view-transition-name: none;
-}
+/* La cabecera no lleva view-transition-name: en Chromium, un nombre de transición
+   convierte el elemento en «raíz de fondo» y el cristal ya no desenfoca la página. */
 
 html:not(.is-theme-switch)::view-transition-old(root) {
     animation: page-out 0.32s var(--ease) both;
@@ -4602,7 +4624,7 @@ html[data-motion="reduced"]::view-transition-new(root) {
     }
 
     .page-hero {
-        padding: calc(var(--header-h) + 4.5rem) 0 4rem;
+        padding: calc(var(--header-h) + 4.5rem) 0 2.75rem;
     }
 
     .page-hero__panes span:nth-child(1),
@@ -4714,5 +4736,134 @@ html[data-motion="reduced"]::view-transition-new(root) {
 
     .settings-toggle:not([hidden]) + .theme-toggle {
         margin-left: 0;
+    }
+}
+
+/* Pantallas táctiles: zonas de toque de al menos 44 px de alto (recomendación de Apple)
+   en enlaces sueltos, enlaces del pie y la casilla de privacidad. */
+@media (pointer: coarse) {
+    .link-arrow,
+    .contact-item a,
+    .footer-links a,
+    .footer-areas a,
+    .footer-legal a,
+    .footer-contact a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
+    .footer-links li + li {
+        margin-top: 0;
+    }
+
+    .footer-legal {
+        gap: 0 1.25rem;
+    }
+
+    .footer-contact li + li {
+        margin-top: 0.25rem;
+    }
+
+    .footer-contact li {
+        align-items: center;
+    }
+
+    .footer-contact .icon {
+        margin-top: 0;
+    }
+
+    .checkbox {
+        min-height: 44px;
+        padding-block: 0.35rem;
+    }
+
+    .checkbox input {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-top: 0;
+    }
+}
+
+/* Móvil: ritmo vertical más compacto (en pantallas pequeñas, los márgenes de escritorio
+   obligan a desplazarse demasiado) y escenas fijas más cortas. */
+@media (max-width: 720px) {
+    .section {
+        padding-block: 4.25rem;
+    }
+
+    .section-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .tone {
+        height: 96px;
+    }
+
+    .gallery {
+        padding-block: 2rem 4.5rem;
+    }
+
+    .gallery__head {
+        margin-bottom: 2rem;
+    }
+
+    .js-scroll .villa-scene {
+        height: 300vh;
+    }
+}
+
+/* Móvil: menos espacio entre la cabecera de un artículo y su texto. */
+@media (max-width: 720px) {
+    .article {
+        padding-block: 2.5rem 4.5rem;
+    }
+}
+
+/* Sin subtítulo debajo (artículos), el título no necesita margen inferior. */
+.page-hero__title:last-child {
+    margin-bottom: 0;
+}
+
+/* Con el aviso de idioma abierto, «volver arriba» se coloca por encima de él. */
+.has-toast .back-to-top {
+    bottom: 6.25rem;
+}
+
+@media (max-width: 720px) {
+    .has-toast .back-to-top {
+        bottom: 8.5rem;
+    }
+}
+
+/* Menú del móvil abierto: botón de cita e idiomas con tamaño cómodo para el dedo. */
+@media (max-width: 1100px) {
+    .nav.is-open .nav__cta.btn--primary {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+
+    .nav .lang-switch a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding-inline: 1.1rem;
+    }
+}
+
+/* Móviles de 320 px: la marca y los huecos se ajustan para que quepan los botones de
+   ajustes y de menú (este último no puede encogerse: es la zona de toque). */
+@media (max-width: 359px) {
+    .site-header .container {
+        gap: 0.4rem;
+    }
+
+    .site-header .brand {
+        gap: 0.45rem;
+        font-size: 1.05rem;
+    }
+
+    .settings-toggle {
+        margin-right: 0;
     }
 }
