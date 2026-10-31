@@ -65,6 +65,7 @@
     --text: #f5f5f7;
     --text-2: #a1a1a6;
     --text-3: #86868b;
+    --text-inverse: #0b0b0d;                    /* texto sobre un círculo del color de --text */
     --nav-link: rgba(245, 245, 247, 0.78);
     --prose: #d2d2d7;
     --title-grad: linear-gradient(180deg, #ffffff 30%, #b9b9be 100%);
@@ -131,6 +132,7 @@
     --text: #1a1a1a;
     --text-2: #5f5648;
     --text-3: #6e6455;
+    --text-inverse: #f6f1e8;
     --nav-link: rgba(26, 26, 26, 0.72);
     --prose: #2e2923;
     --title-grad: linear-gradient(180deg, #1a1a1a 35%, #6b5c47 100%);
@@ -893,11 +895,14 @@ html[data-framed] body {
 /* Transición circular al cambiar de tema (View Transitions API) */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-    animation: none;
     mix-blend-mode: normal;
 }
 
-::view-transition-new(root) {
+html.is-theme-switch::view-transition-old(root) {
+    animation: none;
+}
+
+html.is-theme-switch::view-transition-new(root) {
     animation: theme-reveal 0.75s var(--ease);
 }
 
@@ -1753,18 +1758,34 @@ html[data-framed] body {
 /* Escena «Cómo trabajamos»: villa 3D al atardecer --------------------------- */
 /* Sección siempre oscura, en los dos temas, como una fotografía de arquitectura al
    anochecer. .dusk recupera los valores del tema oscuro dentro de la sección. */
-.dusk {
+.dusk,
+.night {
+    --bg: #08080b;
     --ink: 255, 255, 255;
+    --surface-1: rgba(255, 255, 255, 0.07);
+    --surface-2: rgba(255, 255, 255, 0.025);
     --glass: rgba(255, 255, 255, 0.06);
     --glass-2: rgba(255, 255, 255, 0.1);
     --chip: rgba(28, 26, 30, 0.5);
+    --chip-2: rgba(0, 0, 0, 0.45);
+    --highlight: rgba(255, 255, 255, 0.06);
     --stroke: rgba(255, 255, 255, 0.12);
     --stroke-2: rgba(255, 255, 255, 0.2);
+    --shadow-c: rgba(0, 0, 0, 0.85);
+    --media-a: #151517;
+    --media-b: #070708;
     --text: #f5f5f7;
     --text-2: #b8b3ab;
     --text-3: #8f8a83;
+    --text-inverse: #0b0b0d;
+    --prose: #d2d2d7;
+    --title-grad: linear-gradient(180deg, #ffffff 30%, #b9b9be 100%);
     --accent: #d9bd8f;
+    --accent-2: #f1dcb4;
     --accent-grad: linear-gradient(120deg, #f6e3be 0%, #d6b98a 45%, #b08d5d 100%);
+    --lg-fill: rgba(30, 30, 34, 0.5);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 32%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.16) 100%);
+    --lg-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     color: var(--text);
     color-scheme: dark;
 }
@@ -3274,6 +3295,7 @@ html[data-framed] body {
 .btn--glass,
 .btn--outline,
 .btn--outline-light,
+.btn--orb,
 .callout,
 .back-to-top,
 .split__quote,
@@ -3300,6 +3322,8 @@ html[data-framed] body {
 .btn--glass::after,
 .btn--outline::after,
 .btn--outline-light::after,
+.btn--orb::after,
+.gallery__btn::after,
 .callout::after,
 .back-to-top::after,
 .split__quote::after,
@@ -3337,6 +3361,475 @@ html[data-framed] body {
     font-style: italic;
     font-weight: 500;
     letter-spacing: -0.02em;
+}
+
+/* 7c. Piezas editoriales (inspiradas en webs de arquitectura de alto standing) -- */
+
+/* Botón de cápsula con una flecha dentro de un círculo */
+.btn--orb {
+    gap: 0.9rem;
+    padding: 0.4rem 0.4rem 0.4rem 1.35rem;
+    color: var(--text);
+}
+
+.btn__orb {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--text-inverse);
+    transition: transform 0.5s var(--ease);
+}
+
+.btn__orb .icon {
+    width: 1rem;
+    height: 1rem;
+    stroke-width: 2;
+}
+
+.btn--orb:hover .btn__orb,
+.btn--orb:focus-visible .btn__orb {
+    transform: rotate(45deg);
+}
+
+/* Franjas de transición de color entre secciones claras y oscuras, con un hilo dorado */
+.tone {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: clamp(140px, 24vh, 240px);
+}
+
+.tone--to-night {
+    background: linear-gradient(180deg, var(--bg) 0%, #07070c 100%);
+}
+
+.tone--to-day {
+    background: linear-gradient(180deg, #08080b 0%, var(--bg) 100%);
+}
+
+.tone::after {
+    content: "";
+    width: 1px;
+    height: 70%;
+    background: linear-gradient(180deg, transparent, rgba(199, 169, 125, 0.55), transparent);
+}
+
+/* Las secciones alternas se funden con las vecinas en lugar de cortar en seco */
+.section--alt {
+    background: linear-gradient(180deg, var(--bg) 0, var(--bg-2) 6rem, var(--bg-2) calc(100% - 6rem), var(--bg) 100%);
+}
+
+/* Cifras grandes en cursiva */
+.figures {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+    margin: 0 0 3rem;
+    padding-bottom: 2.25rem;
+    border-bottom: 1px solid var(--stroke);
+}
+
+.figure__value {
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 6.5vw, 5.4rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+}
+
+.figure__label {
+    max-width: 15rem;
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--text-2);
+}
+
+/* Paneles de servicios que se expanden (como galería de fotografías) */
+.panels {
+    display: flex;
+    gap: 1rem;
+    height: clamp(470px, 64vh, 600px);
+}
+
+.panel {
+    position: relative;
+    isolation: isolate;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 28px;
+    color: var(--text);
+    background: var(--panel-bg);
+    box-shadow: 0 40px 70px -40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: flex-grow 0.9s var(--ease), box-shadow var(--transition);
+}
+
+.panel--1 { --panel-bg: radial-gradient(70% 45% at 60% 82%, rgba(236, 160, 90, 0.5), transparent 70%), linear-gradient(180deg, #17142a 0%, #3b2a3c 48%, #9a643e 100%); }
+.panel--2 { --panel-bg: radial-gradient(70% 45% at 40% 82%, rgba(214, 170, 110, 0.45), transparent 70%), linear-gradient(180deg, #0d1822 0%, #213547 50%, #b78450 100%); }
+.panel--3 { --panel-bg: radial-gradient(70% 45% at 55% 80%, rgba(230, 180, 120, 0.4), transparent 70%), linear-gradient(180deg, #14110f 0%, #2e241b 50%, #87663f 100%); }
+.panel--4 { --panel-bg: radial-gradient(70% 45% at 45% 82%, rgba(200, 190, 130, 0.38), transparent 70%), linear-gradient(180deg, #0b1311 0%, #1d2b24 50%, #6f6d48 100%); }
+
+/* Legibilidad del texto sobre el fondo */
+.panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.panel .obj3d {
+    --u: clamp(20px, 2.2vw, 30px);
+    position: absolute;
+    inset: 0 0 38%;
+    height: auto;
+    margin: 0;
+}
+
+.panel__body {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 1.5rem 1.4rem 1.7rem;
+    transition: padding 0.8s var(--ease);
+}
+
+.panel__index {
+    margin-bottom: 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: rgba(245, 245, 247, 0.75);
+}
+
+/* Cerrado, el título es más pequeño para que quepa en el panel estrecho; al abrirse crece. */
+.panel__title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    transition: font-size 0.8s var(--ease);
+}
+
+.panel__more {
+    display: grid;
+    gap: 0.9rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.8s var(--ease), opacity 0.6s var(--ease), margin 0.8s var(--ease);
+}
+
+.panel__text {
+    max-width: 30rem;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 247, 0.82);
+}
+
+.panel__details {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: rgba(245, 245, 247, 0.62);
+}
+
+.panel .btn--orb {
+    justify-self: start;
+    --text: #f5f5f7;
+    --text-inverse: #0b0b0d;
+    --lg-fill: rgba(255, 255, 255, 0.14);
+}
+
+/* Panel abierto: el que tiene el cursor o el foco; si no hay ninguno, el primero. */
+.panel:hover,
+.panel:focus-within,
+.panels:not(:hover):not(:focus-within) .panel:first-child {
+    flex-grow: 2.7;
+}
+
+.panel:hover .panel__title,
+.panel:focus-within .panel__title,
+.panels:not(:hover):not(:focus-within) .panel:first-child .panel__title {
+    font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+}
+
+.panel:hover .panel__body,
+.panel:focus-within .panel__body,
+.panels:not(:hover):not(:focus-within) .panel:first-child .panel__body {
+    padding: 1.9rem 2rem 2rem;
+}
+
+.panel:hover .panel__more,
+.panel:focus-within .panel__more,
+.panels:not(:hover):not(:focus-within) .panel:first-child .panel__more {
+    max-height: 18rem;
+    margin-top: 1.1rem;
+    opacity: 1;
+}
+
+/* Galería horizontal del blog sobre fondo oscuro */
+.gallery {
+    position: relative;
+    padding-block: 3rem 6rem;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.gallery__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.gallery__title {
+    margin: 0 0 1rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.3rem, 4.8vw, 4rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+}
+
+.gallery__lead {
+    max-width: 34rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-2);
+}
+
+.gallery__nav {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.gallery__count {
+    margin-right: 0.6rem;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.12em;
+    color: var(--text-2);
+}
+
+.gallery__count span {
+    color: var(--text);
+}
+
+.gallery__btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: var(--text);
+    background: var(--lg-fill);
+    box-shadow: var(--lg-shadow);
+    -webkit-backdrop-filter: blur(22px) saturate(190%);
+    backdrop-filter: blur(22px) saturate(190%);
+    transition: opacity var(--transition), transform var(--transition);
+}
+
+.gallery__btn:hover {
+    transform: scale(1.06);
+}
+
+.gallery__btn[disabled] {
+    opacity: 0.35;
+    cursor: default;
+    transform: none;
+}
+
+.gallery__btn .icon {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.gallery__track {
+    --edge: max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter)));
+    display: flex;
+    gap: 1.25rem;
+    padding: 0.5rem var(--edge) 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--edge);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+}
+
+.gallery__track::-webkit-scrollbar {
+    display: none;
+}
+
+.gallery__track > .post-card {
+    flex: 0 0 min(360px, 80vw);
+    scroll-snap-align: start;
+}
+
+.gallery__foot {
+    margin-top: 2rem;
+}
+
+/* Entrada de la portada y de las cabeceras interiores: del desenfoque a la nitidez,
+   en cascada. Solo opacidad, desenfoque y desplazamiento de los hijos: el contenedor
+   conserva las transformaciones ligadas al scroll. */
+@keyframes intro {
+    from {
+        opacity: 0;
+        filter: blur(14px);
+        transform: translate3d(0, 26px, 0);
+    }
+}
+
+@keyframes intro-fade {
+    from {
+        opacity: 0;
+        filter: blur(18px);
+    }
+}
+
+.hero3d__copy > *,
+.page-hero .container > * {
+    animation: intro 1.2s var(--ease) backwards;
+}
+
+.hero3d__copy > :nth-child(2),
+.page-hero .container > :nth-child(2) { animation-delay: 0.1s; }
+.hero3d__copy > :nth-child(3),
+.page-hero .container > :nth-child(3) { animation-delay: 0.2s; }
+.hero3d__copy > :nth-child(4),
+.page-hero .container > :nth-child(4) { animation-delay: 0.3s; }
+
+.hero3d__stage {
+    animation: intro-fade 1.8s var(--ease) 0.25s backwards;
+}
+
+/* Transición suave entre páginas (View Transitions entre documentos): la página se
+   desvanece y la nueva aparece nítida; la cabecera se mantiene. El cambio de tema usa
+   su propio efecto circular (main.js añade .is-theme-switch durante el cambio). */
+@view-transition {
+    navigation: auto;
+}
+
+.site-header {
+    view-transition-name: site-header;
+}
+
+html.is-theme-switch .site-header {
+    view-transition-name: none;
+}
+
+html:not(.is-theme-switch)::view-transition-old(root) {
+    animation: page-out 0.32s var(--ease) both;
+}
+
+html:not(.is-theme-switch)::view-transition-new(root) {
+    animation: page-in 0.6s var(--ease) both;
+}
+
+@keyframes page-out {
+    to {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(0.985);
+    }
+}
+
+@keyframes page-in {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(1.012);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+}
+
+/* Paneles: en pantallas táctiles anchas, cuadrícula de 2 con todo visible; en el móvil, apilados. */
+@media (hover: none) and (min-width: 861px) {
+    .panels {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        height: auto;
+    }
+
+    .panel {
+        min-height: 0;
+    }
+}
+
+@media (hover: none), (max-width: 860px) {
+    /* El objeto 3D va encima del texto, sin superponerse. */
+    .panel .obj3d {
+        position: relative;
+        inset: auto;
+        height: 210px;
+    }
+
+    .panel .panel__body {
+        position: relative;
+        padding: 0 1.5rem 1.75rem;
+    }
+
+    .panel .panel__title {
+        font-size: clamp(1.9rem, 7vw, 2.4rem);
+    }
+
+    .panel .panel__more {
+        max-height: none;
+        margin-top: 1.1rem;
+        opacity: 1;
+    }
+}
+
+@media (max-width: 860px) {
+    .panels {
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* En columna, el tamaño lo da el contenido (con flex-basis 0 se quedarían sin altura). */
+    .panel {
+        flex: none;
+        min-height: 0;
+    }
+
+    .figures {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem 1.25rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.75rem;
+    }
+
+    .figure__value {
+        font-size: clamp(2.6rem, 12vw, 3.4rem);
+    }
+
+    .figure__label {
+        font-size: 0.8rem;
+    }
+
+    .gallery__head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 /* 8. Movimiento ------------------------------------------------------------ */

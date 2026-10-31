@@ -437,7 +437,9 @@ test("ninguna página se desborda horizontalmente en móvil, tableta ni escritor
             assert.ok(overflow <= 0, `${file} a ${width}px se desborda ${overflow}px`);
             /* Nada visible se sale por la derecha (aunque el desbordamiento esté oculto). */
             const outside = await page.evaluate(() => Array.from(document.querySelectorAll("header *, main a, main button, main input, main select"))
-                .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.closest(".nav:not(.is-open)") && !el.closest(".field--hp"))
+                .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.closest(".nav:not(.is-open)") && !el.closest(".field--hp") &&
+                    /* Las tarjetas de una galería horizontal quedan fuera a propósito: se deslizan. */
+                    !el.closest(".gallery__track"))
                 .filter((el) => el.getBoundingClientRect().right > document.documentElement.clientWidth + 0.5)
                 .map((el) => el.className || el.tagName));
             assert.deepEqual(outside, [], `${file} a ${width}px`);
@@ -492,6 +494,59 @@ test("la cabecera flota como cápsula al desplazar y se oscurece sobre la secci�
     await page.click(".nav-toggle");
     const nav = await page.locator("#menu-principal").boundingBox();
     assert.equal(Math.round(nav.width), 390);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("los paneles de servicios se expanden con el cursor y el foco", async () => {
+    const { page, errors, close } = await open("index.html");
+    const panels = page.locator(".panel");
+    assert.equal(await panels.count(), 4);
+    await page.locator(".panels").scrollIntoViewIfNeeded();
+    const width = (i) => panels.nth(i).evaluate((el) => el.getBoundingClientRect().width);
+    await page.waitForTimeout(1200);
+    assert.ok(await width(0) > await width(1) * 1.5, "sin cursor, el primer panel está abierto");
+    await panels.nth(2).hover();
+    await page.waitForTimeout(1200);
+    assert.ok(await width(2) > await width(0) * 1.5, "el panel con el cursor se abre");
+    /* Con el teclado: el enlace del cuarto panel lo abre. */
+    await page.mouse.move(5, 5);
+    await panels.nth(3).locator("a").focus();
+    await page.waitForTimeout(1200);
+    assert.ok(await width(3) > await width(0) * 1.5, "el panel con el foco se abre");
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("la galería del blog avanza con las flechas y actualiza el contador", async () => {
+    const { page, errors, close } = await open("index.html");
+    const gallery = page.locator(".gallery");
+    await gallery.scrollIntoViewIfNeeded();
+    assert.equal(await gallery.locator("[data-gallery-current]").textContent(), "01");
+    assert.equal(await gallery.locator("[data-gallery-prev]").isDisabled(), true);
+    await gallery.locator("[data-gallery-next]").click();
+    await page.waitForFunction(() => document.querySelector("[data-gallery-current]").textContent === "02");
+    assert.equal(await gallery.locator("[data-gallery-prev]").isDisabled(), false);
+    assert.ok(await gallery.locator(".post-card").count() >= 10);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("las cifras de la portada terminan en su valor real", async () => {
+    const { page, errors, close } = await open("index.html");
+    await page.locator(".figures").scrollIntoViewIfNeeded();
+    /* La cuenta empieza al aparecer y dura 1,4 s. */
+    await page.waitForTimeout(2500);
+    assert.deepEqual(await page.locator("[data-count]").allTextContents(), ["0", "4", "6", "3"]);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("el cambio de tema marca su transición y la retira al terminar", async () => {
+    const { page, errors, close } = await open("index.html");
+    await page.click(".theme-toggle");
+    await page.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "dark");
+    await page.waitForFunction(() => !document.documentElement.classList.contains("is-theme-switch"), null, { timeout: 4000 });
     assert.deepEqual(errors, []);
     await close();
 });

@@ -34,8 +34,8 @@
     <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/playfair-display-600-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="theme.js?v=246c3d7a12"></script>
-    <link rel="stylesheet" href="styles.min.css?v=d6446267dc">
-    <script src="main.min.js?v=71052545e5" defer></script>
+    <link rel="stylesheet" href="styles.min.css?v=2046ad1c49">
+    <script src="main.min.js?v=693d54700a" defer></script>
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "name": "Twins Real Estate", "slogan": "Because every new chapter deserves a place to call home.", "email": "twinsreagency@gmail.com", "sameAs": ["https://www.instagram.com/twins.real.estate.agency/"], "url": "https://twinsreagency.github.io/en-home.html", "logo": "https://twinsreagency.github.io/logo-icon.png", "image": "https://twinsreagency.github.io/og-image.jpg", "address": {"@type": "PostalAddress", "addressLocality": "Igualada", "addressRegion": "Catalunya", "addressCountry": "ES"}, "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"], "knowsLanguage": ["es", "ca", "en"]}</script>
 </head>
 <body>
@@ -212,6 +212,8 @@
             </div>
         </section>
 
+        <div class="tone tone--to-night" aria-hidden="true"></div>
+
         <section class="villa-scene dusk" data-scroll="sticky" data-steps="4" aria-labelledby="proceso-title">
             <div class="villa-scene__sticky">
                 <div class="villa-scene__sky" aria-hidden="true"><span></span></div>
@@ -271,12 +273,31 @@
                 </div>
             </div>
         </section>
+        <div class="tone tone--to-day" aria-hidden="true"></div>
 
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
                     <p class="eyebrow">About us</p>
                     <h2 class="visually-hidden" id="nosotros-title">About us</h2>
+                    <dl class="figures">
+                        <div class="figure">
+                            <dt class="figure__value">€<span class="figure__num" data-count="0">0</span></dt>
+                            <dd class="figure__label">Valuation of your property, free and with no obligation</dd>
+                        </div>
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="4">4</span></dt>
+                            <dd class="figure__label">Clear steps, from the first meeting to completion</dd>
+                        </div>
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="6">6</span></dt>
+                            <dd class="figure__label">Property services under one roof</dd>
+                        </div>
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="3">3</span></dt>
+                            <dd class="figure__label">Languages: English, Spanish and Catalan</dd>
+                        </div>
+                    </dl>
                     <p class="statement__text" data-words>Twins Real Estate was founded with a clear purpose: to make buying, selling or renting a home a secure, understandable process with no surprises. That is why we handle every transaction on a personal basis and with complete transparency.</p>
                 </div>
             </div>
@@ -315,37 +336,206 @@
                     <p class="section-lead">A complete service for owners, buyers, tenants and investors, with the same high standards in every task.</p>
                     <div class="divider"></div>
                 </header>
-                <div class="bento">
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg></div>
-                    <h3 class="feature__title">Property sales and purchases</h3>
-                    <p class="feature__text">We guide you through the sale or purchase of your property, from the initial valuation to the signing of the title deed.</p>
-                    <p class="feature__more"><a class="link-arrow" href="en-services.html#compraventa">Learn more <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> about property sales and purchases</span></a></p>
-                </article>
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
-                    <h3 class="feature__title">Residential lettings</h3>
-                    <p class="feature__text">We select the right tenant through a rigorous process and draw up a tenancy agreement in accordance with the Spanish Urban Leases Act.</p>
-                    <p class="feature__more"><a class="link-arrow" href="en-services.html#alquiler">Learn more <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> about residential lettings</span></a></p>
-                </article>
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/></svg></div>
-                    <h3 class="feature__title">Full rental management</h3>
-                    <p class="feature__text">We manage your property so that you earn a return without having to deal with the day-to-day.</p>
-                    <p class="feature__more"><a class="link-arrow" href="en-services.html#gestion-alquileres">Learn more <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> about full rental management</span></a></p>
-                </article>
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></div>
-                    <h3 class="feature__title">Investment advice</h3>
-                    <p class="feature__text">We identify opportunities and assess their return using objective criteria tailored to your profile.</p>
-                    <p class="feature__more"><a class="link-arrow" href="en-services.html#inversion">Learn more <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> about investment advice</span></a></p>
-                </article>
+                <div class="panels reveal">
+                    <article class="panel panel--1 night">
+            <div class="obj3d obj3d--sale" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="floor"></span><span class="box box--house"><span class="face face--front"><span class="window"><i></i><i></i><i></i><i></i></span></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span><span class="sign"><span class="sign__post"></span><span class="sign__board"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg></span></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">01 —</p>
+                            <h3 class="panel__title">Property sales and purchases</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">We guide you through the sale or purchase of your property, from the initial valuation to the signing of the title deed.</p>
+                                <p class="panel__details">Market study and pricing · Professional photography and marketing · Viewings and negotiation</p>
+                                <a class="btn btn--orb" href="en-services.html#compraventa">Learn more<span class="visually-hidden"> about property sales and purchases</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="panel panel--2 night">
+            <div class="obj3d obj3d--house" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="box box--house"><span class="face face--front"><span class="window"><i></i><i></i><i></i><i></i></span></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">02 —</p>
+                            <h3 class="panel__title">Residential lettings</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">We select the right tenant through a rigorous process and draw up a tenancy agreement in accordance with the Spanish Urban Leases Act.</p>
+                                <p class="panel__details">Tenant referencing and solvency checks · Drafting and review of the agreement · Lodging the deposit with the regional authority</p>
+                                <a class="btn btn--orb" href="en-services.html#alquiler">Learn more<span class="visually-hidden"> about residential lettings</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="panel panel--3 night">
+            <div class="obj3d obj3d--pages" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="sheet sheet--1"></span><span class="sheet sheet--2"></span><span class="sheet sheet--3"></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">03 —</p>
+                            <h3 class="panel__title">Full rental management</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">We manage your property so that you earn a return without having to deal with the day-to-day.</p>
+                                <p class="panel__details">Rent collection and arrears monitoring · Coordination of repairs and maintenance · Tenant liaison</p>
+                                <a class="btn btn--orb" href="en-services.html#gestion-alquileres">Learn more<span class="visually-hidden"> about full rental management</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="panel panel--4 night">
+            <div class="obj3d obj3d--twins" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="box box--tower"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span></span><span class="box box--tower-b"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">04 —</p>
+                            <h3 class="panel__title">Investment advice</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">We identify opportunities and assess their return using objective criteria tailored to your profile.</p>
+                                <p class="panel__details">Gross and net yield analysis · Study of the area and demand · Selection of assets to match your goals</p>
+                                <a class="btn btn--orb" href="en-services.html#inversion">Learn more<span class="visually-hidden"> about investment advice</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
                 </div>
                 <div class="section-footer">
                     <a class="btn btn--outline" href="en-services.html">View all services <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 </div>
             </div>
         </section>
+
+        <div class="tone tone--to-night" aria-hidden="true"></div>
+
+        <section class="gallery dusk" aria-labelledby="blog-home-title">
+            <div class="container">
+                <div class="gallery__head reveal">
+                    <div>
+                        <span class="eyebrow">Blog</span>
+                        <h2 class="gallery__title" id="blog-home-title">Blog and property news</h2>
+                        <p class="gallery__lead">Practical guides, market analysis and advice to help you make informed property decisions.</p>
+                    </div>
+                    <div class="gallery__nav">
+                        <p class="gallery__count" aria-hidden="true"><span data-gallery-current>01</span> / 10</p>
+                        <button class="gallery__btn" type="button" data-gallery-prev aria-label="Previous" aria-controls="galeria-blog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+                        <button class="gallery__btn" type="button" data-gallery-next aria-label="Next" aria-controls="galeria-blog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery__track" id="galeria-blog" role="region" aria-label="Articles" tabindex="0">
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17 6.5A7 7 0 1 0 17 17.5"/><path d="M4 10h9M4 14h9"/></svg>
+                        <span class="post-card__category">Tax</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-10-07">7 October 2026</time><span aria-hidden="true">·</span><span>7 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-costs-taxes-selling-flat-catalonia.html">Costs and taxes when selling a flat in Catalonia</a></h3>
+                        <p class="post-card__excerpt">Municipal capital gains tax, income tax, mortgage cancellation and other costs: what to plan for before putting your home on the market.</p>
+                        <a class="link-arrow" href="en-blog-costs-taxes-selling-flat-catalonia.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+                        <span class="post-card__category">Legal</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-10-07">7 October 2026</time><span aria-hidden="true">·</span><span>6 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-documents-selling-home.html">The documents you need to sell your home</a></h3>
+                        <p class="post-card__excerpt">Title deeds, land registry extract, energy certificate, certificate of occupancy and other documents worth gathering before advertising the sale.</p>
+                        <a class="link-arrow" href="en-blog-documents-selling-home.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+                        <span class="post-card__category">Selling</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-10-07">7 October 2026</time><span aria-hidden="true">·</span><span>5 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-prepare-home-for-sale.html">How to prepare your home to sell it sooner</a></h3>
+                        <p class="post-card__excerpt">Tidiness, minor repairs, good light and a realistic price: practical advice to help your home attract buyers from day one.</p>
+                        <a class="link-arrow" href="en-blog-prepare-home-for-sale.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
+                        <span class="post-card__category">Market</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-15">15 January 2026</time><span aria-hidden="true">·</span><span>6 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-buy-or-rent-in-2026.html">Buying or renting a home in 2026? Key factors to decide</a></h3>
+                        <p class="post-card__excerpt">How long you plan to stay, available savings, interest rates and flexibility: the factors worth analysing before making a decision.</p>
+                        <a class="link-arrow" href="en-blog-buy-or-rent-in-2026.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+                        <span class="post-card__category">Investment</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-12">12 January 2026</time><span aria-hidden="true">·</span><span>5 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-signs-area-value-growth.html">Five signs that an area is set to increase in value</a></h3>
+                        <p class="post-card__excerpt">Learn to identify the indicators that often anticipate rising property values in a neighbourhood.</p>
+                        <a class="link-arrow" href="en-blog-signs-area-value-growth.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+                        <span class="post-card__category">Guides</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-08">8 January 2026</time><span aria-hidden="true">·</span><span>7 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-first-home-buying-guide.html">A guide to buying your first home</a></h3>
+                        <p class="post-card__excerpt">From budget to signing before a notary: the steps, documents and checks you should not overlook.</p>
+                        <a class="link-arrow" href="en-blog-first-home-buying-guide.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg>
+                        <span class="post-card__category">Lettings</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-02">2 January 2026</time><span aria-hidden="true">·</span><span>5 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-prepare-home-for-rent.html">How to prepare your home to let it faster</a></h3>
+                        <p class="post-card__excerpt">Small improvements, good presentation and a realistic price make all the difference in attracting good tenants.</p>
+                        <a class="link-arrow" href="en-blog-prepare-home-for-rent.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <span class="post-card__category">Legal</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2025-12-28">28 December 2025</time><span aria-hidden="true">·</span><span>6 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-deposit-contract-checklist.html">What to check before signing a deposit contract</a></h3>
+                        <p class="post-card__excerpt">The essential points to verify before committing to the purchase or sale of a property in Spain.</p>
+                        <a class="link-arrow" href="en-blog-deposit-contract-checklist.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 13a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 18v2M19 18v2"/></svg>
+                        <span class="post-card__category">Design</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2025-12-20">20 December 2025</time><span aria-hidden="true">·</span><span>4 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-interior-design-trends-2026.html">Interior design trends for 2026</a></h3>
+                        <p class="post-card__excerpt">Natural materials, flexible spaces and energy efficiency: the keys that define this year’s homes.</p>
+                        <a class="link-arrow" href="en-blog-interior-design-trends-2026.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17 6.5A7 7 0 1 0 17 17.5"/><path d="M4 10h9M4 14h9"/></svg>
+                        <span class="post-card__category">Financing</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2025-12-14">14 December 2025</time><span aria-hidden="true">·</span><span>6 min read</span></p>
+                        <h3 class="post-card__title"><a href="en-blog-mortgage-myths.html">Mortgages: five myths worth dispelling</a></h3>
+                        <p class="post-card__excerpt">We clarify some of the most widespread —and not always accurate— ideas about home financing in Spain.</p>
+                        <a class="link-arrow" href="en-blog-mortgage-myths.html" aria-hidden="true" tabindex="-1">Read article <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+            </div>
+            <div class="container gallery__foot">
+                <a class="btn btn--orb" href="en-blog.html">See all articles<span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+            </div>
+        </section>
+        <div class="tone tone--to-day" aria-hidden="true"></div>
 
         <section class="section section--alt sell" aria-labelledby="vender-title" data-scroll="view">
             <div class="container split">

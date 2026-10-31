@@ -34,8 +34,8 @@
     <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/playfair-display-600-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="theme.js?v=246c3d7a12"></script>
-    <link rel="stylesheet" href="styles.min.css?v=d6446267dc">
-    <script src="main.min.js?v=71052545e5" defer></script>
+    <link rel="stylesheet" href="styles.min.css?v=2046ad1c49">
+    <script src="main.min.js?v=693d54700a" defer></script>
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "name": "Twins Real Estate", "slogan": "Porque cada nueva etapa merece un lugar al que llamar hogar.", "email": "twinsreagency@gmail.com", "sameAs": ["https://www.instagram.com/twins.real.estate.agency/"], "url": "https://twinsreagency.github.io/", "logo": "https://twinsreagency.github.io/logo-icon.png", "image": "https://twinsreagency.github.io/og-image.jpg", "address": {"@type": "PostalAddress", "addressLocality": "Igualada", "addressRegion": "Catalunya", "addressCountry": "ES"}, "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"], "knowsLanguage": ["es", "ca", "en"]}</script>
 </head>
 <body>
@@ -212,6 +212,8 @@
             </div>
         </section>
 
+        <div class="tone tone--to-night" aria-hidden="true"></div>
+
         <section class="villa-scene dusk" data-scroll="sticky" data-steps="4" aria-labelledby="proceso-title">
             <div class="villa-scene__sticky">
                 <div class="villa-scene__sky" aria-hidden="true"><span></span></div>
@@ -271,12 +273,31 @@
                 </div>
             </div>
         </section>
+        <div class="tone tone--to-day" aria-hidden="true"></div>
 
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
                     <p class="eyebrow">Quiénes somos</p>
                     <h2 class="visually-hidden" id="nosotros-title">Quiénes somos</h2>
+                    <dl class="figures">
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="0">0</span> €</dt>
+                            <dd class="figure__label">Valoración de su inmueble, gratuita y sin compromiso</dd>
+                        </div>
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="4">4</span></dt>
+                            <dd class="figure__label">Pasos claros, de la primera reunión a la firma</dd>
+                        </div>
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="6">6</span></dt>
+                            <dd class="figure__label">Servicios inmobiliarios en una sola agencia</dd>
+                        </div>
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num" data-count="3">3</span></dt>
+                            <dd class="figure__label">Idiomas de atención: castellano, catalán e inglés</dd>
+                        </div>
+                    </dl>
                     <p class="statement__text" data-words>Twins Real Estate nace con un propósito claro: que comprar, vender o alquilar una vivienda sea un proceso seguro, comprensible y sin sorpresas. Por ello, gestionamos cada operación de forma personalizada y con la máxima transparencia.</p>
                 </div>
             </div>
@@ -315,37 +336,206 @@
                     <p class="section-lead">Un servicio completo para propietarios, compradores, inquilinos e inversores, con el mismo nivel de exigencia en cada gestión.</p>
                     <div class="divider"></div>
                 </header>
-                <div class="bento">
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg></div>
-                    <h3 class="feature__title">Compraventa de inmuebles</h3>
-                    <p class="feature__text">Le acompañamos en la venta o la adquisición de su inmueble, desde la valoración inicial hasta la firma de la escritura.</p>
-                    <p class="feature__more"><a class="link-arrow" href="es-servicios.html#compraventa">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre compraventa de inmuebles</span></a></p>
-                </article>
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
-                    <h3 class="feature__title">Alquiler de viviendas</h3>
-                    <p class="feature__text">Seleccionamos al inquilino adecuado mediante un proceso riguroso y formalizamos un contrato conforme a la Ley de Arrendamientos Urbanos.</p>
-                    <p class="feature__more"><a class="link-arrow" href="es-servicios.html#alquiler">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre alquiler de viviendas</span></a></p>
-                </article>
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3h6v1"/><path d="M9 11h6M9 15h4"/></svg></div>
-                    <h3 class="feature__title">Gestión integral de alquileres</h3>
-                    <p class="feature__text">Administramos su inmueble para que obtenga rentabilidad sin tener que ocuparse del día a día.</p>
-                    <p class="feature__more"><a class="link-arrow" href="es-servicios.html#gestion-alquileres">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre gestión integral de alquileres</span></a></p>
-                </article>
-                <article class="card feature reveal tilt">
-                    <div class="feature__icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></div>
-                    <h3 class="feature__title">Asesoramiento para inversión</h3>
-                    <p class="feature__text">Identificamos oportunidades y analizamos su rentabilidad con criterios objetivos y adaptados a su perfil.</p>
-                    <p class="feature__more"><a class="link-arrow" href="es-servicios.html#inversion">Más información <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="visually-hidden"> sobre asesoramiento para inversión</span></a></p>
-                </article>
+                <div class="panels reveal">
+                    <article class="panel panel--1 night">
+            <div class="obj3d obj3d--sale" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="floor"></span><span class="box box--house"><span class="face face--front"><span class="window"><i></i><i></i><i></i><i></i></span></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span><span class="sign"><span class="sign__post"></span><span class="sign__board"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg></span></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">01 —</p>
+                            <h3 class="panel__title">Compraventa de inmuebles</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">Le acompañamos en la venta o la adquisición de su inmueble, desde la valoración inicial hasta la firma de la escritura.</p>
+                                <p class="panel__details">Estudio de mercado y fijación del precio · Reportaje fotográfico y difusión del inmueble · Gestión de visitas y negociación</p>
+                                <a class="btn btn--orb" href="es-servicios.html#compraventa">Más información<span class="visually-hidden"> sobre compraventa de inmuebles</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="panel panel--2 night">
+            <div class="obj3d obj3d--house" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="box box--house"><span class="face face--front"><span class="window"><i></i><i></i><i></i><i></i></span></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="gable gable--front"></span><span class="gable gable--back"></span><span class="slope slope--left"></span><span class="slope slope--right"></span></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">02 —</p>
+                            <h3 class="panel__title">Alquiler de viviendas</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">Seleccionamos al inquilino adecuado mediante un proceso riguroso y formalizamos un contrato conforme a la Ley de Arrendamientos Urbanos.</p>
+                                <p class="panel__details">Análisis de solvencia de los candidatos · Redacción y revisión del contrato · Depósito de la fianza ante el organismo autonómico</p>
+                                <a class="btn btn--orb" href="es-servicios.html#alquiler">Más información<span class="visually-hidden"> sobre alquiler de viviendas</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="panel panel--3 night">
+            <div class="obj3d obj3d--pages" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="sheet sheet--1"></span><span class="sheet sheet--2"></span><span class="sheet sheet--3"></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">03 —</p>
+                            <h3 class="panel__title">Gestión integral de alquileres</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">Administramos su inmueble para que obtenga rentabilidad sin tener que ocuparse del día a día.</p>
+                                <p class="panel__details">Cobro de rentas y seguimiento de impagos · Coordinación de reparaciones y mantenimiento · Atención a los inquilinos</p>
+                                <a class="btn btn--orb" href="es-servicios.html#gestion-alquileres">Más información<span class="visually-hidden"> sobre gestión integral de alquileres</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="panel panel--4 night">
+            <div class="obj3d obj3d--twins" aria-hidden="true"><span class="obj3d__glow"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="box box--tower"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span></span><span class="box box--tower-b"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span></span></div></div></div>
+                        <div class="panel__body">
+                            <p class="panel__index">04 —</p>
+                            <h3 class="panel__title">Asesoramiento para inversión</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">Identificamos oportunidades y analizamos su rentabilidad con criterios objetivos y adaptados a su perfil.</p>
+                                <p class="panel__details">Análisis de rentabilidad bruta y neta · Estudio de la zona y de la demanda · Selección de activos según sus objetivos</p>
+                                <a class="btn btn--orb" href="es-servicios.html#inversion">Más información<span class="visually-hidden"> sobre asesoramiento para inversión</span><span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+                            </div>
+                        </div>
+                    </article>
                 </div>
                 <div class="section-footer">
                     <a class="btn btn--outline" href="es-servicios.html">Ver todos los servicios <svg class="icon icon-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
                 </div>
             </div>
         </section>
+
+        <div class="tone tone--to-night" aria-hidden="true"></div>
+
+        <section class="gallery dusk" aria-labelledby="blog-home-title">
+            <div class="container">
+                <div class="gallery__head reveal">
+                    <div>
+                        <span class="eyebrow">Blog</span>
+                        <h2 class="gallery__title" id="blog-home-title">Blog y actualidad inmobiliaria</h2>
+                        <p class="gallery__lead">Guías prácticas, análisis de mercado y consejos para tomar decisiones inmobiliarias con criterio.</p>
+                    </div>
+                    <div class="gallery__nav">
+                        <p class="gallery__count" aria-hidden="true"><span data-gallery-current>01</span> / 10</p>
+                        <button class="gallery__btn" type="button" data-gallery-prev aria-label="Anterior" aria-controls="galeria-blog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+                        <button class="gallery__btn" type="button" data-gallery-next aria-label="Siguiente" aria-controls="galeria-blog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery__track" id="galeria-blog" role="region" aria-label="Artículos" tabindex="0">
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17 6.5A7 7 0 1 0 17 17.5"/><path d="M4 10h9M4 14h9"/></svg>
+                        <span class="post-card__category">Fiscalidad</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-10-07">7 de octubre de 2026</time><span aria-hidden="true">·</span><span>7 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-gastos-impuestos-vender-piso-cataluna.html">Gastos e impuestos al vender un piso en Cataluña</a></h3>
+                        <p class="post-card__excerpt">Plusvalía municipal, IRPF, cancelación de la hipoteca y otros gastos: lo que conviene prever antes de poner su vivienda a la venta.</p>
+                        <a class="link-arrow" href="es-blog-gastos-impuestos-vender-piso-cataluna.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+                        <span class="post-card__category">Legal</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-10-07">7 de octubre de 2026</time><span aria-hidden="true">·</span><span>6 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-documentos-vender-vivienda.html">Documentos que necesita para vender su vivienda</a></h3>
+                        <p class="post-card__excerpt">Escritura, nota simple, certificado energético, cédula de habitabilidad y otros documentos que conviene reunir antes de anunciar la venta.</p>
+                        <a class="link-arrow" href="es-blog-documentos-vender-vivienda.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+                        <span class="post-card__category">Venta</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-10-07">7 de octubre de 2026</time><span aria-hidden="true">·</span><span>5 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-preparar-vivienda-vender.html">Cómo preparar su vivienda para venderla antes</a></h3>
+                        <p class="post-card__excerpt">Orden, pequeñas reparaciones, buena luz y un precio realista: consejos prácticos para que su vivienda atraiga compradores desde el primer día.</p>
+                        <a class="link-arrow" href="es-blog-preparar-vivienda-vender.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
+                        <span class="post-card__category">Mercado</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-15">15 de enero de 2026</time><span aria-hidden="true">·</span><span>6 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-comprar-o-alquilar-en-2026.html">¿Comprar o alquilar vivienda en 2026? Claves para decidir</a></h3>
+                        <p class="post-card__excerpt">Horizonte de permanencia, ahorro disponible, tipos de interés y flexibilidad: los factores que conviene analizar antes de tomar una decisión.</p>
+                        <a class="link-arrow" href="es-blog-comprar-o-alquilar-en-2026.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+                        <span class="post-card__category">Inversión</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-12">12 de enero de 2026</time><span aria-hidden="true">·</span><span>5 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-senales-revalorizacion-zona.html">Cinco señales de que una zona va a revalorizarse</a></h3>
+                        <p class="post-card__excerpt">Aprenda a identificar los indicadores que suelen anticipar el crecimiento del valor de los inmuebles en un barrio.</p>
+                        <a class="link-arrow" href="es-blog-senales-revalorizacion-zona.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+                        <span class="post-card__category">Guías</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-08">8 de enero de 2026</time><span aria-hidden="true">·</span><span>7 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-guia-primera-vivienda.html">Guía para comprar su primera vivienda</a></h3>
+                        <p class="post-card__excerpt">Del presupuesto a la firma ante notario: los pasos, los documentos y las comprobaciones que no debe pasar por alto.</p>
+                        <a class="link-arrow" href="es-blog-guia-primera-vivienda.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2"/><path d="m16 6 2 2"/><path d="m14 8 2 2"/></svg>
+                        <span class="post-card__category">Alquiler</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2026-01-02">2 de enero de 2026</time><span aria-hidden="true">·</span><span>5 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-preparar-vivienda-alquiler.html">Cómo preparar su vivienda para alquilarla antes</a></h3>
+                        <p class="post-card__excerpt">Pequeñas mejoras, una buena presentación y un precio ajustado marcan la diferencia a la hora de atraer a buenos inquilinos.</p>
+                        <a class="link-arrow" href="es-blog-preparar-vivienda-alquiler.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+                        <span class="post-card__category">Legal</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2025-12-28">28 de diciembre de 2025</time><span aria-hidden="true">·</span><span>6 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-que-revisar-contrato-arras.html">Qué revisar antes de firmar un contrato de arras</a></h3>
+                        <p class="post-card__excerpt">Los elementos esenciales que debe comprobar antes de comprometerse en la compra o la venta de un inmueble.</p>
+                        <a class="link-arrow" href="es-blog-que-revisar-contrato-arras.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 13a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2z"/><path d="M5 18v2M19 18v2"/></svg>
+                        <span class="post-card__category">Diseño</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2025-12-20">20 de diciembre de 2025</time><span aria-hidden="true">·</span><span>4 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-tendencias-interiorismo-2026.html">Tendencias de interiorismo para 2026</a></h3>
+                        <p class="post-card__excerpt">Materiales naturales, espacios flexibles y eficiencia energética: las claves que definen los hogares de este año.</p>
+                        <a class="link-arrow" href="es-blog-tendencias-interiorismo-2026.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+                <article class="card post-card reveal tilt">
+                    <div class="post-card__media">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17 6.5A7 7 0 1 0 17 17.5"/><path d="M4 10h9M4 14h9"/></svg>
+                        <span class="post-card__category">Financiación</span>
+                    </div>
+                    <div class="post-card__body">
+                        <p class="post-meta"><time datetime="2025-12-14">14 de diciembre de 2025</time><span aria-hidden="true">·</span><span>6 min de lectura</span></p>
+                        <h3 class="post-card__title"><a href="es-blog-mitos-hipoteca.html">Hipotecas: cinco mitos que conviene desterrar</a></h3>
+                        <p class="post-card__excerpt">Aclaramos algunas de las ideas más extendidas —y no siempre ciertas— sobre la financiación de la vivienda.</p>
+                        <a class="link-arrow" href="es-blog-mitos-hipoteca.html" aria-hidden="true" tabindex="-1">Leer artículo <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </article>
+            </div>
+            <div class="container gallery__foot">
+                <a class="btn btn--orb" href="es-blog.html">Ver todos los artículos<span class="btn__orb" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></a>
+            </div>
+        </section>
+        <div class="tone tone--to-day" aria-hidden="true"></div>
 
         <section class="section section--alt sell" aria-labelledby="vender-title" data-scroll="view">
             <div class="container split">

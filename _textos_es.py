@@ -58,6 +58,8 @@ C = {
         "updated_date": "7 de octubre de 2026",
         "theme_to_light": "Cambiar a tema claro",
         "theme_to_dark": "Cambiar a tema oscuro",
+        "prev": "Anterior",
+        "next": "Siguiente",
         "scroll_hint": "Deslice para descubrir",
         "og_image_alt": "Twins Real Estate: compraventa, alquiler y valoración de inmuebles",
         "commitments_title": "Nuestros compromisos",
@@ -251,6 +253,14 @@ C = {
         ],
         "about_btn": "Conozca nuestra agencia",
         "quote": "Sin compromiso, con toda la confianza.",
+        # Cifras de la portada (prefijo, número, sufijo, explicación). Solo datos reales.
+        "figures": [
+            ("", "0", " €", "Valoración de su inmueble, gratuita y sin compromiso"),
+            ("", "4", "", "Pasos claros, de la primera reunión a la firma"),
+            ("", "6", "", "Servicios inmobiliarios en una sola agencia"),
+            ("", "3", "", "Idiomas de atención: castellano, catalán e inglés"),
+        ],
+        "blog_all": "Ver todos los artículos",
         "services_eyebrow": "Servicios",
         "services_title": "Soluciones inmobiliarias integrales",
         "services_lead": "Un servicio completo para propietarios, compradores, inquilinos e inversores, con el mismo nivel de exigencia en cada gestión.",

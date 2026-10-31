@@ -312,6 +312,8 @@
             var y = event.clientY || rect.top + rect.height / 2;
             root.style.setProperty("--vt-x", x + "px");
             root.style.setProperty("--vt-y", y + "px");
+            /* Distingue el cambio de tema (círculo) de la transición entre páginas (fundido). */
+            root.classList.add("is-theme-switch");
             var transition = document.startViewTransition(function () {
                 apply(next);
             });
@@ -319,7 +321,9 @@
             transition.ready.catch(function () {
                 apply(next);
             });
-            transition.finished.catch(function () {});
+            transition.finished.catch(function () {}).then(function () {
+                root.classList.remove("is-theme-switch");
+            });
         });
     }
 
@@ -820,6 +824,84 @@
 
     /* Año actual en el pie ----------------------------------------------- */
 
+    /* Cifras que cuentan hacia arriba al aparecer ---------------------------- */
+
+    function initCounters() {
+        var numbers = $$("[data-count]");
+        if (!numbers.length || REDUCED_MOTION || !("IntersectionObserver" in window)) return;
+
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                observer.unobserve(entry.target);
+                var node = entry.target;
+                var target = Number(node.getAttribute("data-count"));
+                if (!target) return;
+                var start = null;
+                node.textContent = "0";
+
+                function step(time) {
+                    if (start === null) start = time;
+                    var t = Math.min(1, (time - start) / 1400);
+                    node.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+                    if (t < 1) window.requestAnimationFrame(step);
+                }
+
+                window.requestAnimationFrame(step);
+            });
+        }, { threshold: 0.6 });
+
+        numbers.forEach(function (node) {
+            observer.observe(node);
+        });
+    }
+
+    /* Galería horizontal: flechas, contador «01 / 10» y estado de los botones ---- */
+
+    function initGalleries() {
+        $$(".gallery").forEach(function (gallery) {
+            var track = $(".gallery__track", gallery);
+            var prev = $("[data-gallery-prev]", gallery);
+            var next = $("[data-gallery-next]", gallery);
+            var current = $("[data-gallery-current]", gallery);
+            if (!track || !prev || !next) return;
+            var cards = Array.prototype.slice.call(track.children);
+            var ticking = false;
+
+            function stepWidth() {
+                return cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+            }
+
+            function update() {
+                var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+                var index = atEnd ? cards.length - 1 : Math.round(track.scrollLeft / Math.max(1, stepWidth()));
+                if (current) current.textContent = String(Math.min(cards.length, index + 1)).padStart(2, "0");
+                prev.disabled = track.scrollLeft <= 2;
+                next.disabled = atEnd;
+                ticking = false;
+            }
+
+            function go(direction) {
+                track.scrollBy({ left: direction * stepWidth(), behavior: REDUCED_MOTION ? "auto" : "smooth" });
+            }
+
+            prev.addEventListener("click", function () {
+                go(-1);
+            });
+            next.addEventListener("click", function () {
+                go(1);
+            });
+            track.addEventListener("scroll", function () {
+                if (!ticking) {
+                    window.requestAnimationFrame(update);
+                    ticking = true;
+                }
+            }, { passive: true });
+            window.addEventListener("resize", update);
+            update();
+        });
+    }
+
     function initYear() {
         $$("[data-year]").forEach(function (node) {
             node.textContent = String(new Date().getFullYear());
@@ -840,5 +922,7 @@
     initLocalityPreset(); /* antes del filtro, que reescribe la URL */
     initPropertyFilter();
     initLeadForms();
+    initCounters();
+    initGalleries();
     initYear();
 })();
