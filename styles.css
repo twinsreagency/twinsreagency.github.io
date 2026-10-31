@@ -237,6 +237,11 @@ h4 {
 }
 
 /* 3. Utilidades ------------------------------------------------------------ */
+/* Página cargada dentro de un marco de otra web (ver theme.js): no se muestra. */
+html[data-framed] body {
+    display: none !important;
+}
+
 .container {
     width: 100%;
     max-width: var(--container);

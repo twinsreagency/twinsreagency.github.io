@@ -107,17 +107,51 @@ test("la CSP bloquea el código en línea y los recursos de otros dominios", asy
         const blocked = [];
         document.addEventListener("securitypolicyviolation", (e) => blocked.push(e.violatedDirective));
         const script = document.createElement("script");
-        script.textContent = "window.__inline = true;";
-        document.body.appendChild(script);
+        try {
+            script.textContent = "window.__inline = true;";
+            document.body.appendChild(script);
+        } catch (error) {
+            /* Trusted Types rechaza el código antes incluso de que lo vea script-src. */
+            blocked.push("trusted-types:" + error.name);
+        }
         const img = document.createElement("img");
         img.src = "https://example.com/pixel.png";
         document.body.appendChild(img);
         setTimeout(() => resolve({ inline: Boolean(window.__inline), blocked }), 300);
     }));
     assert.equal(result.inline, false);
-    assert.ok(result.blocked.some((d) => d.startsWith("script-src")), JSON.stringify(result.blocked));
+    assert.ok(result.blocked.some((d) => d.startsWith("script-src") || d.startsWith("trusted-types") ||
+        d === "require-trusted-types-for"), JSON.stringify(result.blocked));
     assert.ok(result.blocked.some((d) => d.startsWith("img-src")), JSON.stringify(result.blocked));
     await close();
+});
+
+test("Trusted Types impide escribir HTML desde JavaScript", async () => {
+    const { page, errors, close } = await open("index.html");
+    const result = await page.evaluate(() => {
+        try {
+            document.body.insertAdjacentHTML("beforeend", "<img src=x>");
+            return "permitido";
+        } catch (error) {
+            return error.name;
+        }
+    });
+    assert.equal(result, "TypeError");
+    assert.deepEqual(errors.filter((e) => !/Trusted/i.test(e)), []);
+    await close();
+});
+
+test("otra web no puede mostrar la página dentro de un marco", async () => {
+    /* Una página en blanco, ajena al sitio, que intenta mostrar la portada en un marco. */
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const target = url("index.html");
+    await page.setContent(`<iframe src="${target}" width="800" height="600"></iframe>`);
+    await page.waitForTimeout(1000);
+    const framed = page.frames().find((f) => f.url() === target);
+    assert.ok(framed, "la página debía cargarse dentro del marco");
+    assert.equal(await framed.evaluate(() => getComputedStyle(document.body).display), "none");
+    await context.close();
 });
 
 test("sin inmuebles publicados, la web invita a crear una alerta y a vender", async () => {

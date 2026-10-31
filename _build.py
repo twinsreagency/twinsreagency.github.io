@@ -97,7 +97,12 @@ def csp(meta=True):
     service = f" {urlparse(endpoint).scheme}://{urlparse(endpoint).netloc}" if endpoint else ""
     rules = ["default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self' data:",
              "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
-             "base-uri 'self'", "object-src 'none'"]
+             "base-uri 'self'", "object-src 'none'",
+             # Lo que el sitio no usa, cerrado de forma explícita.
+             "frame-src 'none'", "worker-src 'none'", "media-src 'none'", "manifest-src 'none'",
+             # Trusted Types: el navegador rechaza cualquier intento de escribir HTML o
+             # código desde JavaScript (innerHTML, eval…). main.js solo usa textContent.
+             "require-trusted-types-for 'script'", "trusted-types 'none'"]
     if not meta:
         rules += ["frame-ancestors 'none'", "upgrade-insecure-requests"]
     return "; ".join(rules)
