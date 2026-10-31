@@ -107,17 +107,51 @@ test("la CSP bloquea el código en línea y los recursos de otros dominios", asy
         const blocked = [];
         document.addEventListener("securitypolicyviolation", (e) => blocked.push(e.violatedDirective));
         const script = document.createElement("script");
-        script.textContent = "window.__inline = true;";
-        document.body.appendChild(script);
+        try {
+            script.textContent = "window.__inline = true;";
+            document.body.appendChild(script);
+        } catch (error) {
+            /* Trusted Types rechaza el código antes incluso de que lo vea script-src. */
+            blocked.push("trusted-types:" + error.name);
+        }
         const img = document.createElement("img");
         img.src = "https://example.com/pixel.png";
         document.body.appendChild(img);
         setTimeout(() => resolve({ inline: Boolean(window.__inline), blocked }), 300);
     }));
     assert.equal(result.inline, false);
-    assert.ok(result.blocked.some((d) => d.startsWith("script-src")), JSON.stringify(result.blocked));
+    assert.ok(result.blocked.some((d) => d.startsWith("script-src") || d.startsWith("trusted-types") ||
+        d === "require-trusted-types-for"), JSON.stringify(result.blocked));
     assert.ok(result.blocked.some((d) => d.startsWith("img-src")), JSON.stringify(result.blocked));
     await close();
+});
+
+test("Trusted Types impide escribir HTML desde JavaScript", async () => {
+    const { page, errors, close } = await open("index.html");
+    const result = await page.evaluate(() => {
+        try {
+            document.body.insertAdjacentHTML("beforeend", "<img src=x>");
+            return "permitido";
+        } catch (error) {
+            return error.name;
+        }
+    });
+    assert.equal(result, "TypeError");
+    assert.deepEqual(errors.filter((e) => !/Trusted/i.test(e)), []);
+    await close();
+});
+
+test("otra web no puede mostrar la página dentro de un marco", async () => {
+    /* Una página en blanco, ajena al sitio, que intenta mostrar la portada en un marco. */
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const target = url("index.html");
+    await page.setContent(`<iframe src="${target}" width="800" height="600"></iframe>`);
+    await page.waitForTimeout(1000);
+    const framed = page.frames().find((f) => f.url() === target);
+    assert.ok(framed, "la página debía cargarse dentro del marco");
+    assert.equal(await framed.evaluate(() => getComputedStyle(document.body).display), "none");
+    await context.close();
 });
 
 test("sin inmuebles publicados, la web invita a crear una alerta y a vender", async () => {
@@ -403,11 +437,212 @@ test("ninguna página se desborda horizontalmente en móvil, tableta ni escritor
             assert.ok(overflow <= 0, `${file} a ${width}px se desborda ${overflow}px`);
             /* Nada visible se sale por la derecha (aunque el desbordamiento esté oculto). */
             const outside = await page.evaluate(() => Array.from(document.querySelectorAll("header *, main a, main button, main input, main select"))
-                .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.closest(".nav:not(.is-open)") && !el.closest(".field--hp"))
+                .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.closest(".nav:not(.is-open)") && !el.closest(".field--hp") &&
+                    /* Las tarjetas de una galería horizontal quedan fuera a propósito: se deslizan. */
+                    !el.closest(".gallery__track"))
                 .filter((el) => el.getBoundingClientRect().right > document.documentElement.clientWidth + 0.5)
                 .map((el) => el.className || el.tagName));
             assert.deepEqual(outside, [], `${file} a ${width}px`);
             await close();
         }
     }
+});
+
+test("la escena de la villa avanza por los pasos al desplazarse y es estática sin animaciones", async () => {
+    const { page, errors, close } = await open("index.html");
+    const scene = page.locator(".villa-scene");
+    assert.equal(await page.locator(".villa .vb").count(), 7);
+    assert.equal(await scene.locator(".vstep").count(), 4);
+    for (const [fraction, step] of [[0.1, "0"], [0.6, "2"], [0.95, "3"]]) {
+        await page.evaluate((f) => {
+            const s = document.querySelector(".villa-scene");
+            window.scrollTo(0, s.offsetTop + (s.offsetHeight - window.innerHeight) * f);
+        }, fraction);
+        await page.waitForFunction((expected) => document.querySelector(".villa-scene").getAttribute("data-active") === expected, step);
+    }
+    /* Solo el paso activo muestra su texto. */
+    await scene.locator(".vstep:nth-child(4) .vstep__text").waitFor({ state: "visible", timeout: 3000 });
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".vstep:nth-child(1) .vstep__text")).opacity), "0");
+    assert.deepEqual(errors, []);
+    await close();
+
+    /* Con «reducir movimiento», la sección es normal y se leen los cuatro pasos. */
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const still = await context.newPage();
+    await still.goto(url("index.html"));
+    const height = await still.evaluate(() => document.querySelector(".villa-scene").offsetHeight / window.innerHeight);
+    assert.ok(height < 2, `la sección no debe alargarse (mide ${height.toFixed(1)} pantallas)`);
+    for (let i = 1; i <= 4; i++) {
+        assert.equal(await still.locator(`.vstep:nth-child(${i}) .vstep__text`).isVisible(), true);
+    }
+    await context.close();
+});
+
+test("la cabecera flota como cápsula al desplazar y se oscurece sobre la sección oscura", async () => {
+    const { page, errors, close } = await open("index.html");
+    const header = page.locator(".site-header");
+    await page.evaluate(() => window.scrollTo(0, 300));
+    await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-scrolled"));
+    assert.equal(await header.evaluate((h) => h.classList.contains("is-on-dark")), false);
+    await page.evaluate(() => {
+        const s = document.querySelector(".villa-scene");
+        window.scrollTo(0, s.offsetTop + window.innerHeight);
+    });
+    await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-on-dark"));
+    /* El menú del móvil sigue ocupando toda la pantalla aunque la cabecera sea una cápsula. */
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.click(".nav-toggle");
+    const nav = await page.locator("#menu-principal").boundingBox();
+    assert.equal(Math.round(nav.width), 390);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("los paneles de servicios se expanden con el cursor y el foco", async () => {
+    const { page, errors, close } = await open("index.html");
+    const panels = page.locator(".panel");
+    assert.equal(await panels.count(), 4);
+    await page.locator(".panels").scrollIntoViewIfNeeded();
+    const width = (i) => panels.nth(i).evaluate((el) => el.getBoundingClientRect().width);
+    await page.waitForTimeout(1200);
+    assert.ok(await width(0) > await width(1) * 1.5, "sin cursor, el primer panel está abierto");
+    await panels.nth(2).hover();
+    await page.waitForTimeout(1200);
+    assert.ok(await width(2) > await width(0) * 1.5, "el panel con el cursor se abre");
+    /* Con el teclado: el enlace del cuarto panel lo abre. */
+    await page.mouse.move(5, 5);
+    await panels.nth(3).locator("a").focus();
+    await page.waitForTimeout(1200);
+    assert.ok(await width(3) > await width(0) * 1.5, "el panel con el foco se abre");
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("la galería del blog avanza con las flechas y actualiza el contador", async () => {
+    const { page, errors, close } = await open("index.html");
+    const gallery = page.locator(".gallery");
+    await gallery.scrollIntoViewIfNeeded();
+    assert.equal(await gallery.locator("[data-gallery-current]").textContent(), "01");
+    assert.equal(await gallery.locator("[data-gallery-prev]").isDisabled(), true);
+    await gallery.locator("[data-gallery-next]").click();
+    await page.waitForFunction(() => document.querySelector("[data-gallery-current]").textContent === "02");
+    assert.equal(await gallery.locator("[data-gallery-prev]").isDisabled(), false);
+    assert.ok(await gallery.locator(".post-card").count() >= 10);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("las cifras de la portada terminan en su valor real", async () => {
+    const { page, errors, close } = await open("index.html");
+    await page.locator(".figures").scrollIntoViewIfNeeded();
+    /* La cuenta empieza al aparecer y dura 1,4 s. */
+    await page.waitForTimeout(2500);
+    assert.deepEqual(await page.locator("[data-count]").allTextContents(), ["0", "4", "6", "3"]);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("el cambio de tema marca su transición y la retira al terminar", async () => {
+    const { page, errors, close } = await open("index.html");
+    await page.click(".theme-toggle");
+    await page.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "dark");
+    await page.waitForFunction(() => !document.documentElement.classList.contains("is-theme-switch"), null, { timeout: 4000 });
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("los ajustes cambian el texto, el contraste y el movimiento, y se recuerdan", async () => {
+    const { page, errors, close } = await open("index.html");
+    const toggle = page.locator(".settings-toggle");
+    assert.equal(await toggle.isVisible(), true);
+    await toggle.click();
+    const panel = page.locator("#ajustes");
+    assert.equal(await panel.isVisible(), true);
+    assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+
+    await page.click("label[for='ajuste-texto-xl']");
+    await page.click("label[for='ajuste-contraste-more']");
+    await page.click("label[for='ajuste-movimiento-reduced']");
+    const attrs = () => page.evaluate(() => ["data-text", "data-contrast", "data-motion"].map((a) => document.documentElement.getAttribute(a)));
+    assert.deepEqual(await attrs(), ["xl", "more", "reduced"]);
+
+    /* Escape cierra el panel y devuelve el foco al botón. */
+    await page.keyboard.press("Escape");
+    assert.equal(await panel.isVisible(), false);
+    assert.equal(await page.evaluate(() => document.activeElement.classList.contains("settings-toggle")), true);
+
+    /* Se aplican antes de pintar en la siguiente página; con movimiento reducido la villa es estática. */
+    await page.goto(url("index.html"));
+    assert.deepEqual(await attrs(), ["xl", "more", "reduced"]);
+    const screens = await page.evaluate(() => document.querySelector(".villa-scene").offsetHeight / window.innerHeight);
+    assert.ok(screens < 2, `la escena no debe alargarse (${screens.toFixed(1)} pantallas)`);
+
+    /* «Restablecer» vuelve a los valores de fábrica. */
+    await page.click(".settings-toggle");
+    await page.click(".settings__reset");
+    assert.deepEqual(await attrs(), [null, null, null]);
+    assert.equal(await page.evaluate(() => localStorage.getItem("twins:ajustes")), null);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("el tema automático sigue al sistema", async () => {
+    const context = await browser.newContext({ colorScheme: "dark" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    assert.equal(await page.getAttribute("html", "data-theme"), "light");
+    await page.click(".settings-toggle");
+    await page.click("label[for='ajuste-tema-auto']");
+    await page.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "dark");
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "light");
+    await page.goto(url("es-servicios.html"));
+    assert.equal(await page.getAttribute("html", "data-theme"), "light");
+    assert.equal(await page.evaluate(() => document.documentElement.hasAttribute("data-theme-auto")), true);
+    await context.close();
+});
+
+test("se sugiere el idioma del navegador una sola vez", async () => {
+    const context = await browser.newContext({ locale: "ca-ES" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    const toast = page.locator(".lang-toast");
+    await toast.waitFor({ state: "visible", timeout: 4000 });
+    assert.equal(await toast.getAttribute("lang"), "ca");
+    assert.match(await toast.locator("a").getAttribute("href"), /ca-inici\.html$/);
+    await toast.locator("button").click();
+    await page.goto(url("es-servicios.html"));
+    await page.waitForTimeout(1600);
+    assert.equal(await page.locator(".lang-toast").count(), 0, "tras cerrarla no se vuelve a sugerir");
+    /* En la versión catalana no se sugiere nada a un navegador en catalán. */
+    const fresh = await browser.newContext({ locale: "ca-ES" });
+    const ca = await fresh.newPage();
+    await ca.goto(url("ca-inici.html"));
+    await ca.waitForTimeout(1600);
+    assert.equal(await ca.locator(".lang-toast").count(), 0);
+    await fresh.close();
+    await context.close();
+});
+
+test("en el móvil: botón de menú completo, zonas de toque cómodas y cristal que desenfoca", async () => {
+    /* Sin animaciones: la aparición de los bloques los escala un instante (97 %). */
+    const context = await browser.newContext({ viewport: { width: 360, height: 780 }, isMobile: true, hasTouch: true, reducedMotion: "reduce" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    /* El botón del menú no se aplasta aunque haya otros botones en la cabecera. */
+    const toggle = await page.locator(".nav-toggle").boundingBox();
+    assert.ok(toggle.width >= 44 && toggle.height >= 44, `menú de ${toggle.width}×${toggle.height}`);
+    /* Enlaces sueltos y del pie con al menos 44 px de alto (recomendación de Apple). */
+    const heights = await page.evaluate(() => [...document.querySelectorAll(".footer-links a, .footer-legal a, .link-arrow")]
+        .filter((a) => a.getClientRects().length && !a.closest("[hidden]"))
+        .map((a) => a.getBoundingClientRect().height));
+    assert.ok(heights.length > 10);
+    assert.ok(Math.min(...heights) >= 43.5, `zona de toque mínima: ${Math.min(...heights)} px`);
+    /* Un view-transition-name en la cabecera impediría que su cristal desenfoque la página. */
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".site-header")).viewTransitionName), "none");
+    /* Ningún campo del formulario por debajo de 16 px: el iPhone ampliaría la pantalla al tocarlo. */
+    const small = await page.evaluate(() => [...document.querySelectorAll("input:not([type=checkbox]):not([type=radio]), select, textarea")]
+        .filter((el) => el.getClientRects().length && parseFloat(getComputedStyle(el).fontSize) < 16).map((el) => el.id));
+    assert.deepEqual(small, []);
+    await context.close();
 });

@@ -59,6 +59,20 @@ C = {
         "updated_date": "7 October 2026",
         "theme_to_light": "Switch to light theme",
         "theme_to_dark": "Switch to dark theme",
+        "prev": "Previous",
+        "next": "Next",
+        "settings": {
+            "open": "Website settings",
+            "title": "Settings",
+            "close": "Close settings",
+            "theme": ("Appearance", [("light", "Light"), ("dark", "Dark"), ("auto", "Automatic")]),
+            "language": "Language",
+            "text": ("Text size", [("m", "Standard"), ("l", "Large"), ("xl", "Extra large")]),
+            "motion": ("Motion", [("full", "Full"), ("reduced", "Reduced")]),
+            "contrast": ("Contrast", [("normal", "Standard"), ("more", "High")]),
+            "reset": "Reset",
+            "note": "Your preferences are only stored in this browser.",
+        },
         "scroll_hint": "Scroll to explore",
         "og_image_alt": "Twins Real Estate: property sales, lettings and valuations",
         "commitments_title": "Our commitments",
@@ -249,6 +263,13 @@ C = {
         ],
         "about_btn": "Discover our agency",
         "quote": "No obligation, complete confidence.",
+        "figures": [
+            ("€", "0", "", "Valuation of your property, free and with no obligation"),
+            ("", "4", "", "Clear steps, from the first meeting to completion"),
+            ("", "6", "", "Property services under one roof"),
+            ("", "3", "", "Languages: English, Spanish and Catalan"),
+        ],
+        "blog_all": "See all articles",
         "services_eyebrow": "Services",
         "services_title": "Comprehensive property solutions",
         "services_lead": "A complete service for owners, buyers, tenants and investors, with the same high standards in every task.",
@@ -687,7 +708,7 @@ C = {
 <h2>1. Do we use cookies?</h2>
 <p>This website <strong>does not use</strong> first-party or third-party <strong>cookies</strong> for analytics, advertising or tracking purposes. For this reason, no cookie consent banner is displayed.</p>
 <h2>2. Local storage</h2>
-<p>If you mark a property as a favourite, your browser stores only the reference of that property using local storage technology (<em>localStorage</em>). This information contains no personal data, is not sent to any server and remains exclusively on your device. Likewise, if you change the website’s visual theme (dark or cream), only that preference is stored.</p>
+<p>If you mark a property as a favourite, your browser stores only the reference of that property using local storage technology (<em>localStorage</em>). This information contains no personal data, is not sent to any server and remains exclusively on your device. Likewise, if you personalise the website from “Settings” (light, dark or automatic theme, text size, motion or contrast) or choose a language, only those preferences are stored.</p>
 <p>This is technical storage necessary to provide a feature you have expressly requested, and is therefore exempt from the consent requirement under Article 22.2 of the LSSI-CE. You can delete it at any time from your browser settings.</p>
 <div class="table-scroll">
 <table>
@@ -696,7 +717,9 @@ C = {
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Local storage (first-party)</td><td>Remembering properties marked as favourites</td><td>Until deleted by the user</td></tr>
-<tr><td>twins:tema</td><td>Local storage (first-party)</td><td>Remembering the chosen theme (dark or cream)</td><td>Until deleted by the user</td></tr>
+<tr><td>twins:tema</td><td>Local storage (first-party)</td><td>Remembering the chosen theme (light, dark or automatic)</td><td>Until deleted by the user</td></tr>
+<tr><td>twins:ajustes</td><td>Local storage (first-party)</td><td>Remembering the chosen text size, motion and contrast</td><td>Until deleted by the user</td></tr>
+<tr><td>twins:idioma</td><td>Local storage (first-party)</td><td>Remembering the chosen language so that no other is suggested again</td><td>Until deleted by the user</td></tr>
 </tbody>
 </table>
 </div>

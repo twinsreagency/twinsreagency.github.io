@@ -58,6 +58,20 @@ C = {
         "updated_date": "7 d’octubre de 2026",
         "theme_to_light": "Canvia al tema clar",
         "theme_to_dark": "Canvia al tema fosc",
+        "prev": "Anterior",
+        "next": "Següent",
+        "settings": {
+            "open": "Ajustos del web",
+            "title": "Ajustos",
+            "close": "Tanca els ajustos",
+            "theme": ("Aparença", [("light", "Clar"), ("dark", "Fosc"), ("auto", "Automàtic")]),
+            "language": "Idioma",
+            "text": ("Mida del text", [("m", "Normal"), ("l", "Gran"), ("xl", "Molt gran")]),
+            "motion": ("Moviment", [("full", "Complet"), ("reduced", "Reduït")]),
+            "contrast": ("Contrast", [("normal", "Estàndard"), ("more", "Alt")]),
+            "reset": "Restableix",
+            "note": "Les vostres preferències es desen només en aquest navegador.",
+        },
         "scroll_hint": "Llisqueu per descobrir",
         "og_image_alt": "Twins Real Estate: compravenda, lloguer i valoració d’immobles",
         "commitments_title": "Els nostres compromisos",
@@ -248,6 +262,13 @@ C = {
         ],
         "about_btn": "Conegueu la nostra agència",
         "quote": "Sense compromís, amb tota la confiança.",
+        "figures": [
+            ("", "0", " €", "Valoració del vostre immoble, gratuïta i sense compromís"),
+            ("", "4", "", "Passos clars, de la primera reunió a la signatura"),
+            ("", "6", "", "Serveis immobiliaris en una sola agència"),
+            ("", "3", "", "Idiomes d’atenció: català, castellà i anglès"),
+        ],
+        "blog_all": "Veure tots els articles",
         "services_eyebrow": "Serveis",
         "services_title": "Solucions immobiliàries integrals",
         "services_lead": "Un servei complet per a propietaris, compradors, llogaters i inversors, amb el mateix nivell d’exigència en cada gestió.",
@@ -686,7 +707,7 @@ C = {
 <h2>1. Utilitzem galetes?</h2>
 <p>Aquest lloc web <strong>no utilitza galetes</strong> pròpies ni de tercers amb finalitats analítiques, publicitàries o de seguiment. Per aquest motiu, no es mostra cap avís de consentiment de galetes.</p>
 <h2>2. Emmagatzematge local</h2>
-<p>Si marqueu un immoble com a preferit, el vostre navegador desa únicament la referència d’aquell immoble mitjançant la tecnologia d’emmagatzematge local (<em>localStorage</em>). Aquesta informació no inclou dades personals, no s’envia a cap servidor i roman exclusivament al vostre dispositiu. De la mateixa manera, si canvieu el tema visual del lloc (fosc o crema), només es desa aquesta preferència.</p>
+<p>Si marqueu un immoble com a preferit, el vostre navegador desa únicament la referència d’aquell immoble mitjançant la tecnologia d’emmagatzematge local (<em>localStorage</em>). Aquesta informació no inclou dades personals, no s’envia a cap servidor i roman exclusivament al vostre dispositiu. De la mateixa manera, si personalitzeu el web des d’«Ajustos» (tema clar, fosc o automàtic, mida del text, moviment o contrast) o escolliu un idioma, només es desen aquestes preferències.</p>
 <p>Es tracta d’un emmagatzematge tècnic necessari per prestar una funcionalitat sol·licitada expressament per vós, de manera que està exempt del deure de consentiment d’acord amb l’article 22.2 de la LSSI-CE. El podeu eliminar en qualsevol moment des de la configuració del navegador.</p>
 <div class="table-scroll">
 <table>
@@ -695,7 +716,9 @@ C = {
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Emmagatzematge local (propi)</td><td>Recordar els immobles marcats com a preferits</td><td>Fins que l’usuari l’elimini</td></tr>
-<tr><td>twins:tema</td><td>Emmagatzematge local (propi)</td><td>Recordar el tema escollit (fosc o crema)</td><td>Fins que l’usuari l’elimini</td></tr>
+<tr><td>twins:tema</td><td>Emmagatzematge local (propi)</td><td>Recordar el tema escollit (clar, fosc o automàtic)</td><td>Fins que l’usuari l’elimini</td></tr>
+<tr><td>twins:ajustes</td><td>Emmagatzematge local (propi)</td><td>Recordar la mida del text, el moviment i el contrast escollits</td><td>Fins que l’usuari l’elimini</td></tr>
+<tr><td>twins:idioma</td><td>Emmagatzematge local (propi)</td><td>Recordar l’idioma escollit per no tornar a suggerir-ne un altre</td><td>Fins que l’usuari l’elimini</td></tr>
 </tbody>
 </table>
 </div>

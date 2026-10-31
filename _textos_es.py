@@ -58,6 +58,20 @@ C = {
         "updated_date": "7 de octubre de 2026",
         "theme_to_light": "Cambiar a tema claro",
         "theme_to_dark": "Cambiar a tema oscuro",
+        "prev": "Anterior",
+        "next": "Siguiente",
+        "settings": {
+            "open": "Ajustes de la web",
+            "title": "Ajustes",
+            "close": "Cerrar los ajustes",
+            "theme": ("Apariencia", [("light", "Claro"), ("dark", "Oscuro"), ("auto", "Automático")]),
+            "language": "Idioma",
+            "text": ("Tamaño del texto", [("m", "Normal"), ("l", "Grande"), ("xl", "Muy grande")]),
+            "motion": ("Movimiento", [("full", "Completo"), ("reduced", "Reducido")]),
+            "contrast": ("Contraste", [("normal", "Estándar"), ("more", "Alto")]),
+            "reset": "Restablecer",
+            "note": "Sus preferencias se guardan solo en este navegador.",
+        },
         "scroll_hint": "Deslice para descubrir",
         "og_image_alt": "Twins Real Estate: compraventa, alquiler y valoración de inmuebles",
         "commitments_title": "Nuestros compromisos",
@@ -251,6 +265,14 @@ C = {
         ],
         "about_btn": "Conozca nuestra agencia",
         "quote": "Sin compromiso, con toda la confianza.",
+        # Cifras de la portada (prefijo, número, sufijo, explicación). Solo datos reales.
+        "figures": [
+            ("", "0", " €", "Valoración de su inmueble, gratuita y sin compromiso"),
+            ("", "4", "", "Pasos claros, de la primera reunión a la firma"),
+            ("", "6", "", "Servicios inmobiliarios en una sola agencia"),
+            ("", "3", "", "Idiomas de atención: castellano, catalán e inglés"),
+        ],
+        "blog_all": "Ver todos los artículos",
         "services_eyebrow": "Servicios",
         "services_title": "Soluciones inmobiliarias integrales",
         "services_lead": "Un servicio completo para propietarios, compradores, inquilinos e inversores, con el mismo nivel de exigencia en cada gestión.",
@@ -691,7 +713,7 @@ C = {
 <h2>1. ¿Utilizamos cookies?</h2>
 <p>Este sitio web <strong>no utiliza cookies</strong> propias ni de terceros con fines analíticos, publicitarios o de seguimiento. Por este motivo, no se muestra un aviso de consentimiento de cookies.</p>
 <h2>2. Almacenamiento local</h2>
-<p>Si usted marca un inmueble como favorito, su navegador guarda únicamente la referencia de ese inmueble mediante la tecnología de almacenamiento local (<em>localStorage</em>). Esta información no incluye datos personales, no se envía a ningún servidor y permanece exclusivamente en su dispositivo. Del mismo modo, si cambia el tema visual del sitio (oscuro o crema), se guarda únicamente esa preferencia.</p>
+<p>Si usted marca un inmueble como favorito, su navegador guarda únicamente la referencia de ese inmueble mediante la tecnología de almacenamiento local (<em>localStorage</em>). Esta información no incluye datos personales, no se envía a ningún servidor y permanece exclusivamente en su dispositivo. Del mismo modo, si personaliza la web desde «Ajustes» (tema claro, oscuro o automático, tamaño del texto, movimiento o contraste) o elige un idioma, se guardan únicamente esas preferencias.</p>
 <p>Se trata de un almacenamiento técnico necesario para prestar una funcionalidad solicitada expresamente por usted, por lo que está exento del deber de consentimiento conforme al artículo 22.2 de la LSSI-CE. Puede eliminarlo en cualquier momento desde la configuración de su navegador.</p>
 <div class="table-scroll">
 <table>
@@ -700,7 +722,9 @@ C = {
 </thead>
 <tbody>
 <tr><td>twins:favoritos</td><td>Almacenamiento local (propio)</td><td>Recordar los inmuebles marcados como favoritos</td><td>Hasta que el usuario lo elimine</td></tr>
-<tr><td>twins:tema</td><td>Almacenamiento local (propio)</td><td>Recordar el tema elegido (oscuro o crema)</td><td>Hasta que el usuario lo elimine</td></tr>
+<tr><td>twins:tema</td><td>Almacenamiento local (propio)</td><td>Recordar el tema elegido (claro, oscuro o automático)</td><td>Hasta que el usuario lo elimine</td></tr>
+<tr><td>twins:ajustes</td><td>Almacenamiento local (propio)</td><td>Recordar el tamaño del texto, el movimiento y el contraste elegidos</td><td>Hasta que el usuario lo elimine</td></tr>
+<tr><td>twins:idioma</td><td>Almacenamiento local (propio)</td><td>Recordar el idioma elegido para no volver a sugerir otro</td><td>Hasta que el usuario lo elimine</td></tr>
 </tbody>
 </table>
 </div>

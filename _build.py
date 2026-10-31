@@ -97,7 +97,12 @@ def csp(meta=True):
     service = f" {urlparse(endpoint).scheme}://{urlparse(endpoint).netloc}" if endpoint else ""
     rules = ["default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self' data:",
              "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
-             "base-uri 'self'", "object-src 'none'"]
+             "base-uri 'self'", "object-src 'none'",
+             # Lo que el sitio no usa, cerrado de forma explícita.
+             "frame-src 'none'", "worker-src 'none'", "media-src 'none'", "manifest-src 'none'",
+             # Trusted Types: el navegador rechaza cualquier intento de escribir HTML o
+             # código desde JavaScript (innerHTML, eval…). main.js solo usa textContent.
+             "require-trusted-types-for 'script'", "trusted-types 'none'"]
     if not meta:
         rules += ["frame-ancestors 'none'", "upgrade-insecure-requests"]
     return "; ".join(rules)
@@ -136,6 +141,9 @@ ICONS = {
     "heart": '<path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/>',
     "arrow-right": '<path d="M5 12h14M13 6l6 6-6 6"/>',
     "arrow-left": '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    "sliders": '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+    "close": '<path d="M6 6l12 12M18 6 6 18"/>',
+    "arrow-up-right": '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
     "arrow-up": '<path d="M12 19V5M6 11l6-6 6 6"/>',
     "check": '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
     "instagram": '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
@@ -489,6 +497,7 @@ def site_header(ctx, active):
                 {lang_switch(ctx)}
                 <a class="btn btn--primary nav__cta" href="{ctx.page('contacto.html')}?asunto=visita#formulario">{ui['cta_nav']}</a>
             </nav>
+            <button class="settings-toggle" type="button" aria-label="{esc(ui['settings']['open'])}" title="{esc(ui['settings']['open'])}" aria-expanded="false" aria-controls="ajustes" hidden>{icon('sliders')}</button>
             <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_dark'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="{esc(ui['menu_open'])}" data-label-open="{esc(ui['menu_open'])}" data-label-close="{esc(ui['menu_close'])}">
                 <span></span><span></span><span></span>
@@ -510,6 +519,45 @@ def footer_areas(ctx):
                 <ul>{links}
                 </ul>
             </nav>"""
+
+
+def settings_panel(ctx):
+    """Panel de ajustes (apariencia, idioma, tamaño del texto, movimiento y contraste).
+    Va al final del <body>; main.js lo abre desde la cabecera y guarda las preferencias.
+    Sin JavaScript no se muestra (el botón empieza oculto)."""
+    S = ctx.L["ui"]["settings"]
+
+    def group(name, legend, choices):
+        options = "".join(
+            f'<input class="visually-hidden" type="radio" name="ajuste-{name}" id="ajuste-{name}-{value}" value="{value}">'
+            f'<label for="ajuste-{name}-{value}">{label}</label>' for value, label in choices)
+        return f"""
+            <fieldset class="seg-field">
+                <legend class="seg-field__legend">{legend}</legend>
+                <div class="seg" data-setting="{name}">{options}</div>
+            </fieldset>"""
+
+    current = ' aria-current="true"'
+    languages = "".join(
+        f'<a href="{ctx.translation(other)}" hreflang="{other["lang"]}" lang="{other["lang"]}"'
+        f'{current if other["code"] == ctx.L["code"] else ""}>{other["label"]}</a>'
+        for other in LANGS)
+    return f"""
+    <div class="settings" id="ajustes" role="dialog" aria-labelledby="ajustes-title" hidden>
+        <div class="settings__head">
+            <p class="settings__title" id="ajustes-title">{S['title']}</p>
+            <button class="settings__close" type="button" aria-label="{esc(S['close'])}">{icon('close')}</button>
+        </div>{group("tema", *S['theme'])}
+            <div class="seg-field" role="group" aria-labelledby="ajustes-idioma">
+                <p class="seg-field__legend" id="ajustes-idioma">{S['language']}</p>
+                <div class="seg seg--links">{languages}</div>
+            </div>{group("texto", *S['text'])}{group("movimiento", *S['motion'])}{group("contraste", *S['contrast'])}
+        <div class="settings__foot">
+            <p class="settings__note">{S['note']}</p>
+            <button class="settings__reset" type="button">{S['reset']}</button>
+        </div>
+    </div>
+"""
 
 
 def site_footer(ctx):
@@ -559,6 +607,7 @@ def site_footer(ctx):
         </div>
     </footer>
 
+{settings_panel(ctx)}
     <button class="back-to-top" type="button" aria-label="{esc(ui['back_top'])}">{icon('arrow-up')}</button>
 </body>
 </html>
@@ -713,6 +762,151 @@ def model_3d():
                         </div>
                     </div>
                 </div>"""
+
+
+def villa_3d():
+    """Villa contemporánea de una planta construida con CSS 3D: un ala de cristal
+    iluminada por dentro, un ala de piedra, tejados planos volados con el techo de
+    madera, chimenea, piscina y árboles. Es decorativa (aria-hidden)."""
+    def block(name, sides=WALLS + ["top"]):
+        return f'<span class="vb vb--{name}">{faces(sides)}</span>'
+    trees = "".join(f'<span class="tree tree--{i}"><i></i><i></i></span>' for i in (1, 2, 3))
+    return f"""
+                    <div class="villa" aria-hidden="true">
+                        <div class="villa__float">
+                            <div class="villa__model">
+                                <span class="villa__ground"></span>
+                                {block("deck")}
+                                {block("pool", ["top"])}
+                                {block("glass")}
+                                {block("stone")}
+                                {block("roof-a", WALLS + ["top", "bottom"])}
+                                {block("roof-b", WALLS + ["top", "bottom"])}
+                                {block("chimney")}
+                                {trees}
+                            </div>
+                        </div>
+                    </div>"""
+
+
+def orb_link(href, label, extra=""):
+    """Botón de cápsula de cristal con una flecha dentro de un círculo (estilo editorial)."""
+    return (f'<a class="btn btn--orb" href="{href}">{label}{extra}'
+            f'<span class="btn__orb" aria-hidden="true">{icon("arrow-up-right")}</span></a>')
+
+
+def tone(direction):
+    """Franja de transición de color entre una sección clara y otra oscura («night») o al
+    revés («day»): el fondo cambia de forma gradual al desplazarse, sin cortes."""
+    return f'\n        <div class="tone tone--to-{direction}" aria-hidden="true"><span class="tone__dark"></span></div>\n'
+
+
+SERVICE_OBJECTS = {"compraventa": "sale", "alquiler": "house", "gestion-alquileres": "pages",
+                   "inversion": "twins", "valoracion": "cube", "asesoramiento-juridico": "rings"}
+
+
+def service_panels(ctx):
+    """Servicios de la portada como paneles oscuros que se expanden al pasar el cursor o al
+    recibir el foco, cada uno con su objeto 3D (en el móvil se apilan, abiertos)."""
+    L, T, ui = ctx.L, ctx.L["index"], ctx.L["ui"]
+    panels = []
+    for i, (sid, _) in enumerate(SERVICES[:4], start=1):
+        title, text, items = L["services"][sid]
+        details = " · ".join(items[:3])
+        panels.append(f"""
+                    <article class="panel panel--{i} night">{object_3d(SERVICE_OBJECTS[sid])}
+                        <div class="panel__body">
+                            <p class="panel__index">{i:02d} —</p>
+                            <h3 class="panel__title">{title}</h3>
+                            <div class="panel__more">
+                                <p class="panel__text">{text}</p>
+                                <p class="panel__details">{details}</p>
+                                {orb_link(f"{ctx.page('servicios.html')}#{sid}", ui['more_info'], f'<span class="visually-hidden"> {ui["about"]} {title.lower()}</span>')}
+                            </div>
+                        </div>
+                    </article>""")
+    return f"""
+        <section class="section" aria-labelledby="servicios-title">
+            <div class="container">{section_header(T['services_eyebrow'], T['services_title'], 'servicios-title', T['services_lead'])}
+                <div class="panels reveal">{''.join(panels)}
+                </div>
+                <div class="section-footer">
+                    <a class="btn btn--outline" href="{ctx.page('servicios.html')}">{T['services_all']} {ARROW}</a>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def figures(ctx):
+    """Cifras grandes en cursiva (datos reales de la agencia); main.js las cuenta hacia arriba."""
+    items = "".join(f"""
+                        <div class="figure">
+                            <dt class="figure__value">{prefix}<span class="figure__num" data-count="{number}">{number}</span>{suffix}</dt>
+                            <dd class="figure__label">{label}</dd>
+                        </div>""" for prefix, number, suffix, label in ctx.L["index"]["figures"])
+    return f"""
+                    <dl class="figures">{items}
+                    </dl>"""
+
+
+def blog_gallery(ctx):
+    """Galería horizontal de artículos sobre fondo oscuro, con contador y flechas."""
+    L, ui = ctx.L, ctx.L["ui"]
+    cards = "".join(post_card(ctx, *p) for p in POSTS)
+    return f"""{tone("night")}
+        <section class="gallery dusk" aria-labelledby="blog-home-title">
+            <div class="container">
+                <div class="gallery__head reveal">
+                    <div>
+                        <span class="eyebrow">{ui['nav']['blog.html']}</span>
+                        <h2 class="gallery__title" id="blog-home-title">{L['blog']['h1']}</h2>
+                        <p class="gallery__lead">{L['blog']['text']}</p>
+                    </div>
+                    <div class="gallery__nav">
+                        <p class="gallery__count" aria-hidden="true"><span data-gallery-current>01</span> / {len(POSTS):02d}</p>
+                        <button class="gallery__btn" type="button" data-gallery-prev aria-label="{esc(ui['prev'])}" aria-controls="galeria-blog">{icon('arrow-left')}</button>
+                        <button class="gallery__btn" type="button" data-gallery-next aria-label="{esc(ui['next'])}" aria-controls="galeria-blog">{icon('arrow-right')}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery__track" id="galeria-blog" role="region" aria-label="{esc(L['blog']['list_title'])}" tabindex="0">{cards}
+            </div>
+            <div class="container gallery__foot">
+                {orb_link(ctx.page('blog.html'), L['index']['blog_all'])}
+            </div>
+        </section>{tone("day")}"""
+
+
+def process_scene(ctx):
+    """Cómo trabajamos, con la villa 3D: la sección se queda fija mientras la villa
+    gira y se iluminan, uno tras otro, los cuatro pasos (data-steps, main.js)."""
+    S = ctx.L["servicios"]
+    steps = "".join(f"""
+                            <li class="vstep">
+                                <span class="vstep__num">{i:02d}</span>
+                                <div>
+                                    <h3 class="vstep__title">{title}</h3>
+                                    <p class="vstep__text">{text}</p>
+                                </div>
+                            </li>""" for i, (title, text) in enumerate(S["steps"], start=1))
+    return f"""{tone("night")}
+        <section class="villa-scene dusk" data-scroll="sticky" data-steps="{len(S['steps'])}" aria-labelledby="proceso-title">
+            <div class="villa-scene__sticky">
+                <div class="villa-scene__sky" aria-hidden="true"><span></span></div>
+                <div class="container villa-scene__grid">
+                    <div class="villa-scene__copy">
+                        <span class="eyebrow">{S['process_eyebrow']}</span>
+                        <h2 class="villa-scene__title" id="proceso-title">{S['process_title']}</h2>
+                        <p class="villa-scene__lead">{S['process_lead']}</p>
+                        <ol class="vsteps">{steps}
+                        </ol>
+                    </div>
+                    <div class="villa-scene__stage">{villa_3d()}
+                    </div>
+                </div>
+            </div>
+        </section>{tone("day")}"""
 
 
 def object_3d(kind):
@@ -1052,11 +1246,6 @@ def home_portfolio(ctx):
 def build_index(L):
     ctx = Ctx(L, "index.html")
     T, ui = L["index"], L["ui"]
-    services = "".join(feature_card(
-        ic, L["services"][sid][0], L["services"][sid][1],
-        f'\n                    <p class="feature__more"><a class="link-arrow" href="{ctx.page("servicios.html")}#{sid}">'
-        f'{ui["more_info"]} {icon("arrow-right")}<span class="visually-hidden"> {ui["about"]} {L["services"][sid][0].lower()}</span></a></p>'
-    ) for sid, ic in SERVICES[:4])
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
     ld = json_ld({
         "@context": "https://schema.org",
@@ -1103,12 +1292,12 @@ def build_index(L):
             </div>
         </section>
 
-{portfolio}{valuation_section(ctx)}
+{portfolio}{valuation_section(ctx)}{process_scene(ctx)}
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
                     <p class="eyebrow">{T['about_eyebrow']}</p>
-                    <h2 class="visually-hidden" id="nosotros-title">{T['about_eyebrow']}</h2>
+                    <h2 class="visually-hidden" id="nosotros-title">{T['about_eyebrow']}</h2>{figures(ctx)}
                     <p class="statement__text" data-words>{T['about_paras'][0]}</p>
                 </div>
             </div>
@@ -1133,17 +1322,7 @@ def build_index(L):
                 </div>
             </div>
         </section>
-
-        <section class="section" aria-labelledby="servicios-title">
-            <div class="container">{section_header(T['services_eyebrow'], T['services_title'], 'servicios-title', T['services_lead'])}
-                <div class="bento">{services}
-                </div>
-                <div class="section-footer">
-                    <a class="btn btn--outline" href="{ctx.page('servicios.html')}">{T['services_all']} {ARROW}</a>
-                </div>
-            </div>
-        </section>
-{sell_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+{service_panels(ctx)}{blog_gallery(ctx)}{sell_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "index.html", body,
           extra_head=ld)
 

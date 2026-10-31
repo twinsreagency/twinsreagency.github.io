@@ -25,7 +25,9 @@
         minFillTimeMs: 3000,
         maxMailBody: 3000,
         favoritesKey: "twins:favoritos",
-        themeKey: "twins:tema"
+        themeKey: "twins:tema",
+        settingsKey: "twins:ajustes",
+        languageKey: "twins:idioma"
     };
 
     var MESSAGES = {
@@ -97,7 +99,9 @@
     var LANG = MESSAGES[document.documentElement.lang] ? document.documentElement.lang : "es";
     var T = MESSAGES[LANG];
 
-    var REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* Movimiento reducido: por la configuración del sistema o por «Ajustes» (theme.js). */
+    var SYSTEM_REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var REDUCED_MOTION = SYSTEM_REDUCED || document.documentElement.getAttribute("data-motion") === "reduced";
     var FINE_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     var PROPERTY_REF = /^TRE-\d{3}$/;
@@ -173,6 +177,24 @@
 
         /* En el siguiente fotograma, para no forzar un recálculo del diseño al cargar. */
         window.requestAnimationFrame(update);
+
+        /* Sobre una sección oscura (.dusk), la cápsula pasa a cristal oscuro, como en Apple.
+           La franja observada es la de la cabecera: el 8 % superior de la pantalla. */
+        var darkSections = $$(".dusk, .tone__dark");
+        if (darkSections.length && "IntersectionObserver" in window) {
+            var under = [];
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var index = under.indexOf(entry.target);
+                    if (entry.isIntersecting && index === -1) under.push(entry.target);
+                    if (!entry.isIntersecting && index !== -1) under.splice(index, 1);
+                });
+                header.classList.toggle("is-on-dark", under.length > 0);
+            }, { rootMargin: "0px 0px -92% 0px" });
+            darkSections.forEach(function (section) {
+                observer.observe(section);
+            });
+        }
 
         if (backToTop) {
             backToTop.addEventListener("click", function () {
@@ -258,10 +280,29 @@
 
     /* Tema oscuro / crema ----------------------------------------------- */
 
+    /* Tema: crema, oscuro o automático (sigue al sistema) ------------------- */
+
+    /** Lo usan el botón rápido de la cabecera y el panel de ajustes. */
+    var themeApi = null;
+
     function initTheme() {
         var root = document.documentElement;
         var toggle = $(".theme-toggle");
         var meta = $("meta[name='theme-color']");
+        var systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function stored() {
+            try {
+                var value = window.localStorage.getItem(CONFIG.themeKey);
+                return value === "dark" || value === "auto" ? value : "light";
+            } catch (error) {
+                return "light";
+            }
+        }
+
+        function resolve(choice) {
+            return choice === "auto" ? (systemDark.matches ? "dark" : "light") : choice;
+        }
 
         function apply(theme) {
             root.setAttribute("data-theme", theme);
@@ -273,27 +314,32 @@
             }
         }
 
-        apply(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
-        if (!toggle) return;
-
-        toggle.addEventListener("click", function (event) {
-            var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        /** Cambia el tema; con «origin» (el botón pulsado) lo hace con el efecto circular. */
+        function change(choice, origin, event) {
             try {
-                window.localStorage.setItem(CONFIG.themeKey, next);
+                window.localStorage.setItem(CONFIG.themeKey, choice);
             } catch (error) {
                 /* Almacenamiento no disponible: el cambio dura solo esta visita. */
             }
+            if (choice === "auto") {
+                root.setAttribute("data-theme-auto", "");
+            } else {
+                root.removeAttribute("data-theme-auto");
+            }
 
-            if (!document.startViewTransition || REDUCED_MOTION) {
+            var next = resolve(choice);
+            if (next === root.getAttribute("data-theme") || !origin || !document.startViewTransition || REDUCED_MOTION) {
                 apply(next);
                 return;
             }
 
-            var rect = toggle.getBoundingClientRect();
-            var x = event.clientX || rect.left + rect.width / 2;
-            var y = event.clientY || rect.top + rect.height / 2;
+            var rect = origin.getBoundingClientRect();
+            var x = (event && event.clientX) || rect.left + rect.width / 2;
+            var y = (event && event.clientY) || rect.top + rect.height / 2;
             root.style.setProperty("--vt-x", x + "px");
             root.style.setProperty("--vt-y", y + "px");
+            /* Distingue el cambio de tema (círculo) de la transición entre páginas (fundido). */
+            root.classList.add("is-theme-switch");
             var transition = document.startViewTransition(function () {
                 apply(next);
             });
@@ -301,8 +347,260 @@
             transition.ready.catch(function () {
                 apply(next);
             });
-            transition.finished.catch(function () {});
+            transition.finished.catch(function () {}).then(function () {
+                root.classList.remove("is-theme-switch");
+            });
+        }
+
+        apply(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
+
+        /* En automático, la web sigue al sistema también mientras está abierta. */
+        if (systemDark.addEventListener) {
+            systemDark.addEventListener("change", function () {
+                if (stored() === "auto") apply(resolve("auto"));
+            });
+        }
+
+        themeApi = { current: stored, change: change };
+        if (!toggle) return;
+
+        toggle.addEventListener("click", function (event) {
+            change(root.getAttribute("data-theme") === "dark" ? "light" : "dark", toggle, event);
         });
+    }
+
+    /* Panel de ajustes: apariencia, idioma, tamaño del texto, movimiento y contraste */
+
+    var SETTING_VALUES = {
+        tema: ["light", "dark", "auto"],
+        texto: ["m", "l", "xl"],
+        movimiento: ["full", "reduced"],
+        contraste: ["normal", "more"]
+    };
+
+    function initSettings() {
+        var root = document.documentElement;
+        var toggle = $(".settings-toggle");
+        var panel = document.getElementById("ajustes");
+        if (!toggle || !panel) return;
+
+        var closeButton = $(".settings__close", panel);
+        var reset = $(".settings__reset", panel);
+        toggle.hidden = false;
+
+        function read() {
+            try {
+                var value = JSON.parse(window.localStorage.getItem(CONFIG.settingsKey));
+                return value && typeof value === "object" ? value : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function write(value) {
+            try {
+                window.localStorage.setItem(CONFIG.settingsKey, JSON.stringify(value));
+            } catch (error) {
+                /* Almacenamiento no disponible: el ajuste dura solo esta visita. */
+            }
+        }
+
+        function setAttribute(name, value) {
+            if (value) {
+                root.setAttribute(name, value);
+            } else {
+                root.removeAttribute(name);
+            }
+        }
+
+        function state() {
+            var saved = read();
+            return {
+                tema: themeApi ? themeApi.current() : "light",
+                texto: SETTING_VALUES.texto.indexOf(saved.text) !== -1 ? saved.text : "m",
+                movimiento: saved.motion === "reduced" ? "reduced" : "full",
+                contraste: saved.contrast === "more" ? "more" : "normal"
+            };
+        }
+
+        function sync() {
+            var current = state();
+            Object.keys(current).forEach(function (name) {
+                var input = document.getElementById("ajuste-" + name + "-" + current[name]);
+                if (input) input.checked = true;
+            });
+        }
+
+        function apply(name, value) {
+            var saved = read();
+            if (name === "texto") {
+                saved.text = value;
+                setAttribute("data-text", value === "m" ? "" : value);
+            } else if (name === "movimiento") {
+                saved.motion = value;
+                setAttribute("data-motion", value === "reduced" ? "reduced" : "");
+                REDUCED_MOTION = SYSTEM_REDUCED || value === "reduced";
+                /* Las escenas ligadas al desplazamiento se vuelven estáticas (o al revés). */
+                root.classList.toggle("js-scroll", !REDUCED_MOTION && $$("[data-scroll]").length > 0);
+            } else if (name === "contraste") {
+                saved.contrast = value;
+                setAttribute("data-contrast", value === "more" ? "more" : "");
+            }
+            write(saved);
+            /* Cambian tamaños y alturas: las escenas recalculan su avance. */
+            window.dispatchEvent(new Event("resize"));
+        }
+
+        function onKey(event) {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                close(true);
+            }
+        }
+
+        function onOutside(event) {
+            if (!panel.contains(event.target) && !toggle.contains(event.target)) close(false);
+        }
+
+        function open() {
+            sync();
+            panel.hidden = false;
+            toggle.setAttribute("aria-expanded", "true");
+            ($("input:checked", panel) || closeButton).focus();
+            document.addEventListener("keydown", onKey);
+            document.addEventListener("pointerdown", onOutside, true);
+        }
+
+        function close(returnFocus) {
+            panel.hidden = true;
+            toggle.setAttribute("aria-expanded", "false");
+            document.removeEventListener("keydown", onKey);
+            document.removeEventListener("pointerdown", onOutside, true);
+            if (returnFocus) toggle.focus();
+        }
+
+        toggle.addEventListener("click", function () {
+            if (panel.hidden) {
+                open();
+            } else {
+                close(true);
+            }
+        });
+
+        closeButton.addEventListener("click", function () {
+            close(true);
+        });
+
+        panel.addEventListener("change", function (event) {
+            var input = event.target;
+            if (input.type !== "radio") return;
+            var name = input.name.replace("ajuste-", "");
+            if (!SETTING_VALUES[name] || SETTING_VALUES[name].indexOf(input.value) === -1) return;
+            if (name === "tema") {
+                if (themeApi) themeApi.change(input.value, input.nextElementSibling);
+            } else {
+                apply(name, input.value);
+            }
+        });
+
+        reset.addEventListener("click", function () {
+            apply("texto", "m");
+            apply("movimiento", "full");
+            apply("contraste", "normal");
+            if (themeApi) themeApi.change("light", reset);
+            try {
+                window.localStorage.removeItem(CONFIG.settingsKey);
+                window.localStorage.removeItem(CONFIG.themeKey);
+            } catch (error) {
+                /* Almacenamiento no disponible: no hay nada que borrar. */
+            }
+            sync();
+        });
+    }
+
+    /* Idioma: recuerda la elección y sugiere el del navegador ---------------- */
+
+    var LANGUAGE_OFFER = {
+        es: { text: "Esta web también está disponible en castellano.", action: "Ver en castellano", close: "Cerrar" },
+        ca: { text: "Aquest web també està disponible en català.", action: "Veure-la en català", close: "Tanca" },
+        en: { text: "This website is also available in English.", action: "View in English", close: "Close" }
+    };
+
+    function initLanguage() {
+        function remember(code) {
+            try {
+                window.localStorage.setItem(CONFIG.languageKey, code);
+            } catch (error) {
+                /* Almacenamiento no disponible: se volverá a sugerir. */
+            }
+        }
+
+        /* Elegir un idioma en la cabecera o en «Ajustes» cuenta como decisión. */
+        $$(".lang-switch a[hreflang], .seg--links a[hreflang]").forEach(function (link) {
+            link.addEventListener("click", function () {
+                remember(link.getAttribute("hreflang"));
+            });
+        });
+
+        var chosen = null;
+        try {
+            chosen = window.localStorage.getItem(CONFIG.languageKey);
+        } catch (error) {
+            return;
+        }
+        if (chosen) return;
+
+        /* Primer idioma del navegador que la web ofrece. */
+        var preferred = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]);
+        var wanted = null;
+        for (var i = 0; i < preferred.length && !wanted; i++) {
+            var code = String(preferred[i]).slice(0, 2).toLowerCase();
+            if (LANGUAGE_OFFER[code]) wanted = code;
+        }
+        if (!wanted || wanted === LANG) return;
+
+        var target = $(".lang-switch a[hreflang='" + wanted + "']");
+        if (!target) return;
+        var offer = LANGUAGE_OFFER[wanted];
+
+        var toast = document.createElement("aside");
+        toast.className = "lang-toast";
+        toast.setAttribute("lang", wanted);
+        toast.setAttribute("aria-label", offer.text);
+        var text = document.createElement("p");
+        text.textContent = offer.text;
+        var action = document.createElement("a");
+        action.className = "btn btn--primary";
+        action.href = target.href;
+        action.setAttribute("hreflang", wanted);
+        action.textContent = offer.action;
+        var dismiss = document.createElement("button");
+        dismiss.type = "button";
+        dismiss.className = "lang-toast__close";
+        dismiss.setAttribute("aria-label", offer.close);
+        dismiss.textContent = "×";
+
+        action.addEventListener("click", function () {
+            remember(wanted);
+        });
+        dismiss.addEventListener("click", function () {
+            remember(LANG);
+            document.body.classList.remove("has-toast");
+            toast.classList.remove("is-visible");
+            window.setTimeout(function () {
+                toast.remove();
+            }, 400);
+        });
+
+        toast.appendChild(text);
+        toast.appendChild(action);
+        toast.appendChild(dismiss);
+        document.body.appendChild(toast);
+        window.setTimeout(function () {
+            toast.classList.add("is-visible");
+            /* El botón «volver arriba» sube para no quedar debajo del aviso. */
+            document.body.classList.add("has-toast");
+        }, 1200);
     }
 
     /* Escenas ligadas al desplazamiento ------------------------------------ */
@@ -333,6 +631,11 @@
                     : clamp((viewport - rect.top) / (viewport + rect.height));
                 scene.style.setProperty("--p", progress.toFixed(4));
                 scene.classList.toggle("is-advanced", progress > 0.45);
+                /* data-steps="n": marca el paso activo (0 … n-1) según el avance. */
+                var steps = Number(scene.getAttribute("data-steps"));
+                if (steps) {
+                    scene.setAttribute("data-active", String(Math.min(steps - 1, Math.floor(progress * steps))));
+                }
             });
             ticking = false;
         }
@@ -797,6 +1100,84 @@
 
     /* Año actual en el pie ----------------------------------------------- */
 
+    /* Cifras que cuentan hacia arriba al aparecer ---------------------------- */
+
+    function initCounters() {
+        var numbers = $$("[data-count]");
+        if (!numbers.length || REDUCED_MOTION || !("IntersectionObserver" in window)) return;
+
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                observer.unobserve(entry.target);
+                var node = entry.target;
+                var target = Number(node.getAttribute("data-count"));
+                if (!target) return;
+                var start = null;
+                node.textContent = "0";
+
+                function step(time) {
+                    if (start === null) start = time;
+                    var t = Math.min(1, (time - start) / 1400);
+                    node.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+                    if (t < 1) window.requestAnimationFrame(step);
+                }
+
+                window.requestAnimationFrame(step);
+            });
+        }, { threshold: 0.6 });
+
+        numbers.forEach(function (node) {
+            observer.observe(node);
+        });
+    }
+
+    /* Galería horizontal: flechas, contador «01 / 10» y estado de los botones ---- */
+
+    function initGalleries() {
+        $$(".gallery").forEach(function (gallery) {
+            var track = $(".gallery__track", gallery);
+            var prev = $("[data-gallery-prev]", gallery);
+            var next = $("[data-gallery-next]", gallery);
+            var current = $("[data-gallery-current]", gallery);
+            if (!track || !prev || !next) return;
+            var cards = Array.prototype.slice.call(track.children);
+            var ticking = false;
+
+            function stepWidth() {
+                return cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+            }
+
+            function update() {
+                var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 8;
+                var index = atEnd ? cards.length - 1 : Math.round(track.scrollLeft / Math.max(1, stepWidth()));
+                if (current) current.textContent = String(Math.min(cards.length, index + 1)).padStart(2, "0");
+                prev.disabled = track.scrollLeft <= 8;
+                next.disabled = atEnd;
+                ticking = false;
+            }
+
+            function go(direction) {
+                track.scrollBy({ left: direction * stepWidth(), behavior: REDUCED_MOTION ? "auto" : "smooth" });
+            }
+
+            prev.addEventListener("click", function () {
+                go(-1);
+            });
+            next.addEventListener("click", function () {
+                go(1);
+            });
+            track.addEventListener("scroll", function () {
+                if (!ticking) {
+                    window.requestAnimationFrame(update);
+                    ticking = true;
+                }
+            }, { passive: true });
+            window.addEventListener("resize", update);
+            update();
+        });
+    }
+
     function initYear() {
         $$("[data-year]").forEach(function (node) {
             node.textContent = String(new Date().getFullYear());
@@ -806,6 +1187,8 @@
     /* Arranque ----------------------------------------------------------- */
 
     initTheme();
+    initSettings();
+    initLanguage();
     initHeader();
     initNavigation();
     initWordReveal();
@@ -817,5 +1200,7 @@
     initLocalityPreset(); /* antes del filtro, que reescribe la URL */
     initPropertyFilter();
     initLeadForms();
+    initCounters();
+    initGalleries();
     initYear();
 })();

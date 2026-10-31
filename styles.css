@@ -65,6 +65,7 @@
     --text: #f5f5f7;
     --text-2: #a1a1a6;
     --text-3: #86868b;
+    --text-inverse: #0b0b0d;                    /* texto sobre un círculo del color de --text */
     --nav-link: rgba(245, 245, 247, 0.78);
     --prose: #d2d2d7;
     --title-grad: linear-gradient(180deg, #ffffff 30%, #b9b9be 100%);
@@ -80,6 +81,11 @@
 
     --edge-house: rgba(245, 245, 247, 0.7);
     --edge-tower: rgba(199, 169, 125, 0.85);
+
+    /* Cristal líquido (Apple): relleno, borde con reflejo de luz y sombra */
+    --lg-fill: rgba(30, 30, 34, 0.5);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 32%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.16) 100%);
+    --lg-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
     --danger: #ff6b5e;
     --success: #5fd08a;
@@ -125,7 +131,8 @@
 
     --text: #1a1a1a;
     --text-2: #5f5648;
-    --text-3: #6e6455;
+    --text-3: #685e4f;                          /* 4,6:1 sobre el fondo del pie */
+    --text-inverse: #f6f1e8;
     --nav-link: rgba(26, 26, 26, 0.72);
     --prose: #2e2923;
     --title-grad: linear-gradient(180deg, #1a1a1a 35%, #6b5c47 100%);
@@ -137,6 +144,10 @@
 
     --edge-house: rgba(26, 26, 26, 0.72);
     --edge-tower: rgba(154, 116, 64, 0.95);
+
+    --lg-fill: rgba(255, 255, 255, 0.58);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 30%, rgba(176, 141, 93, 0.12) 60%, rgba(255, 255, 255, 0.7) 100%);
+    --lg-shadow: 0 12px 34px -16px rgba(92, 70, 38, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
     --danger: #b3261e;
     --success: #2f6b45;
@@ -237,6 +248,11 @@ h4 {
 }
 
 /* 3. Utilidades ------------------------------------------------------------ */
+/* Página cargada dentro de un marco de otra web (ver theme.js): no se muestra. */
+html[data-framed] body {
+    display: none !important;
+}
+
 .container {
     width: 100%;
     max-width: var(--container);
@@ -626,6 +642,10 @@ h4 {
 }
 
 /* 5. Cabecera y pie -------------------------------------------------------- */
+/* Arriba del todo, la cabecera es una barra translúcida a todo el ancho. Al desplazar
+   se convierte en una cápsula de cristal líquido flotante, como en Apple. El cristal va
+   en ::before y su reflejo en ::after: con backdrop-filter en la propia cabecera, el
+   menú del móvil (position: fixed) quedaría encerrado dentro de ella. */
 .site-header {
     position: fixed;
     inset: 0 0 auto;
@@ -633,30 +653,103 @@ h4 {
     height: var(--header-h);
     display: flex;
     align-items: center;
+}
+
+.site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background: var(--header-bg);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid transparent;
-    transition: background-color var(--transition), border-color var(--transition);
-}
-
-.site-header.is-scrolled {
-    background: var(--header-bg-2);
-    border-bottom-color: var(--stroke);
-}
-
-/* backdrop-filter crea un bloque contenedor que confinaría el menú fijo */
-.site-header.is-open {
-    background: var(--bg);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+    transition: opacity 0.45s var(--ease);
 }
 
 .site-header .container {
+    position: relative;
+    isolation: isolate;
+    align-self: stretch;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
+    transition: max-width 0.6s var(--ease), padding 0.6s var(--ease);
+}
+
+.site-header .container::before,
+.site-header .container::after {
+    content: "";
+    position: absolute;
+    inset: 0.5rem 0;
+    border-radius: var(--pill);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s var(--ease);
+}
+
+.site-header .container::before {
+    z-index: -1;
+    background: var(--lg-fill);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    backdrop-filter: blur(24px) saturate(190%);
+    box-shadow: var(--lg-shadow);
+}
+
+.site-header .container::after {
+    padding: 1px;
+    background: var(--lg-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.site-header.is-scrolled:not(.is-open)::before {
+    opacity: 0;
+}
+
+.site-header.is-scrolled:not(.is-open) .container {
+    max-width: calc(var(--container) - 1.5rem);
+    padding-inline: 1.5rem 0.55rem;
+}
+
+.site-header.is-scrolled:not(.is-open) .container::before,
+.site-header.is-scrolled:not(.is-open) .container::after {
+    opacity: 1;
+}
+
+/* Sobre una sección oscura (main.js añade .is-on-dark), la cabecera usa los colores
+   del tema oscuro aunque la web esté en el tema crema. */
+.site-header.is-on-dark:not(.is-open) {
+    --ink: 255, 255, 255;
+    --text: #f5f5f7;
+    --text-2: #a1a1a6;
+    --nav-link: rgba(245, 245, 247, 0.78);
+    --accent: #c7a97d;
+    --glass: rgba(255, 255, 255, 0.045);
+    --glass-2: rgba(255, 255, 255, 0.08);
+    --stroke: rgba(255, 255, 255, 0.1);
+    --stroke-2: rgba(255, 255, 255, 0.18);
+    --header-bg: rgba(0, 0, 0, 0.55);
+    --lg-fill: rgba(30, 30, 34, 0.5);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 32%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.16) 100%);
+    --lg-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    color-scheme: dark;
+}
+
+.site-header.is-on-dark:not(.is-open) .logo--on-dark {
+    display: block;
+}
+
+.site-header.is-on-dark:not(.is-open) .logo--on-light {
+    display: none;
+}
+
+/* Con el menú del móvil abierto, la cabecera es opaca y ocupa todo el ancho. */
+.site-header.is-open::before {
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 .brand {
@@ -802,11 +895,14 @@ h4 {
 /* Transición circular al cambiar de tema (View Transitions API) */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-    animation: none;
     mix-blend-mode: normal;
 }
 
-::view-transition-new(root) {
+html.is-theme-switch::view-transition-old(root) {
+    animation: none;
+}
+
+html.is-theme-switch::view-transition-new(root) {
     animation: theme-reveal 0.75s var(--ease);
 }
 
@@ -817,6 +913,7 @@ h4 {
 
 .nav-toggle {
     display: none;
+    flex-shrink: 0;            /* si no, los demás botones lo aplastan en el móvil */
     width: 44px;
     height: 44px;
     align-items: center;
@@ -1659,6 +1756,401 @@ h4 {
     margin: 0 auto 1.5rem;
 }
 
+/* Escena «Cómo trabajamos»: villa 3D al atardecer --------------------------- */
+/* Sección siempre oscura, en los dos temas, como una fotografía de arquitectura al
+   anochecer. .dusk recupera los valores del tema oscuro dentro de la sección. */
+.dusk,
+.night {
+    --bg: #08080b;
+    --ink: 255, 255, 255;
+    --surface-1: rgba(255, 255, 255, 0.07);
+    --surface-2: rgba(255, 255, 255, 0.025);
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-2: rgba(255, 255, 255, 0.1);
+    --chip: rgba(28, 26, 30, 0.5);
+    --chip-2: rgba(0, 0, 0, 0.45);
+    --highlight: rgba(255, 255, 255, 0.06);
+    --stroke: rgba(255, 255, 255, 0.12);
+    --stroke-2: rgba(255, 255, 255, 0.2);
+    --shadow-c: rgba(0, 0, 0, 0.85);
+    --media-a: #151517;
+    --media-b: #070708;
+    --text: #f5f5f7;
+    --text-2: #b8b3ab;
+    --text-3: #8f8a83;
+    --text-inverse: #0b0b0d;
+    --prose: #d2d2d7;
+    --title-grad: linear-gradient(180deg, #ffffff 30%, #b9b9be 100%);
+    --accent: #d9bd8f;
+    --accent-2: #f1dcb4;
+    --accent-grad: linear-gradient(120deg, #f6e3be 0%, #d6b98a 45%, #b08d5d 100%);
+    --lg-fill: rgba(30, 30, 34, 0.5);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 32%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.16) 100%);
+    --lg-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    color: var(--text);
+    color-scheme: dark;
+}
+
+/* Sin animaciones (o sin JavaScript) es una sección normal; con ellas, la sección
+   mide cuatro pantallas y su contenido queda fijo mientras se recorre. */
+.villa-scene {
+    --p: 0;
+    position: relative;
+    background: #08080b;
+}
+
+.js-scroll .villa-scene {
+    height: 420vh;
+}
+
+.villa-scene__sticky {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 3rem) 4rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.js-scroll .villa-scene__sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    padding-block: var(--header-h) 0;
+}
+
+/* Cielo: del violeta del anochecer al ámbar del horizonte; la noche cae al avanzar. */
+.villa-scene__sky {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(60% 38% at 70% 74%, rgba(232, 168, 98, 0.42), transparent 70%),
+        linear-gradient(180deg, #07070c 0%, #121022 30%, #2b1f33 52%, #5a3a3a 66%, #b0784a 78%, #2a1d16 86%, #0b0a09 100%);
+}
+
+.villa-scene__sky span {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #050508 0%, #0b0b14 55%, #1a1410 80%, #070706 100%);
+    opacity: calc(var(--p) * 0.75);
+}
+
+.villa-scene__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+}
+
+.villa-scene__title {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.villa-scene__lead {
+    max-width: 30rem;
+    margin-bottom: 2rem;
+    font-size: clamp(1rem, 1.3vw, 1.15rem);
+    line-height: 1.6;
+    color: var(--text-2);
+}
+
+/* Pasos: el activo se ilumina; los demás quedan en segundo plano. */
+.vsteps {
+    display: grid;
+    gap: 0.25rem;
+    counter-reset: none;
+}
+
+.vstep {
+    display: grid;
+    grid-template-columns: 4.2rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--stroke);
+    transition: opacity 0.6s var(--ease);
+}
+
+.vstep__num {
+    font-family: var(--font-serif);
+    font-size: 2.6rem;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.vstep__title {
+    margin-bottom: 0.35rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.vstep__text {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--text-2);
+}
+
+/* Con la escena activa, solo el paso en curso muestra su texto (como un acordeón). */
+.js-scroll .villa-scene .vstep {
+    opacity: 0.35;
+}
+
+.js-scroll .villa-scene .vstep__text {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.6s var(--ease), opacity 0.6s var(--ease);
+}
+
+.js-scroll .villa-scene[data-active="0"] .vstep:nth-child(1),
+.js-scroll .villa-scene[data-active="1"] .vstep:nth-child(2),
+.js-scroll .villa-scene[data-active="2"] .vstep:nth-child(3),
+.js-scroll .villa-scene[data-active="3"] .vstep:nth-child(4) {
+    opacity: 1;
+}
+
+.js-scroll .villa-scene[data-active="0"] .vstep:nth-child(1) .vstep__text,
+.js-scroll .villa-scene[data-active="1"] .vstep:nth-child(2) .vstep__text,
+.js-scroll .villa-scene[data-active="2"] .vstep:nth-child(3) .vstep__text,
+.js-scroll .villa-scene[data-active="3"] .vstep:nth-child(4) .vstep__text {
+    max-height: 8em;
+    opacity: 1;
+}
+
+.villa-scene__stage {
+    position: relative;
+    height: min(72vh, 640px);
+}
+
+/* Villa ------------------------------------------------------------------ */
+.villa {
+    --u: clamp(22px, 3.9vw, 54px);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    perspective: 1700px;
+}
+
+.villa__float {
+    transform-style: preserve-3d;
+    animation: float 9s ease-in-out infinite;
+}
+
+.villa__model {
+    position: relative;
+    transform-style: preserve-3d;
+    transform:
+        translateY(calc(var(--u) * 1.6))
+        rotateX(calc(-22deg + var(--p) * 10deg))
+        rotateY(calc(-34deg + var(--p) * 150deg));
+    will-change: transform;
+}
+
+/* Bloque genérico: --y es la altura de su base (negativa = hacia arriba). */
+.vb {
+    position: absolute;
+    transform-style: preserve-3d;
+    transform: translate3d(var(--x, 0px), calc(var(--y, 0px) - var(--h) / 2), var(--z, 0px));
+}
+
+.vb .face {
+    border-color: var(--edge);
+    box-shadow: none;
+    background: linear-gradient(var(--shade, transparent), var(--shade, transparent)), var(--mat);
+}
+
+/* Luz cenital desde la izquierda: cada cara con su sombra. */
+.vb .face--top { --shade: rgba(255, 255, 255, 0.06); }
+.vb .face--front { --shade: transparent; }
+.vb .face--left { --shade: rgba(0, 0, 0, 0.12); }
+.vb .face--right { --shade: rgba(0, 0, 0, 0.3); }
+.vb .face--back { --shade: rgba(0, 0, 0, 0.4); }
+.vb .face--bottom { --shade: rgba(0, 0, 0, 0.15); }
+
+/* Tarima de piedra clara */
+.vb--deck {
+    --w: calc(var(--u) * 10);
+    --d: calc(var(--u) * 7);
+    --h: calc(var(--u) * 0.3);
+    --edge: rgba(240, 226, 204, 0.35);
+    --mat: linear-gradient(160deg, #d9ccb6, #a99a83);
+}
+
+.vb--deck .face--top {
+    background:
+        repeating-linear-gradient(90deg, transparent 0 calc(var(--u) - 1px), rgba(60, 45, 30, 0.14) calc(var(--u) - 1px) var(--u)),
+        linear-gradient(160deg, #e8dcc6, #b9a98f);
+}
+
+/* Piscina: agua translúcida con reflejos en movimiento */
+.vb--pool {
+    --w: calc(var(--u) * 4.4);
+    --d: calc(var(--u) * 1.7);
+    --h: calc(var(--u) * 0.06);
+    --x: calc(var(--u) * -1.6);
+    --y: calc(var(--u) * -0.3);
+    --z: calc(var(--u) * 2.15);
+    --edge: rgba(220, 240, 245, 0.6);
+}
+
+.vb--pool .face--top {
+    background:
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0) 0 14px, rgba(255, 255, 255, 0.22) 16px, rgba(255, 255, 255, 0) 19px 34px),
+        linear-gradient(160deg, rgba(120, 205, 215, 0.85), rgba(40, 120, 150, 0.75));
+    background-size: 200% 200%, 100% 100%;
+    box-shadow: 0 0 calc(var(--u) * 1.2) rgba(120, 205, 215, 0.45);
+    animation: water 7s linear infinite;
+}
+
+@keyframes water {
+    from { background-position: 0% 0%, 0 0; }
+    to { background-position: 100% 100%, 0 0; }
+}
+
+/* Ala de cristal iluminada por dentro */
+.vb--glass {
+    --w: calc(var(--u) * 6);
+    --d: calc(var(--u) * 2.4);
+    --h: calc(var(--u) * 1.6);
+    --x: calc(var(--u) * -1.3);
+    --y: calc(var(--u) * -0.3);
+    --z: calc(var(--u) * -1.55);
+    --edge: rgba(40, 32, 26, 0.9);
+    --mat:
+        repeating-linear-gradient(90deg, transparent 0 calc(var(--u) * 0.75 - 2px), rgba(30, 24, 20, 0.85) calc(var(--u) * 0.75 - 2px) calc(var(--u) * 0.75)),
+        radial-gradient(120% 90% at 50% 100%, rgba(255, 196, 120, calc(0.55 + var(--p) * 0.35)), rgba(255, 170, 90, 0.18) 70%),
+        linear-gradient(180deg, rgba(60, 46, 36, 0.35), rgba(255, 190, 120, 0.25));
+}
+
+.vb--glass .face--top {
+    --mat: #2a221c;
+}
+
+/* Ala de piedra con un ventanal */
+.vb--stone {
+    --w: calc(var(--u) * 2.2);
+    --d: calc(var(--u) * 4.2);
+    --h: calc(var(--u) * 1.6);
+    --x: calc(var(--u) * 3.05);
+    --y: calc(var(--u) * -0.3);
+    --z: calc(var(--u) * 0.15);
+    --edge: rgba(90, 72, 52, 0.55);
+    --mat:
+        repeating-linear-gradient(180deg, transparent 0 calc(var(--u) * 0.2 - 1px), rgba(90, 70, 48, 0.18) calc(var(--u) * 0.2 - 1px) calc(var(--u) * 0.2)),
+        linear-gradient(160deg, #e7d9c1, #b8a284);
+}
+
+.vb--stone .face--left,
+.vb--stone .face--front {
+    background:
+        linear-gradient(var(--shade), var(--shade)),
+        radial-gradient(closest-side, rgba(255, 200, 130, calc(0.7 + var(--p) * 0.3)), rgba(255, 170, 90, 0.35)) 50% 70% / 58% 62% no-repeat,
+        var(--mat);
+}
+
+/* Tejados planos volados: blancos por fuera, de madera por debajo (como un porche) */
+.vb--roof-a,
+.vb--roof-b {
+    --h: calc(var(--u) * 0.2);
+    --y: calc(var(--u) * -1.9);
+    --edge: rgba(255, 255, 255, 0.5);
+    --mat: linear-gradient(160deg, #f6f1e8, #d8cfc0);
+}
+
+.vb--roof-a {
+    --w: calc(var(--u) * 7.4);
+    --d: calc(var(--u) * 3.6);
+    --x: calc(var(--u) * -1.1);
+    --z: calc(var(--u) * -1.1);
+}
+
+.vb--roof-b {
+    --w: calc(var(--u) * 3);
+    --d: calc(var(--u) * 5.2);
+    --x: calc(var(--u) * 3.05);
+    --z: calc(var(--u) * 0.4);
+}
+
+.vb--roof-a .face--bottom,
+.vb--roof-b .face--bottom {
+    background:
+        repeating-linear-gradient(90deg, transparent 0 6px, rgba(60, 35, 18, 0.25) 6px 7px),
+        linear-gradient(160deg, #b98656, #7c5232);
+}
+
+/* Chimenea de piedra */
+.vb--chimney {
+    --w: calc(var(--u) * 0.6);
+    --d: calc(var(--u) * 0.6);
+    --h: calc(var(--u) * 2.4);
+    --x: calc(var(--u) * 3.7);
+    --y: calc(var(--u) * -0.3);
+    --z: calc(var(--u) * -1.55);
+    --edge: rgba(90, 72, 52, 0.5);
+    --mat: linear-gradient(160deg, #e2d3ba, #ad967a);
+}
+
+/* Suelo: halo cálido bajo la casa */
+.villa__ground {
+    position: absolute;
+    left: calc(var(--u) * -8);
+    top: calc(var(--u) * -8);
+    width: calc(var(--u) * 16);
+    height: calc(var(--u) * 16);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, rgba(232, 168, 98, 0.35) 0%, rgba(120, 90, 60, 0.12) 40%, transparent 68%),
+        repeating-linear-gradient(0deg, transparent 0 calc(var(--u) - 1px), rgba(255, 255, 255, 0.05) calc(var(--u) - 1px) var(--u)),
+        repeating-linear-gradient(90deg, transparent 0 calc(var(--u) - 1px), rgba(255, 255, 255, 0.05) calc(var(--u) - 1px) var(--u));
+    -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 68%);
+    mask-image: radial-gradient(circle, #000 30%, transparent 68%);
+    transform: rotateX(90deg);
+}
+
+/* Árboles: dos planos cruzados con la copa recortada */
+.tree {
+    position: absolute;
+    transform-style: preserve-3d;
+    transform: translate3d(var(--x), 0, var(--z));
+}
+
+.tree i {
+    position: absolute;
+    left: calc(var(--s) * -0.5);
+    top: calc(var(--s) * -1.25);
+    width: var(--s);
+    height: calc(var(--s) * 1.25);
+    background:
+        linear-gradient(90deg, transparent calc(50% - 1.5px), #3a2a1c calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px)) 0 100% / 100% 40% no-repeat,
+        radial-gradient(closest-side, #2f3a24 0%, #232c1b 70%, transparent 72%) 50% 0 / 100% 72% no-repeat;
+    opacity: 0.92;
+}
+
+.tree i:last-child {
+    transform: rotateY(90deg);
+}
+
+.tree--1 { --s: calc(var(--u) * 2.2); --x: calc(var(--u) * -5.2); --z: calc(var(--u) * -2.6); }
+.tree--2 { --s: calc(var(--u) * 2.6); --x: calc(var(--u) * 5.4); --z: calc(var(--u) * -2.4); }
+.tree--3 { --s: calc(var(--u) * 1.8); --x: calc(var(--u) * -4.6); --z: calc(var(--u) * 2.9); }
+
 /* 7. Secciones ------------------------------------------------------------- */
 
 /* Hero de páginas interiores */
@@ -1749,6 +2241,25 @@ h4 {
     background: var(--glass);
     border: 1px solid var(--stroke);
     border-radius: var(--pill);
+}
+
+/* Siempre en una línea: si no cabe, el título de la página actual se recorta con «…»
+   (se lee completo justo debajo, en el título). */
+.breadcrumb ol {
+    flex-wrap: nowrap;
+    max-width: 100%;
+}
+
+.breadcrumb li {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.breadcrumb li[aria-current] {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .breadcrumb li + li::before {
@@ -2565,7 +3076,7 @@ h4 {
     background: var(--chip-2);
     border: 1px solid rgba(199, 169, 125, 0.45);
     border-radius: var(--pill);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--accent-2);
@@ -2797,13 +3308,945 @@ h4 {
     color: var(--text-2);
 }
 
+/* 7b. Cristal líquido ------------------------------------------------------ */
+/* Material común de botones de cristal, etiquetas flotantes, cita, selector de tema e
+   idioma y botón «volver arriba»: relleno translúcido, desenfoque del fondo y un borde
+   con reflejo de luz (--lg-rim) que se dibuja en ::after con una máscara. */
+.btn--glass,
+.btn--outline,
+.btn--outline-light,
+.btn--orb,
+.callout,
+.back-to-top,
+.split__quote,
+.theme-toggle,
+.settings-toggle,
+.lang-switch {
+    position: relative;
+    background: var(--lg-fill);
+    border-color: transparent;
+    -webkit-backdrop-filter: blur(22px) saturate(190%);
+    backdrop-filter: blur(22px) saturate(190%);
+    box-shadow: var(--lg-shadow);
+}
+
+.callout,
+.back-to-top,
+.split__quote {
+    position: absolute;
+}
+
+.back-to-top {
+    position: fixed;
+}
+
+.btn--glass::after,
+.btn--outline::after,
+.btn--outline-light::after,
+.btn--orb::after,
+.gallery__btn::after,
+.callout::after,
+.back-to-top::after,
+.split__quote::after,
+.theme-toggle::after,
+.settings-toggle::after,
+.lang-switch::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--lg-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+
+.btn--glass:hover,
+.btn--outline:hover,
+.btn--outline-light:hover,
+.theme-toggle:hover,
+.settings-toggle:hover {
+    background: var(--glass-2);
+    border-color: transparent;
+}
+
+/* Tarjetas: un brillo superior más marcado, como el canto de un cristal. */
+.card {
+    box-shadow: inset 0 1px 0 var(--highlight), inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 30px 60px -30px var(--shadow-c);
+}
+
+/* Cifras editoriales en cursiva (pasos del proceso en Servicios) */
+.step::before {
+    font-family: var(--font-serif);
+    font-size: 3.6rem;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+}
+
+/* 7c. Piezas editoriales (inspiradas en webs de arquitectura de alto standing) -- */
+
+/* Botón de cápsula con una flecha dentro de un círculo */
+.btn--orb {
+    gap: 0.9rem;
+    padding: 0.4rem 0.4rem 0.4rem 1.35rem;
+    color: var(--text);
+}
+
+.btn__orb {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--text-inverse);
+    transition: transform 0.5s var(--ease);
+}
+
+.btn__orb .icon {
+    width: 1rem;
+    height: 1rem;
+    stroke-width: 2;
+}
+
+.btn--orb:hover .btn__orb,
+.btn--orb:focus-visible .btn__orb {
+    transform: rotate(45deg);
+}
+
+/* Franjas de transición de color entre secciones claras y oscuras, con un hilo dorado */
+.tone {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: clamp(140px, 24vh, 240px);
+}
+
+.tone--to-night {
+    background: linear-gradient(180deg, var(--bg) 0%, #07070c 100%);
+}
+
+.tone--to-day {
+    background: linear-gradient(180deg, #08080b 0%, var(--bg) 100%);
+}
+
+/* Mitad oscura de la franja: la cabecera ya se oscurece al pasar por ella (main.js). */
+.tone__dark {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    pointer-events: none;
+}
+
+.tone--to-night .tone__dark {
+    bottom: 0;
+}
+
+.tone--to-day .tone__dark {
+    top: 0;
+}
+
+.tone::after {
+    content: "";
+    width: 1px;
+    height: 70%;
+    background: linear-gradient(180deg, transparent, rgba(199, 169, 125, 0.55), transparent);
+}
+
+/* Las secciones alternas se funden con las vecinas en lugar de cortar en seco */
+.section--alt {
+    background: linear-gradient(180deg, var(--bg) 0, var(--bg-2) 6rem, var(--bg-2) calc(100% - 6rem), var(--bg) 100%);
+}
+
+/* Cifras grandes en cursiva */
+.figures {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+    margin: 0 0 3rem;
+    padding-bottom: 2.25rem;
+    border-bottom: 1px solid var(--stroke);
+}
+
+.figure__value {
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 6.5vw, 5.4rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+}
+
+.figure__label {
+    max-width: 15rem;
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--text-2);
+}
+
+/* Paneles de servicios que se expanden (como galería de fotografías) */
+.panels {
+    display: flex;
+    gap: 1rem;
+    height: clamp(470px, 64vh, 600px);
+}
+
+.panel {
+    position: relative;
+    isolation: isolate;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 28px;
+    color: var(--text);
+    background: var(--panel-bg);
+    box-shadow: 0 40px 70px -40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: flex-grow 0.9s var(--ease), box-shadow var(--transition);
+}
+
+.panel--1 { --panel-bg: radial-gradient(70% 45% at 60% 82%, rgba(236, 160, 90, 0.5), transparent 70%), linear-gradient(180deg, #17142a 0%, #3b2a3c 48%, #9a643e 100%); }
+.panel--2 { --panel-bg: radial-gradient(70% 45% at 40% 82%, rgba(214, 170, 110, 0.45), transparent 70%), linear-gradient(180deg, #0d1822 0%, #213547 50%, #b78450 100%); }
+.panel--3 { --panel-bg: radial-gradient(70% 45% at 55% 80%, rgba(230, 180, 120, 0.4), transparent 70%), linear-gradient(180deg, #14110f 0%, #2e241b 50%, #87663f 100%); }
+.panel--4 { --panel-bg: radial-gradient(70% 45% at 45% 82%, rgba(200, 190, 130, 0.38), transparent 70%), linear-gradient(180deg, #0b1311 0%, #1d2b24 50%, #6f6d48 100%); }
+
+/* Legibilidad del texto sobre el fondo */
+.panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.panel .obj3d {
+    --u: clamp(20px, 2.2vw, 30px);
+    position: absolute;
+    inset: 0 0 38%;
+    height: auto;
+    margin: 0;
+}
+
+.panel__body {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 1.5rem 1.4rem 1.7rem;
+    transition: padding 0.8s var(--ease);
+}
+
+.panel__index {
+    margin-bottom: 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: rgba(245, 245, 247, 0.75);
+}
+
+/* Cerrado, el título es más pequeño para que quepa en el panel estrecho; al abrirse crece. */
+.panel__title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    transition: font-size 0.8s var(--ease);
+}
+
+.panel__more {
+    display: grid;
+    gap: 0.9rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.8s var(--ease), opacity 0.6s var(--ease), margin 0.8s var(--ease);
+}
+
+.panel__text {
+    max-width: 30rem;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: rgba(245, 245, 247, 0.82);
+}
+
+.panel__details {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: rgba(245, 245, 247, 0.62);
+}
+
+.panel .btn--orb {
+    justify-self: start;
+    --text: #f5f5f7;
+    --text-inverse: #0b0b0d;
+    --lg-fill: rgba(255, 255, 255, 0.14);
+}
+
+/* Panel abierto: el que tiene el cursor o el foco; si no hay ninguno, el primero. */
+.panel:hover,
+.panel:focus-within,
+.panels:not(:hover):not(:focus-within) .panel:first-child {
+    flex-grow: 2.7;
+}
+
+.panel:hover .panel__title,
+.panel:focus-within .panel__title,
+.panels:not(:hover):not(:focus-within) .panel:first-child .panel__title {
+    font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+}
+
+.panel:hover .panel__body,
+.panel:focus-within .panel__body,
+.panels:not(:hover):not(:focus-within) .panel:first-child .panel__body {
+    padding: 1.9rem 2rem 2rem;
+}
+
+.panel:hover .panel__more,
+.panel:focus-within .panel__more,
+.panels:not(:hover):not(:focus-within) .panel:first-child .panel__more {
+    max-height: 18rem;
+    margin-top: 1.1rem;
+    opacity: 1;
+}
+
+/* Galería horizontal del blog sobre fondo oscuro */
+.gallery {
+    position: relative;
+    padding-block: 3rem 6rem;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.gallery__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.gallery__title {
+    margin: 0 0 1rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.3rem, 4.8vw, 4rem);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+}
+
+.gallery__lead {
+    max-width: 34rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-2);
+}
+
+.gallery__nav {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.gallery__count {
+    margin-right: 0.6rem;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.12em;
+    color: var(--text-2);
+}
+
+.gallery__count span {
+    color: var(--text);
+}
+
+.gallery__btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    color: var(--text);
+    background: var(--lg-fill);
+    box-shadow: var(--lg-shadow);
+    -webkit-backdrop-filter: blur(22px) saturate(190%);
+    backdrop-filter: blur(22px) saturate(190%);
+    transition: opacity var(--transition), transform var(--transition);
+}
+
+.gallery__btn:hover {
+    transform: scale(1.06);
+}
+
+.gallery__btn[disabled] {
+    opacity: 0.35;
+    cursor: default;
+    transform: none;
+}
+
+.gallery__btn .icon {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.gallery__track {
+    --edge: max(var(--gutter), calc((100vw - var(--container)) / 2 + var(--gutter)));
+    display: flex;
+    gap: 1.25rem;
+    padding: 0.5rem var(--edge) 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--edge);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+}
+
+.gallery__track::-webkit-scrollbar {
+    display: none;
+}
+
+.gallery__track > .post-card {
+    flex: 0 0 min(360px, 80vw);
+    scroll-snap-align: start;
+}
+
+/* En el carril horizontal, las tarjetas solo aparecen con un fundido: si se movieran o
+   se escalaran, el navegador recolocaría el carril al terminar la animación. */
+.js-reveal .gallery__track .reveal:not(.is-visible) {
+    filter: none;
+    transform: none;
+}
+
+.gallery__foot {
+    margin-top: 2rem;
+}
+
+/* Entrada de la portada y de las cabeceras interiores: del desenfoque a la nitidez,
+   en cascada. Solo opacidad, desenfoque y desplazamiento de los hijos: el contenedor
+   conserva las transformaciones ligadas al scroll. */
+@keyframes intro {
+    from {
+        opacity: 0;
+        filter: blur(14px);
+        transform: translate3d(0, 26px, 0);
+    }
+}
+
+@keyframes intro-fade {
+    from {
+        opacity: 0;
+        filter: blur(18px);
+    }
+}
+
+.hero3d__copy > *,
+.page-hero .container > * {
+    animation: intro 1.2s var(--ease) backwards;
+}
+
+.hero3d__copy > :nth-child(2),
+.page-hero .container > :nth-child(2) { animation-delay: 0.1s; }
+.hero3d__copy > :nth-child(3),
+.page-hero .container > :nth-child(3) { animation-delay: 0.2s; }
+.hero3d__copy > :nth-child(4),
+.page-hero .container > :nth-child(4) { animation-delay: 0.3s; }
+
+.hero3d__stage {
+    animation: intro-fade 1.8s var(--ease) 0.25s backwards;
+}
+
+/* Transición suave entre páginas (View Transitions entre documentos): la página se
+   desvanece y la nueva aparece nítida. El cambio de tema usa
+   su propio efecto circular (main.js añade .is-theme-switch durante el cambio). */
+@view-transition {
+    navigation: auto;
+}
+
+/* La cabecera no lleva view-transition-name: en Chromium, un nombre de transición
+   convierte el elemento en «raíz de fondo» y el cristal ya no desenfoca la página. */
+
+html:not(.is-theme-switch)::view-transition-old(root) {
+    animation: page-out 0.32s var(--ease) both;
+}
+
+html:not(.is-theme-switch)::view-transition-new(root) {
+    animation: page-in 0.6s var(--ease) both;
+}
+
+@keyframes page-out {
+    to {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(0.985);
+    }
+}
+
+@keyframes page-in {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(1.012);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+}
+
+/* Paneles: en pantallas táctiles anchas, cuadrícula de 2 con todo visible; en el móvil, apilados. */
+@media (hover: none) and (min-width: 861px) {
+    .panels {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        height: auto;
+    }
+
+    .panel {
+        min-height: 0;
+    }
+}
+
+@media (hover: none), (max-width: 860px) {
+    /* El objeto 3D va encima del texto, sin superponerse. */
+    .panel .obj3d {
+        position: relative;
+        inset: auto;
+        height: 210px;
+    }
+
+    .panel .panel__body {
+        position: relative;
+        padding: 0 1.5rem 1.75rem;
+    }
+
+    .panel .panel__title {
+        font-size: clamp(1.9rem, 7vw, 2.4rem);
+    }
+
+    .panel .panel__more {
+        max-height: none;
+        margin-top: 1.1rem;
+        opacity: 1;
+    }
+}
+
+@media (max-width: 860px) {
+    .panels {
+        flex-direction: column;
+        height: auto;
+    }
+
+    /* En columna, el tamaño lo da el contenido (con flex-basis 0 se quedarían sin altura). */
+    .panel {
+        flex: none;
+        min-height: 0;
+    }
+
+    .figures {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem 1.25rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.75rem;
+    }
+
+    .figure__value {
+        font-size: clamp(2.6rem, 12vw, 3.4rem);
+    }
+
+    .figure__label {
+        font-size: 0.8rem;
+    }
+
+    .gallery__head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* 7d. Ajustes, idioma y personalización -------------------------------------- */
+
+/* Botón de ajustes de la cabecera (mismo aspecto que el del tema) */
+.settings-toggle {
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    margin-left: -0.5rem;
+    border-radius: 50%;
+    color: var(--text);
+    transition: background-color var(--transition), transform var(--transition);
+}
+
+.settings-toggle[hidden] {
+    display: none;
+}
+
+.settings-toggle .icon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.settings-toggle[aria-expanded="true"] {
+    background: var(--glass-2);
+}
+
+/* Panel de cristal anclado bajo la cabecera (en el móvil, una hoja inferior) */
+.settings {
+    position: fixed;
+    top: calc(var(--header-h) + 0.5rem);
+    right: max(0.75rem, calc((100vw - var(--container)) / 2 + 0.75rem));
+    z-index: 1100;
+    width: min(380px, calc(100vw - 1.5rem));
+    max-height: calc(100vh - var(--header-h) - 1.5rem);
+    max-height: calc(100dvh - var(--header-h) - 1.5rem);
+    overflow-y: auto;
+    padding: 1.1rem 1.1rem 1rem;
+    border-radius: 28px;
+    color: var(--text);
+    background: var(--settings-fill, rgba(246, 241, 232, 0.86));
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    backdrop-filter: blur(30px) saturate(190%);
+    box-shadow: var(--lg-shadow), 0 30px 80px -30px rgba(0, 0, 0, 0.45);
+    animation: settings-in 0.45s var(--ease);
+    transform-origin: top right;
+}
+
+[data-theme="dark"] .settings {
+    --settings-fill: rgba(24, 24, 28, 0.86);
+}
+
+.settings[hidden] {
+    display: none;
+}
+
+.settings::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--lg-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+
+@keyframes settings-in {
+    from {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(-8px) scale(0.96);
+    }
+}
+
+.settings__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-left: 0.3rem;
+}
+
+.settings__title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.settings__close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(var(--ink), 0.08);
+    color: var(--text);
+}
+
+.settings__close .icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.seg-field {
+    margin: 0;
+    padding: 0.55rem 0 0.35rem;
+    border: 0;
+}
+
+.seg-field__legend {
+    margin-bottom: 0.45rem;
+    padding-left: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-2);
+}
+
+/* Control segmentado (como en iOS) */
+.seg {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 14px;
+    background: rgba(var(--ink), 0.07);
+}
+
+.seg label,
+.seg a {
+    display: grid;
+    place-items: center;
+    min-height: 2.35rem;
+    padding: 0.35rem 0.4rem;
+    border-radius: 11px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background-color 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.seg label:hover,
+.seg a:hover {
+    color: var(--text);
+}
+
+.seg input:checked + label,
+.seg a[aria-current="true"] {
+    background: var(--seg-on, #fffdf9);
+    color: var(--text);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .seg {
+    --seg-on: rgba(255, 255, 255, 0.16);
+}
+
+.seg input:focus-visible + label {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.settings__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding: 0.85rem 0.3rem 0.1rem;
+    border-top: 1px solid var(--stroke);
+}
+
+.settings__note {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-2);
+}
+
+.settings__reset {
+    flex-shrink: 0;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--pill);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(var(--ink), 0.06);
+}
+
+/* Aviso de idioma (el navegador del visitante prefiere otro idioma de la web) */
+.lang-toast {
+    position: fixed;
+    left: max(0.75rem, calc((100vw - var(--container)) / 2 + 0.75rem));
+    bottom: 1.25rem;
+    z-index: 950;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    max-width: min(560px, calc(100vw - 1.5rem));
+    padding: 0.6rem 0.6rem 0.6rem 1.2rem;
+    border-radius: var(--pill);
+    color: var(--text);
+    background: var(--settings-fill, rgba(246, 241, 232, 0.88));
+    -webkit-backdrop-filter: blur(26px) saturate(190%);
+    backdrop-filter: blur(26px) saturate(190%);
+    box-shadow: var(--lg-shadow), 0 24px 60px -24px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    pointer-events: none;
+}
+
+[data-theme="dark"] .lang-toast {
+    --settings-fill: rgba(24, 24, 28, 0.88);
+}
+
+.lang-toast.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+.lang-toast p {
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.lang-toast .btn {
+    flex-shrink: 0;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.85rem;
+}
+
+.lang-toast__close {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--text-2);
+    background: rgba(var(--ink), 0.07);
+}
+
+/* Tamaño del texto (todo se mide en rem, así que crece de forma proporcional) */
+html[data-text="l"] {
+    font-size: 112.5%;
+}
+
+html[data-text="xl"] {
+    font-size: 125%;
+}
+
+/* La cabecera (navegación) conserva su tamaño: lo que se amplía es el contenido.
+   Así el menú, el idioma y los botones siguen cabiendo en una línea. */
+html[data-text="l"] .site-header {
+    zoom: 0.8889;
+}
+
+html[data-text="xl"] .site-header {
+    zoom: 0.8;
+}
+
+/* El zoom también encoge el ancho máximo (en píxeles): se compensa. */
+html[data-text="l"] .site-header .container {
+    max-width: calc(var(--container) * 1.125);
+}
+
+html[data-text="l"] .site-header.is-scrolled:not(.is-open) .container {
+    max-width: calc((var(--container) - 1.5rem) * 1.125);
+}
+
+html[data-text="xl"] .site-header .container {
+    max-width: calc(var(--container) * 1.25);
+}
+
+html[data-text="xl"] .site-header.is-scrolled:not(.is-open) .container {
+    max-width: calc((var(--container) - 1.5rem) * 1.25);
+}
+
+/* Con el texto ampliado, las palabras largas (correos, enlaces) y los botones pueden
+   partirse en lugar de salirse de la pantalla. */
+html[data-text] body {
+    overflow-wrap: break-word;
+}
+
+html[data-text] td a {
+    overflow-wrap: anywhere;
+}
+
+html[data-text] main .btn {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+}
+
+/* Contraste alto: textos secundarios y bordes más marcados */
+html[data-contrast="more"] {
+    --text-2: #3d362d;
+    --text-3: #3d362d;
+    --nav-link: #1a1a1a;
+    --stroke: rgba(26, 26, 26, 0.24);
+    --stroke-2: rgba(26, 26, 26, 0.36);
+}
+
+html[data-contrast="more"][data-theme="dark"] {
+    --text-2: #d8d8dd;
+    --text-3: #c4c4c9;
+    --nav-link: #ffffff;
+    --stroke: rgba(255, 255, 255, 0.24);
+    --stroke-2: rgba(255, 255, 255, 0.36);
+}
+
+html[data-contrast="more"] .dusk,
+html[data-contrast="more"] .night,
+html[data-contrast="more"] .site-header.is-on-dark:not(.is-open) {
+    --text-2: #e6e2db;
+    --text-3: #d2cdc5;
+    --nav-link: #ffffff;
+}
+
+@media (max-width: 720px) {
+    .settings {
+        top: auto;
+        right: 0.6rem;
+        bottom: 0.6rem;
+        left: 0.6rem;
+        width: auto;
+        max-height: 82vh;
+        max-height: 82dvh;
+        transform-origin: bottom center;
+    }
+
+    .lang-toast {
+        right: 0.75rem;
+        bottom: 0.75rem;
+        flex-wrap: wrap;
+        border-radius: 22px;
+        padding: 0.9rem 1rem;
+    }
+
+    .lang-toast p {
+        flex: 1 1 100%;
+    }
+}
+
+/* Móviles muy estrechos: el tema se cambia desde «Ajustes» */
+@media (max-width: 400px) {
+    .settings-toggle:not([hidden]) + .theme-toggle {
+        display: none;
+    }
+}
+
 /* 8. Movimiento ------------------------------------------------------------ */
+/* Al entrar en pantalla, cada bloque pasa de desenfocado a nítido (como en las webs
+   de arquitectura de alto standing) mientras sube y se endereza. */
 .reveal {
-    transition: opacity 1.1s var(--ease), transform 1.1s var(--ease), border-color var(--transition);
+    transition: opacity 1.1s var(--ease), transform 1.1s var(--ease), filter 1.1s var(--ease), border-color var(--transition);
 }
 
 .js-reveal .reveal:not(.is-visible) {
     opacity: 0;
+    filter: blur(14px);
     transform: perspective(1200px) translate3d(0, 60px, 0) rotateX(12deg) scale(0.97);
     transform-origin: 50% 100%;
 }
@@ -2823,6 +4266,7 @@ h4 {
 
     .js-reveal .reveal:not(.is-visible) {
         opacity: 1;
+        filter: none;
         transform: none;
     }
 
@@ -2863,6 +4307,68 @@ h4 {
         transform: none;
     }
 }
+
+/* Lo mismo cuando el visitante elige «Movimiento: reducido» en «Ajustes». */
+html[data-motion="reduced"] {
+        scroll-behavior: auto;
+}
+
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+}
+
+html[data-motion="reduced"].js-reveal .reveal:not(.is-visible) {
+        opacity: 1;
+        filter: none;
+        transform: none;
+}
+
+html[data-motion="reduced"] .hero3d,
+html[data-motion="reduced"] .statement {
+        height: auto;
+}
+
+html[data-motion="reduced"] .hero3d__sticky,
+html[data-motion="reduced"] .statement__sticky {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        padding-block: calc(var(--header-h) + 3rem) 4rem;
+}
+
+html[data-motion="reduced"] .hero3d__copy,
+html[data-motion="reduced"] .hero3d__stage,
+html[data-motion="reduced"] .scroll-hint {
+        opacity: 1;
+        transform: none;
+}
+
+html[data-motion="reduced"] .scroll-hint {
+        display: none;
+}
+
+html[data-motion="reduced"] .callout {
+        opacity: 1;
+        transform: none;
+}
+
+html[data-motion="reduced"] .model {
+        transform: translateY(calc(var(--u) * 1.4)) rotateX(-18deg) rotateY(-32deg);
+}
+
+html[data-motion="reduced"] .tilt {
+        transform: none;
+}
+
+html[data-motion="reduced"]::view-transition-old(root),
+html[data-motion="reduced"]::view-transition-new(root) {
+    animation: none !important;
+}
+
 
 /* 9. Responsive ------------------------------------------------------------ */
 @media (max-width: 1100px) {
@@ -3118,7 +4624,7 @@ h4 {
     }
 
     .page-hero {
-        padding: calc(var(--header-h) + 4.5rem) 0 4rem;
+        padding: calc(var(--header-h) + 4.5rem) 0 2.75rem;
     }
 
     .page-hero__panes span:nth-child(1),
@@ -3159,3 +4665,205 @@ h4 {
     }
 }
 
+
+/* Escena de la villa en tabletas y móviles: la villa arriba y los pasos debajo. */
+@media (max-width: 860px) {
+    .js-scroll .villa-scene {
+        height: 360vh;
+    }
+
+    .villa-scene__grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.5rem;
+    }
+
+    .villa-scene__stage {
+        order: -1;
+        height: 36vh;
+        height: 36svh;
+    }
+
+    .villa {
+        --u: clamp(16px, 5.4vw, 32px);
+    }
+
+    .villa-scene__title {
+        margin-bottom: 0.6rem;
+        font-size: clamp(2.1rem, 9vw, 3rem);
+    }
+
+    .villa-scene__lead {
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .vstep {
+        grid-template-columns: 2.8rem minmax(0, 1fr);
+        gap: 0.6rem;
+        padding-block: 0.6rem;
+    }
+
+    .vstep__num {
+        font-size: 1.8rem;
+    }
+
+    .vstep__title {
+        font-size: 1rem;
+    }
+}
+
+/* Pantallas bajas: la introducción no cabe junto a los pasos mientras la escena está fija. */
+@media (max-width: 860px) and (max-height: 760px), (max-height: 640px) {
+    .js-scroll .villa-scene__lead {
+        display: none;
+    }
+}
+
+/* En pantallas estrechas la cápsula deja un margen a cada lado. */
+@media (max-width: 1100px) {
+    .site-header.is-scrolled:not(.is-open) .container {
+        width: calc(100% - 1.25rem);
+        padding-inline: 1rem 0.35rem;
+    }
+}
+
+/* Cabecera estrecha: el botón de ajustes empuja los botones a la derecha. */
+@media (max-width: 1100px) {
+    .settings-toggle {
+        margin-left: auto;
+        margin-right: 0.35rem;
+    }
+
+    .settings-toggle:not([hidden]) + .theme-toggle {
+        margin-left: 0;
+    }
+}
+
+/* Pantallas táctiles: zonas de toque de al menos 44 px de alto (recomendación de Apple)
+   en enlaces sueltos, enlaces del pie y la casilla de privacidad. */
+@media (pointer: coarse) {
+    .link-arrow,
+    .contact-item a,
+    .footer-links a,
+    .footer-areas a,
+    .footer-legal a,
+    .footer-contact a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
+    .footer-links li + li {
+        margin-top: 0;
+    }
+
+    .footer-legal {
+        gap: 0 1.25rem;
+    }
+
+    .footer-contact li + li {
+        margin-top: 0.25rem;
+    }
+
+    .footer-contact li {
+        align-items: center;
+    }
+
+    .footer-contact .icon {
+        margin-top: 0;
+    }
+
+    .checkbox {
+        min-height: 44px;
+        padding-block: 0.35rem;
+    }
+
+    .checkbox input {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-top: 0;
+    }
+}
+
+/* Móvil: ritmo vertical más compacto (en pantallas pequeñas, los márgenes de escritorio
+   obligan a desplazarse demasiado) y escenas fijas más cortas. */
+@media (max-width: 720px) {
+    .section {
+        padding-block: 4.25rem;
+    }
+
+    .section-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .tone {
+        height: 96px;
+    }
+
+    .gallery {
+        padding-block: 2rem 4.5rem;
+    }
+
+    .gallery__head {
+        margin-bottom: 2rem;
+    }
+
+    .js-scroll .villa-scene {
+        height: 300vh;
+    }
+}
+
+/* Móvil: menos espacio entre la cabecera de un artículo y su texto. */
+@media (max-width: 720px) {
+    .article {
+        padding-block: 2.5rem 4.5rem;
+    }
+}
+
+/* Sin subtítulo debajo (artículos), el título no necesita margen inferior. */
+.page-hero__title:last-child {
+    margin-bottom: 0;
+}
+
+/* Con el aviso de idioma abierto, «volver arriba» se coloca por encima de él. */
+.has-toast .back-to-top {
+    bottom: 6.25rem;
+}
+
+@media (max-width: 720px) {
+    .has-toast .back-to-top {
+        bottom: 8.5rem;
+    }
+}
+
+/* Menú del móvil abierto: botón de cita e idiomas con tamaño cómodo para el dedo. */
+@media (max-width: 1100px) {
+    .nav.is-open .nav__cta.btn--primary {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+
+    .nav .lang-switch a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding-inline: 1.1rem;
+    }
+}
+
+/* Móviles de 320 px: la marca y los huecos se ajustan para que quepan los botones de
+   ajustes y de menú (este último no puede encogerse: es la zona de toque). */
+@media (max-width: 359px) {
+    .site-header .container {
+        gap: 0.4rem;
+    }
+
+    .site-header .brand {
+        gap: 0.45rem;
+        font-size: 1.05rem;
+    }
+
+    .settings-toggle {
+        margin-right: 0;
+    }
+}

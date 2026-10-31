@@ -248,7 +248,8 @@ def published_files():
 
 class SecurityTest(unittest.TestCase):
     REQUIRED = ["default-src 'self'", "script-src 'self'", "style-src 'self'", "object-src 'none'",
-                "base-uri 'self'", "font-src 'self'"]
+                "base-uri 'self'", "font-src 'self'", "frame-src 'none'", "worker-src 'none'",
+                "require-trusted-types-for 'script'", "trusted-types 'none'"]
 
     def test_every_page_has_a_strict_csp(self):
         for name, page in PAGES.items():
