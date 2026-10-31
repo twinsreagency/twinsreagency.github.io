@@ -720,6 +720,63 @@ def model_3d():
                 </div>"""
 
 
+def villa_3d():
+    """Villa contemporánea de una planta construida con CSS 3D: un ala de cristal
+    iluminada por dentro, un ala de piedra, tejados planos volados con el techo de
+    madera, chimenea, piscina y árboles. Es decorativa (aria-hidden)."""
+    def block(name, sides=WALLS + ["top"]):
+        return f'<span class="vb vb--{name}">{faces(sides)}</span>'
+    trees = "".join(f'<span class="tree tree--{i}"><i></i><i></i></span>' for i in (1, 2, 3))
+    return f"""
+                    <div class="villa" aria-hidden="true">
+                        <div class="villa__float">
+                            <div class="villa__model">
+                                <span class="villa__ground"></span>
+                                {block("deck")}
+                                {block("pool", ["top"])}
+                                {block("glass")}
+                                {block("stone")}
+                                {block("roof-a", WALLS + ["top", "bottom"])}
+                                {block("roof-b", WALLS + ["top", "bottom"])}
+                                {block("chimney")}
+                                {trees}
+                            </div>
+                        </div>
+                    </div>"""
+
+
+def process_scene(ctx):
+    """Cómo trabajamos, con la villa 3D: la sección se queda fija mientras la villa
+    gira y se iluminan, uno tras otro, los cuatro pasos (data-steps, main.js)."""
+    S = ctx.L["servicios"]
+    steps = "".join(f"""
+                            <li class="vstep">
+                                <span class="vstep__num">{i:02d}</span>
+                                <div>
+                                    <h3 class="vstep__title">{title}</h3>
+                                    <p class="vstep__text">{text}</p>
+                                </div>
+                            </li>""" for i, (title, text) in enumerate(S["steps"], start=1))
+    return f"""
+        <section class="villa-scene dusk" data-scroll="sticky" data-steps="{len(S['steps'])}" aria-labelledby="proceso-title">
+            <div class="villa-scene__sticky">
+                <div class="villa-scene__sky" aria-hidden="true"><span></span></div>
+                <div class="container villa-scene__grid">
+                    <div class="villa-scene__copy">
+                        <span class="eyebrow">{S['process_eyebrow']}</span>
+                        <h2 class="villa-scene__title" id="proceso-title">{S['process_title']}</h2>
+                        <p class="villa-scene__lead">{S['process_lead']}</p>
+                        <ol class="vsteps">{steps}
+                        </ol>
+                    </div>
+                    <div class="villa-scene__stage">{villa_3d()}
+                    </div>
+                </div>
+            </div>
+        </section>
+"""
+
+
 def object_3d(kind):
     """Objeto 3D decorativo para la cabecera de las páginas interiores."""
     if kind == "house":
@@ -1108,7 +1165,7 @@ def build_index(L):
             </div>
         </section>
 
-{portfolio}{valuation_section(ctx)}
+{portfolio}{valuation_section(ctx)}{process_scene(ctx)}
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">

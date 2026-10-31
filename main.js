@@ -333,6 +333,11 @@
                     : clamp((viewport - rect.top) / (viewport + rect.height));
                 scene.style.setProperty("--p", progress.toFixed(4));
                 scene.classList.toggle("is-advanced", progress > 0.45);
+                /* data-steps="n": marca el paso activo (0 … n-1) según el avance. */
+                var steps = Number(scene.getAttribute("data-steps"));
+                if (steps) {
+                    scene.setAttribute("data-active", String(Math.min(steps - 1, Math.floor(progress * steps))));
+                }
             });
             ticking = false;
         }

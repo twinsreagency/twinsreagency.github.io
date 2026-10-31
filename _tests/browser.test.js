@@ -445,3 +445,33 @@ test("ninguna página se desborda horizontalmente en móvil, tableta ni escritor
         }
     }
 });
+
+test("la escena de la villa avanza por los pasos al desplazarse y es estática sin animaciones", async () => {
+    const { page, errors, close } = await open("index.html");
+    const scene = page.locator(".villa-scene");
+    assert.equal(await page.locator(".villa .vb").count(), 7);
+    assert.equal(await scene.locator(".vstep").count(), 4);
+    for (const [fraction, step] of [[0.1, "0"], [0.6, "2"], [0.95, "3"]]) {
+        await page.evaluate((f) => {
+            const s = document.querySelector(".villa-scene");
+            window.scrollTo(0, s.offsetTop + (s.offsetHeight - window.innerHeight) * f);
+        }, fraction);
+        await page.waitForFunction((expected) => document.querySelector(".villa-scene").getAttribute("data-active") === expected, step);
+    }
+    /* Solo el paso activo muestra su texto. */
+    await scene.locator(".vstep:nth-child(4) .vstep__text").waitFor({ state: "visible", timeout: 3000 });
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".vstep:nth-child(1) .vstep__text")).opacity), "0");
+    assert.deepEqual(errors, []);
+    await close();
+
+    /* Con «reducir movimiento», la sección es normal y se leen los cuatro pasos. */
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const still = await context.newPage();
+    await still.goto(url("index.html"));
+    const height = await still.evaluate(() => document.querySelector(".villa-scene").offsetHeight / window.innerHeight);
+    assert.ok(height < 2, `la sección no debe alargarse (mide ${height.toFixed(1)} pantallas)`);
+    for (let i = 1; i <= 4; i++) {
+        assert.equal(await still.locator(`.vstep:nth-child(${i}) .vstep__text`).isVisible(), true);
+    }
+    await context.close();
+});
