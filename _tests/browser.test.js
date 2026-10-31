@@ -550,3 +550,76 @@ test("el cambio de tema marca su transición y la retira al terminar", async () 
     assert.deepEqual(errors, []);
     await close();
 });
+
+test("los ajustes cambian el texto, el contraste y el movimiento, y se recuerdan", async () => {
+    const { page, errors, close } = await open("index.html");
+    const toggle = page.locator(".settings-toggle");
+    assert.equal(await toggle.isVisible(), true);
+    await toggle.click();
+    const panel = page.locator("#ajustes");
+    assert.equal(await panel.isVisible(), true);
+    assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+
+    await page.click("label[for='ajuste-texto-xl']");
+    await page.click("label[for='ajuste-contraste-more']");
+    await page.click("label[for='ajuste-movimiento-reduced']");
+    const attrs = () => page.evaluate(() => ["data-text", "data-contrast", "data-motion"].map((a) => document.documentElement.getAttribute(a)));
+    assert.deepEqual(await attrs(), ["xl", "more", "reduced"]);
+
+    /* Escape cierra el panel y devuelve el foco al botón. */
+    await page.keyboard.press("Escape");
+    assert.equal(await panel.isVisible(), false);
+    assert.equal(await page.evaluate(() => document.activeElement.classList.contains("settings-toggle")), true);
+
+    /* Se aplican antes de pintar en la siguiente página; con movimiento reducido la villa es estática. */
+    await page.goto(url("index.html"));
+    assert.deepEqual(await attrs(), ["xl", "more", "reduced"]);
+    const screens = await page.evaluate(() => document.querySelector(".villa-scene").offsetHeight / window.innerHeight);
+    assert.ok(screens < 2, `la escena no debe alargarse (${screens.toFixed(1)} pantallas)`);
+
+    /* «Restablecer» vuelve a los valores de fábrica. */
+    await page.click(".settings-toggle");
+    await page.click(".settings__reset");
+    assert.deepEqual(await attrs(), [null, null, null]);
+    assert.equal(await page.evaluate(() => localStorage.getItem("twins:ajustes")), null);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("el tema automático sigue al sistema", async () => {
+    const context = await browser.newContext({ colorScheme: "dark" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    assert.equal(await page.getAttribute("html", "data-theme"), "light");
+    await page.click(".settings-toggle");
+    await page.click("label[for='ajuste-tema-auto']");
+    await page.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "dark");
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.waitForFunction(() => document.documentElement.getAttribute("data-theme") === "light");
+    await page.goto(url("es-servicios.html"));
+    assert.equal(await page.getAttribute("html", "data-theme"), "light");
+    assert.equal(await page.evaluate(() => document.documentElement.hasAttribute("data-theme-auto")), true);
+    await context.close();
+});
+
+test("se sugiere el idioma del navegador una sola vez", async () => {
+    const context = await browser.newContext({ locale: "ca-ES" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    const toast = page.locator(".lang-toast");
+    await toast.waitFor({ state: "visible", timeout: 4000 });
+    assert.equal(await toast.getAttribute("lang"), "ca");
+    assert.match(await toast.locator("a").getAttribute("href"), /ca-inici\.html$/);
+    await toast.locator("button").click();
+    await page.goto(url("es-servicios.html"));
+    await page.waitForTimeout(1600);
+    assert.equal(await page.locator(".lang-toast").count(), 0, "tras cerrarla no se vuelve a sugerir");
+    /* En la versión catalana no se sugiere nada a un navegador en catalán. */
+    const fresh = await browser.newContext({ locale: "ca-ES" });
+    const ca = await fresh.newPage();
+    await ca.goto(url("ca-inici.html"));
+    await ca.waitForTimeout(1600);
+    assert.equal(await ca.locator(".lang-toast").count(), 0);
+    await fresh.close();
+    await context.close();
+});

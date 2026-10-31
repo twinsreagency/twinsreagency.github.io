@@ -141,6 +141,8 @@ ICONS = {
     "heart": '<path d="M12 20s-7-4.4-9.2-8.6A5 5 0 0 1 12 6a5 5 0 0 1 9.2 5.4C19 15.6 12 20 12 20z"/>',
     "arrow-right": '<path d="M5 12h14M13 6l6 6-6 6"/>',
     "arrow-left": '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    "sliders": '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+    "close": '<path d="M6 6l12 12M18 6 6 18"/>',
     "arrow-up-right": '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
     "arrow-up": '<path d="M12 19V5M6 11l6-6 6 6"/>',
     "check": '<circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
@@ -495,6 +497,7 @@ def site_header(ctx, active):
                 {lang_switch(ctx)}
                 <a class="btn btn--primary nav__cta" href="{ctx.page('contacto.html')}?asunto=visita#formulario">{ui['cta_nav']}</a>
             </nav>
+            <button class="settings-toggle" type="button" aria-label="{esc(ui['settings']['open'])}" title="{esc(ui['settings']['open'])}" aria-expanded="false" aria-controls="ajustes" hidden>{icon('sliders')}</button>
             <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_dark'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="{esc(ui['menu_open'])}" data-label-open="{esc(ui['menu_open'])}" data-label-close="{esc(ui['menu_close'])}">
                 <span></span><span></span><span></span>
@@ -516,6 +519,45 @@ def footer_areas(ctx):
                 <ul>{links}
                 </ul>
             </nav>"""
+
+
+def settings_panel(ctx):
+    """Panel de ajustes (apariencia, idioma, tamaño del texto, movimiento y contraste).
+    Va al final del <body>; main.js lo abre desde la cabecera y guarda las preferencias.
+    Sin JavaScript no se muestra (el botón empieza oculto)."""
+    S = ctx.L["ui"]["settings"]
+
+    def group(name, legend, choices):
+        options = "".join(
+            f'<input class="visually-hidden" type="radio" name="ajuste-{name}" id="ajuste-{name}-{value}" value="{value}">'
+            f'<label for="ajuste-{name}-{value}">{label}</label>' for value, label in choices)
+        return f"""
+            <fieldset class="seg-field">
+                <legend class="seg-field__legend">{legend}</legend>
+                <div class="seg" data-setting="{name}">{options}</div>
+            </fieldset>"""
+
+    current = ' aria-current="true"'
+    languages = "".join(
+        f'<a href="{ctx.translation(other)}" hreflang="{other["lang"]}" lang="{other["lang"]}"'
+        f'{current if other["code"] == ctx.L["code"] else ""}>{other["label"]}</a>'
+        for other in LANGS)
+    return f"""
+    <div class="settings" id="ajustes" role="dialog" aria-labelledby="ajustes-title" hidden>
+        <div class="settings__head">
+            <p class="settings__title" id="ajustes-title">{S['title']}</p>
+            <button class="settings__close" type="button" aria-label="{esc(S['close'])}">{icon('close')}</button>
+        </div>{group("tema", *S['theme'])}
+            <div class="seg-field" role="group" aria-labelledby="ajustes-idioma">
+                <p class="seg-field__legend" id="ajustes-idioma">{S['language']}</p>
+                <div class="seg seg--links">{languages}</div>
+            </div>{group("texto", *S['text'])}{group("movimiento", *S['motion'])}{group("contraste", *S['contrast'])}
+        <div class="settings__foot">
+            <p class="settings__note">{S['note']}</p>
+            <button class="settings__reset" type="button">{S['reset']}</button>
+        </div>
+    </div>
+"""
 
 
 def site_footer(ctx):
@@ -565,6 +607,7 @@ def site_footer(ctx):
         </div>
     </footer>
 
+{settings_panel(ctx)}
     <button class="back-to-top" type="button" aria-label="{esc(ui['back_top'])}">{icon('arrow-up')}</button>
 </body>
 </html>

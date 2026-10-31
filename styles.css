@@ -131,7 +131,7 @@
 
     --text: #1a1a1a;
     --text-2: #5f5648;
-    --text-3: #6e6455;
+    --text-3: #685e4f;                          /* 4,6:1 sobre el fondo del pie */
     --text-inverse: #f6f1e8;
     --nav-link: rgba(26, 26, 26, 0.72);
     --prose: #2e2923;
@@ -3300,6 +3300,7 @@ html.is-theme-switch::view-transition-new(root) {
 .back-to-top,
 .split__quote,
 .theme-toggle,
+.settings-toggle,
 .lang-switch {
     position: relative;
     background: var(--lg-fill);
@@ -3328,6 +3329,7 @@ html.is-theme-switch::view-transition-new(root) {
 .back-to-top::after,
 .split__quote::after,
 .theme-toggle::after,
+.settings-toggle::after,
 .lang-switch::after {
     content: "";
     position: absolute;
@@ -3344,7 +3346,8 @@ html.is-theme-switch::view-transition-new(root) {
 .btn--glass:hover,
 .btn--outline:hover,
 .btn--outline-light:hover,
-.theme-toggle:hover {
+.theme-toggle:hover,
+.settings-toggle:hover {
     background: var(--glass-2);
     border-color: transparent;
 }
@@ -3832,6 +3835,352 @@ html:not(.is-theme-switch)::view-transition-new(root) {
     }
 }
 
+/* 7d. Ajustes, idioma y personalización -------------------------------------- */
+
+/* Botón de ajustes de la cabecera (mismo aspecto que el del tema) */
+.settings-toggle {
+    position: relative;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    margin-left: -0.5rem;
+    border-radius: 50%;
+    color: var(--text);
+    transition: background-color var(--transition), transform var(--transition);
+}
+
+.settings-toggle[hidden] {
+    display: none;
+}
+
+.settings-toggle .icon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.settings-toggle[aria-expanded="true"] {
+    background: var(--glass-2);
+}
+
+/* Panel de cristal anclado bajo la cabecera (en el móvil, una hoja inferior) */
+.settings {
+    position: fixed;
+    top: calc(var(--header-h) + 0.5rem);
+    right: max(0.75rem, calc((100vw - var(--container)) / 2 + 0.75rem));
+    z-index: 1100;
+    width: min(380px, calc(100vw - 1.5rem));
+    max-height: calc(100vh - var(--header-h) - 1.5rem);
+    max-height: calc(100dvh - var(--header-h) - 1.5rem);
+    overflow-y: auto;
+    padding: 1.1rem 1.1rem 1rem;
+    border-radius: 28px;
+    color: var(--text);
+    background: var(--settings-fill, rgba(246, 241, 232, 0.86));
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    backdrop-filter: blur(30px) saturate(190%);
+    box-shadow: var(--lg-shadow), 0 30px 80px -30px rgba(0, 0, 0, 0.45);
+    animation: settings-in 0.45s var(--ease);
+    transform-origin: top right;
+}
+
+[data-theme="dark"] .settings {
+    --settings-fill: rgba(24, 24, 28, 0.86);
+}
+
+.settings[hidden] {
+    display: none;
+}
+
+.settings::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--lg-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+
+@keyframes settings-in {
+    from {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(-8px) scale(0.96);
+    }
+}
+
+.settings__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-left: 0.3rem;
+}
+
+.settings__title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.settings__close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(var(--ink), 0.08);
+    color: var(--text);
+}
+
+.settings__close .icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.seg-field {
+    margin: 0;
+    padding: 0.55rem 0 0.35rem;
+    border: 0;
+}
+
+.seg-field__legend {
+    margin-bottom: 0.45rem;
+    padding-left: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-2);
+}
+
+/* Control segmentado (como en iOS) */
+.seg {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 14px;
+    background: rgba(var(--ink), 0.07);
+}
+
+.seg label,
+.seg a {
+    display: grid;
+    place-items: center;
+    min-height: 2.35rem;
+    padding: 0.35rem 0.4rem;
+    border-radius: 11px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background-color 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.seg label:hover,
+.seg a:hover {
+    color: var(--text);
+}
+
+.seg input:checked + label,
+.seg a[aria-current="true"] {
+    background: var(--seg-on, #fffdf9);
+    color: var(--text);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .seg {
+    --seg-on: rgba(255, 255, 255, 0.16);
+}
+
+.seg input:focus-visible + label {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.settings__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    padding: 0.85rem 0.3rem 0.1rem;
+    border-top: 1px solid var(--stroke);
+}
+
+.settings__note {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-2);
+}
+
+.settings__reset {
+    flex-shrink: 0;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--pill);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(var(--ink), 0.06);
+}
+
+/* Aviso de idioma (el navegador del visitante prefiere otro idioma de la web) */
+.lang-toast {
+    position: fixed;
+    left: max(0.75rem, calc((100vw - var(--container)) / 2 + 0.75rem));
+    bottom: 1.25rem;
+    z-index: 950;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    max-width: min(560px, calc(100vw - 1.5rem));
+    padding: 0.6rem 0.6rem 0.6rem 1.2rem;
+    border-radius: var(--pill);
+    color: var(--text);
+    background: var(--settings-fill, rgba(246, 241, 232, 0.88));
+    -webkit-backdrop-filter: blur(26px) saturate(190%);
+    backdrop-filter: blur(26px) saturate(190%);
+    box-shadow: var(--lg-shadow), 0 24px 60px -24px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    pointer-events: none;
+}
+
+[data-theme="dark"] .lang-toast {
+    --settings-fill: rgba(24, 24, 28, 0.88);
+}
+
+.lang-toast.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+.lang-toast p {
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.lang-toast .btn {
+    flex-shrink: 0;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.85rem;
+}
+
+.lang-toast__close {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--text-2);
+    background: rgba(var(--ink), 0.07);
+}
+
+/* Tamaño del texto (todo se mide en rem, así que crece de forma proporcional) */
+html[data-text="l"] {
+    font-size: 112.5%;
+}
+
+html[data-text="xl"] {
+    font-size: 125%;
+}
+
+/* La cabecera (navegación) conserva su tamaño: lo que se amplía es el contenido.
+   Así el menú, el idioma y los botones siguen cabiendo en una línea. */
+html[data-text="l"] .site-header {
+    zoom: 0.8889;
+}
+
+html[data-text="xl"] .site-header {
+    zoom: 0.8;
+}
+
+/* Con el texto ampliado, las palabras largas (correos, enlaces) y los botones pueden
+   partirse en lugar de salirse de la pantalla. */
+html[data-text] body {
+    overflow-wrap: break-word;
+}
+
+html[data-text] td a {
+    overflow-wrap: anywhere;
+}
+
+html[data-text] .btn {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+}
+
+/* Contraste alto: textos secundarios y bordes más marcados */
+html[data-contrast="more"] {
+    --text-2: #3d362d;
+    --text-3: #3d362d;
+    --nav-link: #1a1a1a;
+    --stroke: rgba(26, 26, 26, 0.24);
+    --stroke-2: rgba(26, 26, 26, 0.36);
+}
+
+html[data-contrast="more"][data-theme="dark"] {
+    --text-2: #d8d8dd;
+    --text-3: #c4c4c9;
+    --nav-link: #ffffff;
+    --stroke: rgba(255, 255, 255, 0.24);
+    --stroke-2: rgba(255, 255, 255, 0.36);
+}
+
+html[data-contrast="more"] .dusk,
+html[data-contrast="more"] .night,
+html[data-contrast="more"] .site-header.is-on-dark:not(.is-open) {
+    --text-2: #e6e2db;
+    --text-3: #d2cdc5;
+    --nav-link: #ffffff;
+}
+
+@media (max-width: 720px) {
+    .settings {
+        top: auto;
+        right: 0.6rem;
+        bottom: 0.6rem;
+        left: 0.6rem;
+        width: auto;
+        max-height: 82vh;
+        max-height: 82dvh;
+        transform-origin: bottom center;
+    }
+
+    .lang-toast {
+        right: 0.75rem;
+        bottom: 0.75rem;
+        flex-wrap: wrap;
+        border-radius: 22px;
+        padding: 0.9rem 1rem;
+    }
+
+    .lang-toast p {
+        flex: 1 1 100%;
+    }
+}
+
+/* Móviles muy estrechos: el tema se cambia desde «Ajustes» */
+@media (max-width: 400px) {
+    .settings-toggle:not([hidden]) + .theme-toggle {
+        display: none;
+    }
+}
+
 /* 8. Movimiento ------------------------------------------------------------ */
 /* Al entrar en pantalla, cada bloque pasa de desenfocado a nítido (como en las webs
    de arquitectura de alto standing) mientras sube y se endereza. */
@@ -3902,6 +4251,68 @@ html:not(.is-theme-switch)::view-transition-new(root) {
         transform: none;
     }
 }
+
+/* Lo mismo cuando el visitante elige «Movimiento: reducido» en «Ajustes». */
+html[data-motion="reduced"] {
+        scroll-behavior: auto;
+}
+
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+}
+
+html[data-motion="reduced"].js-reveal .reveal:not(.is-visible) {
+        opacity: 1;
+        filter: none;
+        transform: none;
+}
+
+html[data-motion="reduced"] .hero3d,
+html[data-motion="reduced"] .statement {
+        height: auto;
+}
+
+html[data-motion="reduced"] .hero3d__sticky,
+html[data-motion="reduced"] .statement__sticky {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        padding-block: calc(var(--header-h) + 3rem) 4rem;
+}
+
+html[data-motion="reduced"] .hero3d__copy,
+html[data-motion="reduced"] .hero3d__stage,
+html[data-motion="reduced"] .scroll-hint {
+        opacity: 1;
+        transform: none;
+}
+
+html[data-motion="reduced"] .scroll-hint {
+        display: none;
+}
+
+html[data-motion="reduced"] .callout {
+        opacity: 1;
+        transform: none;
+}
+
+html[data-motion="reduced"] .model {
+        transform: translateY(calc(var(--u) * 1.4)) rotateX(-18deg) rotateY(-32deg);
+}
+
+html[data-motion="reduced"] .tilt {
+        transform: none;
+}
+
+html[data-motion="reduced"]::view-transition-old(root),
+html[data-motion="reduced"]::view-transition-new(root) {
+    animation: none !important;
+}
+
 
 /* 9. Responsive ------------------------------------------------------------ */
 @media (max-width: 1100px) {
@@ -4257,5 +4668,17 @@ html:not(.is-theme-switch)::view-transition-new(root) {
     .site-header.is-scrolled:not(.is-open) .container {
         width: calc(100% - 1.25rem);
         padding-inline: 1rem 0.35rem;
+    }
+}
+
+/* Cabecera estrecha: el botón de ajustes empuja los botones a la derecha. */
+@media (max-width: 1100px) {
+    .settings-toggle {
+        margin-left: auto;
+        margin-right: 0.35rem;
+    }
+
+    .settings-toggle:not([hidden]) + .theme-toggle {
+        margin-left: 0;
     }
 }
