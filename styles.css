@@ -81,6 +81,11 @@
     --edge-house: rgba(245, 245, 247, 0.7);
     --edge-tower: rgba(199, 169, 125, 0.85);
 
+    /* Cristal líquido (Apple): relleno, borde con reflejo de luz y sombra */
+    --lg-fill: rgba(30, 30, 34, 0.5);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 32%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.16) 100%);
+    --lg-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
     --danger: #ff6b5e;
     --success: #5fd08a;
 
@@ -137,6 +142,10 @@
 
     --edge-house: rgba(26, 26, 26, 0.72);
     --edge-tower: rgba(154, 116, 64, 0.95);
+
+    --lg-fill: rgba(255, 255, 255, 0.58);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 30%, rgba(176, 141, 93, 0.12) 60%, rgba(255, 255, 255, 0.7) 100%);
+    --lg-shadow: 0 12px 34px -16px rgba(92, 70, 38, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
     --danger: #b3261e;
     --success: #2f6b45;
@@ -631,6 +640,10 @@ html[data-framed] body {
 }
 
 /* 5. Cabecera y pie -------------------------------------------------------- */
+/* Arriba del todo, la cabecera es una barra translúcida a todo el ancho. Al desplazar
+   se convierte en una cápsula de cristal líquido flotante, como en Apple. El cristal va
+   en ::before y su reflejo en ::after: con backdrop-filter en la propia cabecera, el
+   menú del móvil (position: fixed) quedaría encerrado dentro de ella. */
 .site-header {
     position: fixed;
     inset: 0 0 auto;
@@ -638,30 +651,76 @@ html[data-framed] body {
     height: var(--header-h);
     display: flex;
     align-items: center;
+}
+
+.site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background: var(--header-bg);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid transparent;
-    transition: background-color var(--transition), border-color var(--transition);
-}
-
-.site-header.is-scrolled {
-    background: var(--header-bg-2);
-    border-bottom-color: var(--stroke);
-}
-
-/* backdrop-filter crea un bloque contenedor que confinaría el menú fijo */
-.site-header.is-open {
-    background: var(--bg);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+    transition: opacity 0.45s var(--ease);
 }
 
 .site-header .container {
+    position: relative;
+    isolation: isolate;
+    align-self: stretch;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
+    transition: max-width 0.6s var(--ease), padding 0.6s var(--ease);
+}
+
+.site-header .container::before,
+.site-header .container::after {
+    content: "";
+    position: absolute;
+    inset: 0.5rem 0;
+    border-radius: var(--pill);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s var(--ease);
+}
+
+.site-header .container::before {
+    z-index: -1;
+    background: var(--lg-fill);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    backdrop-filter: blur(24px) saturate(190%);
+    box-shadow: var(--lg-shadow);
+}
+
+.site-header .container::after {
+    padding: 1px;
+    background: var(--lg-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.site-header.is-scrolled:not(.is-open)::before {
+    opacity: 0;
+}
+
+.site-header.is-scrolled:not(.is-open) .container {
+    max-width: calc(var(--container) - 1.5rem);
+    padding-inline: 1.5rem 0.55rem;
+}
+
+.site-header.is-scrolled:not(.is-open) .container::before,
+.site-header.is-scrolled:not(.is-open) .container::after {
+    opacity: 1;
+}
+
+/* Con el menú del móvil abierto, la cabecera es opaca y ocupa todo el ancho. */
+.site-header.is-open::before {
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 .brand {
@@ -3181,13 +3240,88 @@ html[data-framed] body {
     color: var(--text-2);
 }
 
+/* 7b. Cristal líquido ------------------------------------------------------ */
+/* Material común de botones de cristal, etiquetas flotantes, cita, selector de tema e
+   idioma y botón «volver arriba»: relleno translúcido, desenfoque del fondo y un borde
+   con reflejo de luz (--lg-rim) que se dibuja en ::after con una máscara. */
+.btn--glass,
+.btn--outline,
+.btn--outline-light,
+.callout,
+.back-to-top,
+.split__quote,
+.theme-toggle,
+.lang-switch {
+    position: relative;
+    background: var(--lg-fill);
+    border-color: transparent;
+    -webkit-backdrop-filter: blur(22px) saturate(190%);
+    backdrop-filter: blur(22px) saturate(190%);
+    box-shadow: var(--lg-shadow);
+}
+
+.callout,
+.back-to-top,
+.split__quote {
+    position: absolute;
+}
+
+.back-to-top {
+    position: fixed;
+}
+
+.btn--glass::after,
+.btn--outline::after,
+.btn--outline-light::after,
+.callout::after,
+.back-to-top::after,
+.split__quote::after,
+.theme-toggle::after,
+.lang-switch::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--lg-rim);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+
+.btn--glass:hover,
+.btn--outline:hover,
+.btn--outline-light:hover,
+.theme-toggle:hover {
+    background: var(--glass-2);
+    border-color: transparent;
+}
+
+/* Tarjetas: un brillo superior más marcado, como el canto de un cristal. */
+.card {
+    box-shadow: inset 0 1px 0 var(--highlight), inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 30px 60px -30px var(--shadow-c);
+}
+
+/* Cifras editoriales en cursiva (pasos del proceso en Servicios) */
+.step::before {
+    font-family: var(--font-serif);
+    font-size: 3.6rem;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+}
+
 /* 8. Movimiento ------------------------------------------------------------ */
+/* Al entrar en pantalla, cada bloque pasa de desenfocado a nítido (como en las webs
+   de arquitectura de alto standing) mientras sube y se endereza. */
 .reveal {
-    transition: opacity 1.1s var(--ease), transform 1.1s var(--ease), border-color var(--transition);
+    transition: opacity 1.1s var(--ease), transform 1.1s var(--ease), filter 1.1s var(--ease), border-color var(--transition);
 }
 
 .js-reveal .reveal:not(.is-visible) {
     opacity: 0;
+    filter: blur(14px);
     transform: perspective(1200px) translate3d(0, 60px, 0) rotateX(12deg) scale(0.97);
     transform-origin: 50% 100%;
 }
@@ -3207,6 +3341,7 @@ html[data-framed] body {
 
     .js-reveal .reveal:not(.is-visible) {
         opacity: 1;
+        filter: none;
         transform: none;
     }
 
@@ -3594,5 +3729,13 @@ html[data-framed] body {
 @media (max-width: 860px) and (max-height: 760px), (max-height: 640px) {
     .js-scroll .villa-scene__lead {
         display: none;
+    }
+}
+
+/* En pantallas estrechas la cápsula deja un margen a cada lado. */
+@media (max-width: 1100px) {
+    .site-header.is-scrolled:not(.is-open) .container {
+        width: calc(100% - 1.25rem);
+        padding-inline: 1rem 0.35rem;
     }
 }
