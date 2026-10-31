@@ -475,3 +475,23 @@ test("la escena de la villa avanza por los pasos al desplazarse y es estática s
     }
     await context.close();
 });
+
+test("la cabecera flota como cápsula al desplazar y se oscurece sobre la sección oscura", async () => {
+    const { page, errors, close } = await open("index.html");
+    const header = page.locator(".site-header");
+    await page.evaluate(() => window.scrollTo(0, 300));
+    await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-scrolled"));
+    assert.equal(await header.evaluate((h) => h.classList.contains("is-on-dark")), false);
+    await page.evaluate(() => {
+        const s = document.querySelector(".villa-scene");
+        window.scrollTo(0, s.offsetTop + window.innerHeight);
+    });
+    await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-on-dark"));
+    /* El menú del móvil sigue ocupando toda la pantalla aunque la cabecera sea una cápsula. */
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.click(".nav-toggle");
+    const nav = await page.locator("#menu-principal").boundingBox();
+    assert.equal(Math.round(nav.width), 390);
+    assert.deepEqual(errors, []);
+    await close();
+});

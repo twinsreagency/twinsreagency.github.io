@@ -716,6 +716,33 @@ html[data-framed] body {
     opacity: 1;
 }
 
+/* Sobre una sección oscura (main.js añade .is-on-dark), la cabecera usa los colores
+   del tema oscuro aunque la web esté en el tema crema. */
+.site-header.is-on-dark:not(.is-open) {
+    --ink: 255, 255, 255;
+    --text: #f5f5f7;
+    --text-2: #a1a1a6;
+    --nav-link: rgba(245, 245, 247, 0.78);
+    --accent: #c7a97d;
+    --glass: rgba(255, 255, 255, 0.045);
+    --glass-2: rgba(255, 255, 255, 0.08);
+    --stroke: rgba(255, 255, 255, 0.1);
+    --stroke-2: rgba(255, 255, 255, 0.18);
+    --header-bg: rgba(0, 0, 0, 0.55);
+    --lg-fill: rgba(30, 30, 34, 0.5);
+    --lg-rim: linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 32%, rgba(255, 255, 255, 0) 55%, rgba(255, 255, 255, 0.16) 100%);
+    --lg-shadow: 0 12px 34px -14px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    color-scheme: dark;
+}
+
+.site-header.is-on-dark:not(.is-open) .logo--on-dark {
+    display: block;
+}
+
+.site-header.is-on-dark:not(.is-open) .logo--on-light {
+    display: none;
+}
+
 /* Con el menú del móvil abierto, la cabecera es opaca y ocupa todo el ancho. */
 .site-header.is-open::before {
     background: var(--bg);

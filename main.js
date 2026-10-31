@@ -174,6 +174,24 @@
         /* En el siguiente fotograma, para no forzar un recálculo del diseño al cargar. */
         window.requestAnimationFrame(update);
 
+        /* Sobre una sección oscura (.dusk), la cápsula pasa a cristal oscuro, como en Apple.
+           La franja observada es la de la cabecera: el 8 % superior de la pantalla. */
+        var darkSections = $$(".dusk");
+        if (darkSections.length && "IntersectionObserver" in window) {
+            var under = [];
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var index = under.indexOf(entry.target);
+                    if (entry.isIntersecting && index === -1) under.push(entry.target);
+                    if (!entry.isIntersecting && index !== -1) under.splice(index, 1);
+                });
+                header.classList.toggle("is-on-dark", under.length > 0);
+            }, { rootMargin: "0px 0px -92% 0px" });
+            darkSections.forEach(function (section) {
+                observer.observe(section);
+            });
+        }
+
         if (backToTop) {
             backToTop.addEventListener("click", function () {
                 window.scrollTo({ top: 0, behavior: "smooth" });
