@@ -180,7 +180,7 @@
 
         /* Sobre una sección oscura (.dusk), la cápsula pasa a cristal oscuro, como en Apple.
            La franja observada es la de la cabecera: el 8 % superior de la pantalla. */
-        var darkSections = $$(".dusk");
+        var darkSections = $$(".dusk, .tone__dark");
         if (darkSections.length && "IntersectionObserver" in window) {
             var under = [];
             var observer = new IntersectionObserver(function (entries) {

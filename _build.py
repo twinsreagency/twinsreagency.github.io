@@ -798,7 +798,7 @@ def orb_link(href, label, extra=""):
 def tone(direction):
     """Franja de transición de color entre una sección clara y otra oscura («night») o al
     revés («day»): el fondo cambia de forma gradual al desplazarse, sin cortes."""
-    return f'\n        <div class="tone tone--to-{direction}" aria-hidden="true"></div>\n'
+    return f'\n        <div class="tone tone--to-{direction}" aria-hidden="true"><span class="tone__dark"></span></div>\n'
 
 
 SERVICE_OBJECTS = {"compraventa": "sale", "alquiler": "house", "gestion-alquileres": "pages",

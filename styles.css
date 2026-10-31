@@ -3413,6 +3413,23 @@ html.is-theme-switch::view-transition-new(root) {
     background: linear-gradient(180deg, #08080b 0%, var(--bg) 100%);
 }
 
+/* Mitad oscura de la franja: la cabecera ya se oscurece al pasar por ella (main.js). */
+.tone__dark {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    pointer-events: none;
+}
+
+.tone--to-night .tone__dark {
+    bottom: 0;
+}
+
+.tone--to-day .tone__dark {
+    top: 0;
+}
+
 .tone::after {
     content: "";
     width: 1px;
@@ -4108,6 +4125,23 @@ html[data-text="xl"] .site-header {
     zoom: 0.8;
 }
 
+/* El zoom también encoge el ancho máximo (en píxeles): se compensa. */
+html[data-text="l"] .site-header .container {
+    max-width: calc(var(--container) * 1.125);
+}
+
+html[data-text="l"] .site-header.is-scrolled:not(.is-open) .container {
+    max-width: calc((var(--container) - 1.5rem) * 1.125);
+}
+
+html[data-text="xl"] .site-header .container {
+    max-width: calc(var(--container) * 1.25);
+}
+
+html[data-text="xl"] .site-header.is-scrolled:not(.is-open) .container {
+    max-width: calc((var(--container) - 1.5rem) * 1.25);
+}
+
 /* Con el texto ampliado, las palabras largas (correos, enlaces) y los botones pueden
    partirse en lugar de salirse de la pantalla. */
 html[data-text] body {
@@ -4118,7 +4152,7 @@ html[data-text] td a {
     overflow-wrap: anywhere;
 }
 
-html[data-text] .btn {
+html[data-text] main .btn {
     max-width: 100%;
     white-space: normal;
     text-align: center;
