@@ -1,0 +1,364 @@
+# Panel de gestión (Pages CMS, https://app.pagescms.org): inmuebles, datos de la agencia y
+# opiniones, sin tocar código. Cada cambio guardado en el panel llega al repositorio y la
+# publicación (.github/workflows/publicar.yml) prepara las fotos, genera la web, la prueba
+# y la publica. Guía: _inmuebles/LEEME.md.
+
+media:
+  input: _fotos
+  output: /_fotos
+  # Nombre aleatorio: dos inmuebles pueden tener una foto «salon.jpg».
+  rename: random
+  extensions: [jpg, jpeg, png, webp]
+
+settings:
+  content:
+    merge: true
+  commit:
+    templates:
+      create: "panel: crea {path}"
+      update: "panel: actualiza {path}"
+      delete: "panel: borra {path}"
+      rename: "panel: renombra {oldPath} a {newPath}"
+
+content:
+  - name: inmuebles
+    label: Inmuebles
+    type: collection
+    path: _inmuebles
+    format: json
+    exclude: [LEEME.md]
+    filename: "{fields.ref}.json"
+    view:
+      fields: [ref, titulo_es, operacion, precio, publicado]
+      primary: titulo_es
+      sort: [fecha, precio, ref]
+      search: [ref, titulo_es, localidad]
+      default:
+        sort: fecha
+        order: desc
+    fields:
+      - name: ref
+        label: Referencia
+        type: string
+        required: true
+        description: "TRE- y tres cifras, distinta en cada inmueble (p. ej. TRE-001)."
+        pattern:
+          regex: "^TRE-\\d{3}$"
+          message: "Use el formato TRE-001"
+      - name: publicado
+        label: Publicado en la web
+        type: boolean
+        default: true
+        description: "Desactívelo para ocultar el inmueble sin borrarlo (vendido, reservado…)."
+      - name: fecha
+        label: Fecha de alta
+        type: date
+        options:
+          format: yyyy-MM-dd
+        description: "Ordena el listado: los más recientes primero."
+      - name: operacion
+        label: Operación
+        type: select
+        required: true
+        options:
+          values:
+            - { name: venta, label: Venta }
+            - { name: alquiler, label: Alquiler }
+      - name: tipo
+        label: Tipo de inmueble
+        type: select
+        required: true
+        options:
+          values:
+            - { name: piso, label: Piso o apartamento }
+            - { name: atico, label: Ático }
+            - { name: duplex, label: Dúplex }
+            - { name: casa, label: Casa o chalet }
+            - { name: rustica, label: Casa rústica }
+            - { name: estudio, label: Estudio o loft }
+            - { name: oficina, label: Oficina }
+            - { name: local, label: Local o nave }
+            - { name: garaje, label: Garaje }
+            - { name: trastero, label: Trastero }
+            - { name: terreno, label: Terreno }
+            - { name: edificio, label: Edificio }
+      - name: localidad
+        label: Localidad
+        type: string
+        required: true
+        description: "Nombre oficial, p. ej. «Igualada» o «Santa Margarida de Montbui»."
+      - name: zona
+        label: Barrio o zona (opcional)
+        type: string
+      - name: precio
+        label: Precio (€; en alquiler, al mes)
+        type: number
+        required: true
+        options:
+          min: 1
+      - name: dormitorios
+        label: Dormitorios
+        type: number
+        required: true
+        options:
+          min: 0
+          max: 50
+      - name: banos
+        label: Baños
+        type: number
+        required: true
+        options:
+          min: 0
+          max: 50
+      - name: superficie
+        label: Superficie construida (m²)
+        type: number
+        required: true
+        options:
+          min: 1
+      - name: planta
+        label: Planta (opcional)
+        type: string
+        description: "P. ej. «3.ª» o «Baja»."
+      - name: ano
+        label: Año de construcción (opcional)
+        type: number
+        options:
+          min: 1500
+          max: 2100
+      - name: extras
+        label: Características
+        type: select
+        options:
+          multiple: true
+          values:
+            - { name: ascensor, label: Ascensor }
+            - { name: terraza, label: Terraza }
+            - { name: balcon, label: Balcón }
+            - { name: jardin, label: Jardín }
+            - { name: piscina, label: Piscina }
+            - { name: garaje, label: Plaza de garaje }
+            - { name: trastero, label: Trastero }
+            - { name: aire, label: Aire acondicionado }
+            - { name: calefaccion, label: Calefacción }
+            - { name: amueblado, label: Amueblado }
+            - { name: exterior, label: Exterior }
+            - { name: accesible, label: Accesible }
+      - name: energia_consumo
+        label: Certificado energético · consumo
+        type: select
+        required: true
+        description: "Obligatorio en los anuncios (Real Decreto 390/2021)."
+        options:
+          values:
+            - { name: A, label: A }
+            - { name: B, label: B }
+            - { name: C, label: C }
+            - { name: D, label: D }
+            - { name: E, label: E }
+            - { name: F, label: F }
+            - { name: G, label: G }
+            - { name: en_tramite, label: En trámite }
+            - { name: exento, label: Exento }
+      - name: energia_consumo_valor
+        label: Consumo (kWh/m² año, opcional)
+        type: number
+      - name: energia_emisiones
+        label: Certificado energético · emisiones (opcional)
+        type: select
+        options:
+          values: [A, B, C, D, E, F, G]
+      - name: energia_emisiones_valor
+        label: Emisiones (kg CO₂/m² año, opcional)
+        type: number
+      - name: titulo_es
+        label: Título (castellano)
+        type: string
+        required: true
+        description: "Máximo 60 caracteres, p. ej. «Piso luminoso con terraza»."
+        options:
+          maxlength: 60
+      - name: titulo_ca
+        label: Títol (català, opcional)
+        type: string
+        options:
+          maxlength: 60
+      - name: titulo_en
+        label: Title (English, optional)
+        type: string
+        options:
+          maxlength: 60
+      - name: descripcion_es
+        label: Descripción (castellano)
+        type: text
+        description: "Separe los párrafos con una línea en blanco."
+      - name: descripcion_ca
+        label: Descripció (català, opcional)
+        type: text
+      - name: descripcion_en
+        label: Description (English, optional)
+        type: text
+      - name: etiqueta_es
+        label: Etiqueta (opcional, p. ej. «Novedad» o «Reservado»)
+        type: string
+      - name: etiqueta_ca
+        label: Etiqueta en català (opcional)
+        type: string
+      - name: etiqueta_en
+        label: Label in English (optional)
+        type: string
+      - name: fotos
+        label: Fotos (la primera es la portada)
+        type: image
+        description: "Fotos reales, horizontales, de al menos 1600 px de ancho. Quite la ubicación de la cámara antes de subirlas."
+        options:
+          multiple:
+            max: 30
+          unique: true
+      - name: plano
+        label: Plano (opcional)
+        type: image
+      - name: video
+        label: Vídeo (enlace https, opcional)
+        type: string
+        pattern:
+          regex: "^(https://.*)?$"
+          message: "Debe empezar por https://"
+      - name: tour
+        label: Visita virtual 360º (enlace https, opcional)
+        type: string
+        pattern:
+          regex: "^(https://.*)?$"
+          message: "Debe empezar por https://"
+      - name: lat
+        label: Latitud aproximada (opcional)
+        type: number
+        description: "Se redondea a unos 1 km en la web: nunca se muestra la dirección exacta."
+      - name: lon
+        label: Longitud aproximada (opcional)
+        type: number
+
+  - name: agencia
+    label: Datos de la agencia
+    type: file
+    path: _datos/agencia.json
+    format: json
+    fields:
+      - name: titular
+        label: Titular (nombre y apellidos o razón social)
+        type: string
+      - name: nif
+        label: NIF / CIF
+        type: string
+      - name: domicilio
+        label: Domicilio
+        type: string
+      - name: registro_mercantil
+        label: Registro Mercantil (solo sociedades)
+        type: string
+      - name: registro_agentes
+        label: N.º del Registro de Agentes Inmobiliarios de Cataluña (AICAT)
+        type: string
+      - name: telefono
+        label: Teléfono (con prefijo, p. ej. +34 600 00 00 00)
+        type: string
+        pattern:
+          regex: "^(\\+\\d{1,3}( ?\\d){6,14})?$"
+          message: "Con prefijo internacional, p. ej. +34 600 00 00 00"
+      - name: whatsapp
+        label: WhatsApp (con prefijo)
+        type: string
+        pattern:
+          regex: "^(\\+\\d{1,3}( ?\\d){6,14})?$"
+          message: "Con prefijo internacional, p. ej. +34 600 00 00 00"
+      - name: desde
+        label: Año de inicio de la actividad (para «años de experiencia»)
+        type: number
+      - name: google_business
+        label: Enlace de la ficha de Google Business
+        type: string
+        pattern:
+          regex: "^(https://.*)?$"
+          message: "Debe empezar por https://"
+
+  - name: confianza
+    label: Opiniones y casos de éxito
+    type: file
+    path: _datos/confianza.json
+    format: json
+    fields:
+      - name: opiniones
+        label: Opiniones de clientes (solo reales, copiadas de su fuente)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{autor} ({fuente})"
+        fields:
+          - name: autor
+            label: Nombre como aparece en la fuente
+            type: string
+            required: true
+          - name: texto
+            label: Opinión (tal cual)
+            type: text
+            required: true
+            options:
+              maxlength: 600
+          - name: estrellas
+            label: Estrellas (1–5)
+            type: number
+            options:
+              min: 1
+              max: 5
+          - name: fuente
+            label: Fuente (p. ej. Google)
+            type: string
+            required: true
+          - name: enlace
+            label: Enlace a la opinión (opcional)
+            type: string
+          - name: fecha
+            label: Fecha
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: idioma
+            label: Idioma de la opinión
+            type: select
+            options:
+              values:
+                - { name: es, label: Castellano }
+                - { name: ca, label: Català }
+                - { name: en, label: English }
+      - name: casos
+        label: Casos de éxito (reales, con permiso del cliente)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{titulo_es}"
+        fields:
+          - name: titulo_es
+            label: Título (castellano)
+            type: string
+            required: true
+          - name: titulo_ca
+            label: Títol (català, opcional)
+            type: string
+          - name: titulo_en
+            label: Title (English, optional)
+            type: string
+          - name: texto_es
+            label: Texto (castellano)
+            type: text
+            required: true
+          - name: texto_ca
+            label: Text (català, opcional)
+            type: text
+          - name: texto_en
+            label: Text (English, optional)
+            type: text
+          - name: localidad
+            label: Localidad (opcional)
+            type: string

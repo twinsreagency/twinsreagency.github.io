@@ -310,6 +310,160 @@ class ContentTest(unittest.TestCase):
             self.assertEqual(types["WebSite"]["url"], page.canonical)
 
 
+class DataTest(unittest.TestCase):
+    """Inmuebles y datos que se editan en el panel: lo que no es válido detiene la
+    publicación con un mensaje claro, en lugar de publicar una ficha rota."""
+
+    BASE = dict(ref="TRE-010", operacion="venta", tipo="piso", localidad="Òdena", precio=150000,
+                dormitorios=2, banos=1, superficie=70, energia_consumo="E", titulo_es="Piso céntrico")
+
+    def load(self, **changes):
+        return _build.load_property({**self.BASE, **changes}, "_inmuebles/prueba.json", {})
+
+    def assertRejected(self, message, **changes):
+        with self.assertRaises(SystemExit) as raised:
+            self.load(**changes)
+        self.assertIn(message, str(raised.exception))
+
+    def test_valid_property(self):
+        p = self.load(titulo_ca="Pis cèntric", precio="150.000", extras=["terraza", "ascensor"], lat=41.6, lon=1.55)
+        self.assertEqual((p["zone"], p["town"], p["price"]), ("odena", "Òdena", 150000))
+        self.assertEqual(p["title"], {"es": "Piso céntrico", "ca": "Pis cèntric", "en": "Piso céntrico"})
+        self.assertEqual(p["extras"], ["ascensor", "terraza"], "en el orden de la lista")
+        self.assertEqual(_build.slugify("Santa Margarida de Montbui"), "santa-margarida-de-montbui")
+
+    def test_invalid_properties_are_rejected(self):
+        self.assertRejected("TRE- y tres cifras", ref="123")
+        self.assertRejected("operación", operacion="permuta")
+        self.assertRejected("certificado energético es obligatorio", energia_consumo="")
+        self.assertRejected("características desconocidas", extras=["helipuerto"])
+        self.assertRejected("https://", video="http://example.com/video")
+        self.assertRejected("fuera de lo razonable", dormitorios=80)
+        self.assertRejected("falta «titulo_es»", titulo_es="")
+        self.assertRejected("fuera de rango", lat=52.5)
+        self.assertRejected("60 caracteres", titulo_en="A" * 61)
+        self.assertRejected("no existe la foto", fotos=["/_fotos/no-existe.jpg"])
+
+    def test_photos_need_their_optimized_versions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            saved = _build.SITE_DIR
+            try:
+                _build.SITE_DIR = tmp
+                os.makedirs(os.path.join(tmp, "_fotos"))
+                with open(os.path.join(tmp, "_fotos", "a.jpg"), "wb") as fh:
+                    fh.write(b"foto")
+                with self.assertRaises(SystemExit) as raised:
+                    self.load(fotos=["/_fotos/a.jpg"])
+                self.assertIn("python3 _fotos.py --inmuebles", str(raised.exception))
+                index = {"/_fotos/a.jpg": {"hash": _build.file_hash(os.path.join(tmp, "_fotos", "a.jpg")), "width": 960,
+                                           "height": 640, "base": "fotos/inmuebles/x", "formats": {"jpg": [480, 960]}}}
+                p = _build.load_property({**self.BASE, "fotos": ["/_fotos/a.jpg"]}, "prueba", index)
+                html_img = _build.picture(_build.Ctx(_build._textos_es.C, "index.html"), p["photos"][0], "Salón", "100vw")
+                self.assertIn('srcset="fotos/inmuebles/x-480.jpg 480w, fotos/inmuebles/x-960.jpg 960w"', html_img)
+                self.assertIn('width="960" height="640"', html_img)
+            finally:
+                _build.SITE_DIR = saved
+
+    def test_agency_and_trust_data_files(self):
+        for name in ("agencia.json", "confianza.json"):
+            with open(os.path.join(SITE_DIR, "_datos", name), encoding="utf-8") as fh:
+                json.load(fh)
+        with self.assertRaises(SystemExit):
+            _build.load_reviews([{"autor": "Ana", "texto": "Muy bien"}])  # sin fuente
+        review = _build.load_reviews([{"autor": "Ana", "texto": "Muy bien", "fuente": "Google", "estrellas": 5}])[0]
+        self.assertEqual((review["stars"], review["lang"]), (5, "es"))
+
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
+
+
+@unittest.skipUnless(yaml, "necesita PyYAML")
+class PanelTest(unittest.TestCase):
+    """El panel (.pages.yml) ofrece exactamente los valores que acepta el generador."""
+
+    def test_panel_matches_the_build(self):
+        with open(os.path.join(SITE_DIR, ".pages.yml"), encoding="utf-8") as fh:
+            config = yaml.safe_load(fh)
+        entries = {c["name"]: c for c in config["content"]}
+        fields = {f["name"]: f for f in entries["inmuebles"]["fields"]}
+
+        def values(name):
+            return [v["name"] if isinstance(v, dict) else v for v in fields[name]["options"]["values"]]
+
+        self.assertEqual(values("operacion"), _build.SEARCH_VALUES["operacion"])
+        self.assertEqual(values("tipo"), _build.SEARCH_VALUES["tipo"])
+        self.assertEqual(values("extras"), _build.EXTRAS)
+        self.assertEqual(values("energia_consumo"), _build.ENERGY_STATES)
+        self.assertEqual(values("energia_emisiones"), _build.ENERGY_LETTERS)
+        self.assertEqual(entries["inmuebles"]["path"], "_inmuebles")
+        self.assertEqual(config["media"]["input"], "_fotos")
+        # Todo lo que guarda el panel lo lee el generador (y al revés).
+        prop = _build.load_property({**DataTest.BASE, **{k: None for k in fields if k not in DataTest.BASE}},
+                                    "panel", {})
+        self.assertEqual(prop["ref"], "TRE-010")
+        with open(os.path.join(SITE_DIR, "_datos", "agencia.json"), encoding="utf-8") as fh:
+            agency = json.load(fh)
+        self.assertEqual({f["name"] for f in entries["agencia"]["fields"]}, set(agency))
+        self.assertEqual(entries["agencia"]["path"], "_datos/agencia.json")
+
+
+try:
+    import PIL  # noqa: F401  (solo para la prueba de _fotos.py; en GitHub se instala)
+    from PIL import Image as _Image
+    HAS_PILLOW = hasattr(_Image, "new") and _Image.new("RGB", (1, 1)) is not None
+except Exception:  # Pillow no instalado o incompleto
+    HAS_PILLOW = False
+
+
+@unittest.skipUnless(HAS_PILLOW, "necesita Pillow")
+class PhotosTest(unittest.TestCase):
+    """_fotos.py --inmuebles: versiones AVIF, WebP y JPEG, sin GPS, y la ficha las usa."""
+
+    def test_property_photos_are_optimized_and_cleaned(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as tmp:
+            copy = os.path.join(tmp, "site")
+            shutil.copytree(SITE_DIR, copy, ignore=shutil.ignore_patterns(".git", "node_modules", "__pycache__"))
+            os.makedirs(os.path.join(copy, "_fotos"), exist_ok=True)
+            original = os.path.join(copy, "_fotos", "salon.jpg")
+            exif = Image.Exif()
+            exif[0x8825] = {2: (41.0, 34.0, 50.0), 4: (1.0, 37.0, 3.0)}  # coordenadas GPS
+            Image.new("RGB", (3000, 2000), (180, 150, 120)).save(original, "JPEG", exif=exif)
+            # Solo el inmueble de prueba, sin los reales ni sus fotos.
+            shutil.rmtree(os.path.join(copy, "_inmuebles"))
+            shutil.rmtree(os.path.join(copy, "fotos", "inmuebles"), ignore_errors=True)
+            os.makedirs(os.path.join(copy, "_inmuebles"))
+            with open(os.path.join(copy, "_fotos", "indice.json"), "w", encoding="utf-8") as fh:
+                fh.write("{}")
+            prop = dict(DataTest.BASE, fotos=["/_fotos/salon.jpg"])
+            with open(os.path.join(copy, "_inmuebles", "TRE-010.json"), "w", encoding="utf-8") as fh:
+                json.dump(prop, fh)
+            env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+            subprocess.run([sys.executable, "_fotos.py", "--inmuebles"], cwd=copy, check=True, capture_output=True, env=env)
+            subprocess.run([sys.executable, "_build.py"], cwd=copy, check=True, capture_output=True, env=env)
+            with Image.open(original) as cleaned:
+                self.assertEqual(dict(cleaned.getexif()), {}, "sin metadatos GPS")
+                self.assertEqual(max(cleaned.size), 2560)
+            with open(os.path.join(copy, "_fotos", "indice.json"), encoding="utf-8") as fh:
+                entry = json.load(fh)["/_fotos/salon.jpg"]
+            self.assertEqual(entry["formats"], {"avif": [480, 960, 1600], "webp": [480, 960, 1600], "jpg": [480, 960, 1600]})
+            self.assertEqual((entry["width"], entry["height"]), (1600, 1067))
+            with open(os.path.join(copy, "es-inmueble-tre-010.html"), encoding="utf-8") as fh:
+                page = fh.read()
+            self.assertIn('<source type="image/avif"', page)
+            self.assertIn('fetchpriority="high"', page)
+            self.assertIn(f"{entry['base']}-960.webp 960w", page)
+            # Una segunda pasada no rehace nada y quitar la foto borra sus versiones.
+            out = subprocess.run([sys.executable, "_fotos.py", "--inmuebles"], cwd=copy, check=True, capture_output=True, text=True, env=env)
+            self.assertIn("0 nuevas", out.stdout)
+            os.remove(os.path.join(copy, "_inmuebles", "TRE-010.json"))
+            subprocess.run([sys.executable, "_fotos.py", "--inmuebles"], cwd=copy, check=True, capture_output=True, env=env)
+            self.assertEqual(os.listdir(os.path.join(copy, "fotos", "inmuebles")), [])
+
+
 def published_files():
     """Archivos que publica GitHub Pages (Jekyll): todo salvo lo que empieza por «_» o «.»,
     más lo indicado en «include» de _config.yml."""

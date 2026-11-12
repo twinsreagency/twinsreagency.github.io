@@ -3,6 +3,12 @@ name: Tests
 on:
   push:
     branches: [ "main" ]
+    # Los cambios del panel los prueba y publica «Publicar cambios del panel» (publicar.yml),
+    # que además genera la web: aquí fallarían porque los HTML aún no están regenerados.
+    paths-ignore:
+      - "_inmuebles/**"
+      - "_datos/**"
+      - "_fotos/**"
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
@@ -28,6 +34,9 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
+
+      - name: Instalar Pillow (fotos) y PyYAML (prueba del panel)
+        run: python3 -m pip install --disable-pip-version-check pillow==13.0.0 pyyaml==6.0.2
 
       - name: Comprobaciones del sitio generado
         run: python3 -m unittest discover -s _tests -v
