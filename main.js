@@ -778,6 +778,33 @@
         });
     }
 
+    /* Compartir una ficha de inmueble ------------------------------------ */
+
+    /** Usa el menú de compartir del dispositivo si existe; si no, copia el enlace. */
+    function initShare() {
+        $$(".listing__share").forEach(function (button) {
+            var panel = button.closest(".listing__panel");
+            var status = panel ? $(".listing__status", panel) : null;
+            button.addEventListener("click", function () {
+                var link = new URL(button.getAttribute("data-share-url"), window.location.href).href;
+                var title = button.getAttribute("data-share-title") || document.title;
+                if (navigator.share) {
+                    navigator.share({ title: title, url: link }).catch(function () { /* cancelado */ });
+                    return;
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(link).then(function () {
+                        if (status) status.textContent = button.getAttribute("data-share-done") || "";
+                    }, function () {
+                        window.prompt("", link);
+                    });
+                    return;
+                }
+                window.prompt("", link);
+            });
+        });
+    }
+
     /* Filtro de inmuebles ------------------------------------------------ */
 
     function initPropertyFilter() {
@@ -1197,6 +1224,7 @@
     initTilt();
     initHeroPointer();
     initFavorites();
+    initShare();
     initLocalityPreset(); /* antes del filtro, que reescribe la URL */
     initPropertyFilter();
     initLeadForms();
