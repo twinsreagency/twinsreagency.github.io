@@ -853,8 +853,12 @@ def site_header(ctx, active):
                 <ul class="nav__list">
                     {links}
                 </ul>
+                <div class="nav__promo">
+                    <p class="nav__promo-title">{icon('key')}{ui['rail_title']}</p>
+                    <p class="nav__promo-text">{ui['rail_text']}</p>
+                    <a class="btn btn--primary nav__cta" href="{valuation_link(ctx)}">{ui['cta_nav']}</a>
+                </div>
                 {lang_switch(ctx)}
-                <a class="btn btn--primary nav__cta" href="{valuation_link(ctx)}">{ui['cta_nav']}</a>
             </nav>
             <button class="settings-toggle" type="button" aria-label="{esc(ui['settings']['open'])}" title="{esc(ui['settings']['open'])}" aria-expanded="false" aria-controls="ajustes" hidden>{icon('sliders')}</button>
             <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_dark'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
@@ -1921,7 +1925,11 @@ def screens(ctx, parts):
             sid = found.group(1)
         else:
             tag = tag.replace("<section", f'<section id="{sid}"', 1)
-        tag = tag.replace(' class="', ' class="screen ', 1) + f' data-screen="{n}">'
+        # Pantallas oscuras (o con el 3D oscuro a la derecha, como la primera): los puntos
+        # laterales pasan a claros sobre ellas.
+        dark = sid == "inicio" or re.search(r'class="[^"]*\bdusk\b', tag)
+        tag = (tag.replace(' class="', ' class="screen ', 1) + f' data-screen="{n}"'
+               + (' data-screen-tone="dark"' if dark else "") + ">")
         label = O["screens"][sid]
         marker = (f'\n            <p class="screen__tag" aria-hidden="true"><span>{n:02d}</span>{label}</p>'
                   if n > 1 else "")

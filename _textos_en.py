@@ -22,6 +22,8 @@ C = {
             "contacto.html": "Contact",
         },
         "cta_nav": "Free valuation",
+        "rail_title": "Selling your home?",
+        "rail_text": "We’ll tell you what it’s worth, free and with no obligation.",
         "menu_open": "Open menu",
         "menu_close": "Close menu",
         "lang_aria": "Language",

@@ -21,6 +21,8 @@ C = {
             "contacto.html": "Contacto",
         },
         "cta_nav": "Valoración gratuita",
+        "rail_title": "¿Vende su vivienda?",
+        "rail_text": "Le decimos cuánto vale, gratis y sin compromiso.",
         "menu_open": "Abrir menú",
         "menu_close": "Cerrar menú",
         "lang_aria": "Idioma",
