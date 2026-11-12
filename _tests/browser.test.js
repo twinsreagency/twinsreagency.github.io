@@ -79,11 +79,13 @@ async function open(file, { width = 1280, search = "", fixture: useFixture = fal
     });
     const page = await context.newPage();
     const errors = [];
-    page.on("pageerror", (error) => errors.push(error.message));
+    /* Chromium avisa (como consola o como error de página) cuando aborta la animación entre
+       páginas porque se navega otra vez antes de que termine (las pruebas navegan muy
+       rápido): no es un error de la web. */
+    const aborted = (text) => /Transition was aborted/.test(text);
+    page.on("pageerror", (error) => aborted(error.message) || errors.push(error.message));
     page.on("console", (msg) => {
-        /* Chromium avisa cuando aborta la animación entre páginas porque se navega otra vez
-           antes de que termine (las pruebas navegan muy rápido): no es un error de la web. */
-        if (/Transition was aborted/.test(msg.text())) return;
+        if (aborted(msg.text())) return;
         if (msg.type() === "error" || (msg.type() === "warning" && /preload|Content Security Policy/i.test(msg.text()))) {
             errors.push(msg.text());
         }

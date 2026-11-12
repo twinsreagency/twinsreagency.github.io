@@ -6309,3 +6309,15 @@ h3,
         padding-right: 0;
     }
 }
+
+/* Cabeceras interiores con el fondo de la portada nueva (sin los paneles grises). */
+.page-hero__panes {
+    display: none;
+}
+
+.page-hero {
+    background:
+        radial-gradient(40% 60% at 12% 20%, rgba(46, 196, 166, 0.14), transparent 70%),
+        radial-gradient(36% 55% at 88% 80%, rgba(80, 140, 255, 0.1), transparent 70%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+}
