@@ -6,7 +6,7 @@ C = {
     "locale": "en_GB",
     "label": "English",
     "abbr": "EN",
-    "slugs": {"zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
+    "slugs": {"inmueble": "property", "zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
               "contacto": "contact", "aviso-legal": "legal-notice", "privacidad": "privacy", "cookies": "cookies"},
 
     "ui": {
@@ -94,6 +94,7 @@ C = {
             "zona": ("Town", "All"),
             "precio": ("Maximum price", "No limit"),
             "dormitorios": ("Bedrooms", "Any"),
+            "superficie": ("Size", "Any"),
         },
         "options": {
             "operacion": ["To buy", "To rent"],
@@ -101,7 +102,9 @@ C = {
                      "Office", "Commercial premises or warehouse", "Garage", "Storage room", "Plot of land", "Building"],
             "precio": ["Up to €200,000", "Up to €400,000", "Up to €700,000", "Up to €1,000,000"],
             "dormitorios": ["1 or more", "2 or more", "3 or more", "4 or more", "5 or more"],
+            "superficie": ["50 m² or more", "80 m² or more", "100 m² or more", "150 m² or more", "200 m² or more"],
         },
+        "sort": ("Sort by", ["Newest", "Price: low to high", "Price: high to low", "Size: largest first"]),
     },
 
     "prop": {
@@ -116,8 +119,44 @@ C = {
         "ref": "Ref.",
     },
 
-    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
-    "properties": {},
+    # Page of each property (_inmuebles/*.json).
+    "detail": {
+        "description": "{operation}: {type} in {town}. {beds}, {baths} and {area} m². {price}. Ref. {ref}.",
+        "gallery_aria": "Property photos",
+        "photo_alt": "{title}: photo {n} of {total}",
+        "plan_alt": "Floor plan of {title}",
+        "no_photos": "Photos coming soon",
+        "facts_title": "Key facts",
+        "facts": {"ref": "Reference", "operation": "Transaction", "type": "Type", "beds": "Bedrooms",
+                  "baths": "Bathrooms", "area": "Built area", "floor": "Floor", "year": "Year built"},
+        "description_title": "Description",
+        "extras_title": "Features",
+        "extras": {"ascensor": "Lift", "terraza": "Terrace", "balcon": "Balcony", "jardin": "Garden",
+                   "piscina": "Swimming pool", "garaje": "Parking space", "trastero": "Storage room",
+                   "aire": "Air conditioning", "calefaccion": "Heating", "amueblado": "Furnished",
+                   "exterior": "Exterior-facing", "accesible": "Accessible"},
+        "energy_title": "Energy certificate",
+        "energy_consumption": "Energy consumption",
+        "energy_emissions": "CO₂ emissions",
+        "energy_units": ("kWh/m² year", "kg CO₂/m² year"),
+        "energy_pending": "In progress",
+        "energy_exempt": "Exempt",
+        "energy_scale": "Rating {letter} on a scale from A (most efficient) to G (least efficient)",
+        "location_title": "Location",
+        "location_note": "Approximate location: the exact address is provided when arranging a viewing.",
+        "map_link": "See the area on OpenStreetMap",
+        "plan_title": "Floor plan",
+        "media_title": "Video and virtual tour",
+        "video": "Watch the video",
+        "tour": "360º virtual tour",
+        "visit": "Request a viewing",
+        "share": "Share",
+        "copied": "Link copied",
+        "similar_title": "Similar properties",
+        "view": "View property",
+        "view_aria": "View {title}",
+        "aside_aria": "Price and contact",
+    },
 
     "commitments": [
         ("Verified information", "We review the land registry extract, any charges and the energy certificate before listing each property."),

@@ -21,6 +21,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 from urllib.parse import quote, urlencode, urlparse
 
 sys.dont_write_bytecode = True  # no crear la carpeta __pycache__ en el sitio
@@ -50,10 +51,18 @@ LANGS = [_textos_es.C, _textos_ca.C, _textos_en.C]
 
 EMAIL = "twinsreagency@gmail.com"
 
-# Datos del titular para el aviso legal y la política de privacidad (art. 10 LSSI).
-# Mientras un dato esté vacío, su fila no se muestra. Complételos cuando los tenga:
-# la ley exige el titular, el NIF, el domicilio y, en Cataluña, el número del
-# Registro de Agentes Inmobiliarios; los datos registrales, solo si es una sociedad.
+# Datos de la agencia: se editan en el panel (Pages CMS) o en _datos/agencia.json, y
+# los carga load_data(). Mientras un dato esté vacío, no se muestra.
+#   - Titular, NIF, domicilio y n.º del Registro de Agentes Inmobiliarios de Cataluña
+#     (AICAT): obligatorios en el aviso legal (art. 10 LSSI); los datos del Registro
+#     Mercantil, solo si es una sociedad.
+#   - Teléfono y WhatsApp, con prefijo internacional («+34 600 00 00 00»): aparecen en el
+#     pie, en «Contacto», en los datos para buscadores y, el WhatsApp, en cada ficha de
+#     inmueble con su referencia escrita en el mensaje; la política de privacidad añade
+#     entonces el párrafo sobre WhatsApp.
+#   - «desde»: año de inicio de la actividad, para mostrar los años de experiencia.
+#   - «google_business»: dirección de la ficha de Google Business (se enlaza en el pie,
+#     en las opiniones y en los datos estructurados).
 OWNER = {
     "titular": "",
     "nif": "",
@@ -61,6 +70,9 @@ OWNER = {
     "registro_mercantil": "",
     "registro_agentes": "",
 }
+PHONE = ""
+WHATSAPP = ""
+AGENCY = {"desde": "", "google_business": ""}
 OG_IMAGE = "og-image.jpg"  # imagen para compartir en redes (1200 × 630); se genera con _og/make.js
 # Agencia en línea con base en Igualada (sin oficina abierta al público).
 LOCALITY = "Igualada"
@@ -68,13 +80,6 @@ POSTAL_CODE = "08700"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
-# Teléfono y WhatsApp, con prefijo internacional (p. ej. "+34 600 00 00 00"). Mientras
-# estén vacíos no se muestran en ninguna parte. Con un número aparecen en el pie, en
-# «Contacto», en los datos para buscadores y, el WhatsApp, en cada ficha de inmueble
-# (con su referencia escrita en el mensaje). La política de privacidad añade entonces
-# el párrafo sobre WhatsApp.
-PHONE = ""
-WHATSAPP = ""
 
 
 
@@ -223,18 +228,22 @@ SEARCH_VALUES = {
     "zona": None,  # se calcula a partir de los inmuebles publicados (ver places())
     "precio": ["200000", "400000", "700000", "1000000"],
     "dormitorios": ["1", "2", "3", "4", "5"],
+    "superficie": ["50", "80", "100", "150", "200"],
 }
+# Orden del listado de inmuebles (sus textos: «search» → «sort»).
+SORT_VALUES = ["novedad", "precio-asc", "precio-desc", "superficie-desc"]
 
-# Inmuebles publicados. Mientras la lista esté vacía, la web muestra en su lugar
-# la invitación a crear una alerta de búsqueda y a solicitar una valoración, y no
-# se generan el filtro, el buscador de la portada ni los destacados. En cuanto se
-# añada el primer inmueble, todo ello vuelve a aparecer solo. Ejemplo:
-#     dict(ref="TRE-001", op="venta", type="piso", zone="igualada", price=185000,
-#          beds=3, baths=2, area=90, icon="building"),
-# op: "venta" o "alquiler"; type: uno de SEARCH_VALUES["tipo"]; zone: clave de TOWNS;
-# icon: "home", "building", "penthouse", "villa", "tree" o "loft". Su título,
-# ubicación y etiqueta van en «properties» de los tres archivos de textos.
+# Inmuebles publicados: un archivo por inmueble en _inmuebles/ (se editan en el panel,
+# Pages CMS; formato en _inmuebles/LEEME.md) que load_data() lee y valida. Mientras no
+# haya ninguno publicado, la web muestra en su lugar la invitación a crear una alerta de
+# búsqueda y a solicitar una valoración, sin filtro, buscador de la portada ni
+# destacados; con el primero, todo ello vuelve a aparecer solo.
 PROPERTIES = []
+
+# Opiniones reales de clientes (con su fuente) y casos de éxito: _datos/confianza.json.
+# Sin datos, sus secciones no se muestran: nunca se inventan.
+REVIEWS = []
+CASES = []
 
 # Localidades donde trabajamos, con su nombre oficial (igual en los tres idiomas). La
 # clave se usa en la dirección de su página y en el campo «zone» de los inmuebles:
@@ -280,6 +289,226 @@ POSTS = [  # (slug, icono, fecha ISO, minutos de lectura); el primero es el dest
 # --------------------------------------------------------------------------
 # Nombres de archivo y contexto de página
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# Datos editables desde el panel (Pages CMS): _datos/*.json e _inmuebles/*.json
+# --------------------------------------------------------------------------
+REF_PATTERN = re.compile(r"TRE-\d{3}")
+ENERGY_LETTERS = ["A", "B", "C", "D", "E", "F", "G"]
+ENERGY_STATES = ENERGY_LETTERS + ["en_tramite", "exento"]
+# Características que se pueden marcar en cada inmueble (sus textos: «detail» → «extras»).
+EXTRAS = ["ascensor", "terraza", "balcon", "jardin", "piscina", "garaje", "trastero",
+          "aire", "calefaccion", "amueblado", "exterior", "accesible"]
+# Icono de la tarjeta cuando el inmueble aún no tiene fotos.
+TYPE_ICONS = {"piso": "building", "atico": "penthouse", "duplex": "building", "casa": "home",
+              "rustica": "tree", "estudio": "loft", "oficina": "building", "local": "building",
+              "garaje": "building", "trastero": "building", "terreno": "tree", "edificio": "building"}
+PHOTO_INDEX = os.path.join("_fotos", "indice.json")   # lo escribe «python3 _fotos.py --inmuebles»
+
+
+def read_json(path):
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except json.JSONDecodeError as error:
+        raise SystemExit(f"{os.path.relpath(path, SITE_DIR)} no es un JSON válido: {error}")
+
+
+def slugify(text):
+    """«Santa Margarida de Montbui» → «santa-margarida-de-montbui»."""
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", plain.lower()).strip("-")
+
+
+def https_url(value, where):
+    value = str(value or "").strip()
+    if value and urlparse(value).scheme != "https":
+        raise SystemExit(f"{where}: la dirección debe empezar por https:// («{value}»)")
+    return value
+
+
+def whole(value, where, minimum=0, maximum=10 ** 9, required=True):
+    """Número entero de un campo (el panel lo guarda como número; a mano puede ser texto)."""
+    if value in (None, ""):
+        if required:
+            raise SystemExit(f"{where}: falta el dato")
+        return None
+    try:
+        number = int(str(value).replace(".", "").strip()) if isinstance(value, str) else int(value)
+    except ValueError:
+        raise SystemExit(f"{where}: «{value}» no es un número entero")
+    if not minimum <= number <= maximum:
+        raise SystemExit(f"{where}: {number} está fuera de lo razonable ({minimum}–{maximum})")
+    return number
+
+
+def decimal(value, where, minimum, maximum):
+    if value in (None, ""):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        raise SystemExit(f"{where}: «{value}» no es un número")
+    if not minimum <= number <= maximum:
+        raise SystemExit(f"{where}: {number} está fuera de rango ({minimum}–{maximum})")
+    return number
+
+
+def file_hash(path):
+    with open(path, "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()[:16]
+
+
+def photo(index, source, where):
+    """Versiones optimizadas (AVIF, WebP y JPEG en varios anchos) de una foto subida."""
+    key = "/" + str(source).lstrip("/")
+    local = os.path.join(SITE_DIR, key.lstrip("/"))
+    if not os.path.isfile(local):
+        raise SystemExit(f"{where}: no existe la foto {key}")
+    entry = index.get(key)
+    if not entry or entry.get("hash") != file_hash(local):
+        raise SystemExit(f"{where}: faltan las versiones optimizadas de {key}. "
+                         "Ejecute «python3 _fotos.py --inmuebles» (en GitHub lo hace solo la publicación).")
+    return entry
+
+
+def localized(data, key, where, required=False):
+    """{"es": …, "ca": …, "en": …} a partir de los campos «<key>_es», «<key>_ca» y «<key>_en»;
+    si falta una traducción se usa el texto en castellano."""
+    base = str(data.get(f"{key}_es") or "").strip()
+    if required and not base:
+        raise SystemExit(f"{where}: falta «{key}_es»")
+    return {L["code"]: str(data.get(f"{key}_{L['code']}") or "").strip() or base for L in LANGS}
+
+
+def load_property(data, where, index):
+    ref = str(data.get("ref", "")).strip().upper()
+    if not REF_PATTERN.fullmatch(ref):
+        raise SystemExit(f"{where}: la referencia debe ser TRE- y tres cifras (p. ej. TRE-001), no «{ref}»")
+    op, kind = data.get("operacion"), data.get("tipo")
+    if op not in SEARCH_VALUES["operacion"]:
+        raise SystemExit(f"{where}: operación «{op}» no válida ({', '.join(SEARCH_VALUES['operacion'])})")
+    if kind not in SEARCH_VALUES["tipo"]:
+        raise SystemExit(f"{where}: tipo «{kind}» no válido ({', '.join(SEARCH_VALUES['tipo'])})")
+    town = str(data.get("localidad") or "").strip()
+    if not town:
+        raise SystemExit(f"{where}: falta la localidad")
+    energy = data.get("energia_consumo")
+    if energy not in ENERGY_STATES:
+        raise SystemExit(f"{where}: el certificado energético es obligatorio en los anuncios: "
+                         f"letra A–G, «en_tramite» o «exento» (no «{energy}»)")
+    emissions = data.get("energia_emisiones") or ""
+    if emissions and emissions not in ENERGY_LETTERS:
+        raise SystemExit(f"{where}: letra de emisiones «{emissions}» no válida (A–G)")
+    extras = list(data.get("extras") or [])
+    unknown = [e for e in extras if e not in EXTRAS]
+    if unknown:
+        raise SystemExit(f"{where}: características desconocidas: {', '.join(unknown)} ({', '.join(EXTRAS)})")
+    date = str(data.get("fecha") or "").strip()[:10]
+    if date and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
+        raise SystemExit(f"{where}: fecha «{date}» no válida (AAAA-MM-DD)")
+    title = localized(data, "titulo", where, required=True)
+    if max(len(t) for t in title.values()) > 60:
+        raise SystemExit(f"{where}: el título no debe pasar de 60 caracteres (es el título de la página en los buscadores)")
+    photos = [photo(index, src, where) for src in (data.get("fotos") or [])]
+    plan = photo(index, data["plano"], where) if data.get("plano") else None
+    return dict(
+        ref=ref, op=op, type=kind, zone=slugify(town), town=town,
+        district=str(data.get("zona") or "").strip(),
+        price=whole(data.get("precio"), f"{where} (precio)", 1),
+        beds=whole(data.get("dormitorios"), f"{where} (dormitorios)", 0, 50),
+        baths=whole(data.get("banos"), f"{where} (baños)", 0, 50),
+        area=whole(data.get("superficie"), f"{where} (superficie)", 1, 100000),
+        floor=str(data.get("planta") or "").strip(),
+        year=whole(data.get("ano"), f"{where} (año)", 1500, 2100, required=False),
+        extras=[e for e in EXTRAS if e in extras],
+        energy=dict(rating=energy, emissions=emissions,
+                    consumption_value=decimal(data.get("energia_consumo_valor"), f"{where} (consumo)", 0, 2000),
+                    emissions_value=decimal(data.get("energia_emisiones_valor"), f"{where} (emisiones)", 0, 1000)),
+        title=title,
+        description=localized(data, "descripcion", where),
+        badge=localized(data, "etiqueta", where),
+        photos=photos, plan=plan,
+        video=https_url(data.get("video"), f"{where} (vídeo)"),
+        tour=https_url(data.get("tour"), f"{where} (tour virtual)"),
+        # Ubicación aproximada: se redondea a dos decimales (unos 1 km) para no señalar la casa.
+        lat=decimal(data.get("lat"), f"{where} (latitud)", 27, 44.5),
+        lon=decimal(data.get("lon"), f"{where} (longitud)", -18.5, 4.5),
+        date=date, icon=TYPE_ICONS[kind],
+    )
+
+
+def load_properties():
+    folder = os.path.join(SITE_DIR, "_inmuebles")
+    if not os.path.isdir(folder):
+        return []
+    index_file = os.path.join(SITE_DIR, PHOTO_INDEX)
+    index = read_json(index_file) if os.path.exists(index_file) else {}
+    found, refs = [], set()
+    for name in sorted(os.listdir(folder)):
+        if not name.endswith(".json"):
+            continue
+        data = read_json(os.path.join(folder, name))
+        if data.get("publicado") is False:
+            continue
+        p = load_property(data, f"_inmuebles/{name}", index)
+        if p["ref"] in refs:
+            raise SystemExit(f"_inmuebles/{name}: la referencia {p['ref']} ya la tiene otro inmueble")
+        refs.add(p["ref"])
+        found.append(p)
+    # Los más recientes primero (orden «Novedades» del listado).
+    return sorted(found, key=lambda p: (p["date"], p["ref"]), reverse=True)
+
+
+def load_reviews(items):
+    reviews = []
+    for i, r in enumerate(items or [], start=1):
+        where = f"_datos/confianza.json (opinión {i})"
+        author, text, source = (str(r.get(k) or "").strip() for k in ("autor", "texto", "fuente"))
+        if not (author and text and source):
+            raise SystemExit(f"{where}: cada opinión necesita autor, texto y fuente (p. ej. «Google»)")
+        if len(text) > 600:
+            raise SystemExit(f"{where}: el texto es demasiado largo (máximo 600 caracteres)")
+        lang = r.get("idioma") or "es"
+        if lang not in [L["code"] for L in LANGS]:
+            raise SystemExit(f"{where}: idioma «{lang}» no válido")
+        reviews.append(dict(author=author, text=text, source=source, lang=lang,
+                            stars=whole(r.get("estrellas"), f"{where} (estrellas)", 1, 5, required=False),
+                            link=https_url(r.get("enlace"), where),
+                            date=str(r.get("fecha") or "").strip()[:10]))
+    return reviews
+
+
+def load_cases(items):
+    cases = []
+    for i, c in enumerate(items or [], start=1):
+        where = f"_datos/confianza.json (caso {i})"
+        cases.append(dict(title=localized(c, "titulo", where, required=True),
+                          text=localized(c, "texto", where, required=True),
+                          town=str(c.get("localidad") or "").strip()))
+    return cases
+
+
+def load_data():
+    """Lee los datos que se editan desde el panel. Se llama al generar el sitio (main())."""
+    global PHONE, WHATSAPP
+    agency_file = os.path.join(SITE_DIR, "_datos", "agencia.json")
+    if os.path.exists(agency_file):
+        data = read_json(agency_file)
+        for key in OWNER:
+            OWNER[key] = str(data.get(key) or "").strip()
+        PHONE = phone_number(str(data.get("telefono") or "").strip(), "_datos/agencia.json (teléfono)")
+        WHATSAPP = phone_number(str(data.get("whatsapp") or "").strip(), "_datos/agencia.json (WhatsApp)")
+        since = whole(data.get("desde"), "_datos/agencia.json (desde)", 1950, 2100, required=False)
+        AGENCY["desde"] = since or ""
+        AGENCY["google_business"] = https_url(data.get("google_business"), "_datos/agencia.json (Google Business)")
+    trust_file = os.path.join(SITE_DIR, "_datos", "confianza.json")
+    if os.path.exists(trust_file):
+        data = read_json(trust_file)
+        REVIEWS[:] = load_reviews(data.get("opiniones"))
+        CASES[:] = load_cases(data.get("casos"))
+    PROPERTIES[:] = load_properties()
+
+
 def minify_css(css):
     """Versión compacta de styles.css: sin comentarios ni espacios innecesarios. Es
     conservadora a propósito: no toca «:» (en «a :hover» el espacio importa) ni los
@@ -338,6 +567,8 @@ def filename(lang, page):
         slug = "blog-" + lang["posts"][name[len("blog/"):]]["slug"]
     elif name.startswith("zona/"):  # página de una localidad de TOWNS
         slug = lang["slugs"]["zona"] + "-" + name[len("zona/"):]
+    elif name.startswith("inmueble/"):  # ficha de un inmueble: «inmueble/TRE-001.html»
+        slug = lang["slugs"]["inmueble"] + "-" + name[len("inmueble/"):].lower()
     else:
         slug = lang["slugs"][name]
     if lang["code"] == "es" and name == "index":
@@ -431,9 +662,12 @@ def options(values, labels, placeholder):
 
 
 def place_name(slug):
-    """Nombre oficial de una localidad de TOWNS."""
+    """Nombre oficial de una localidad: el de TOWNS o, si no está, el escrito en el inmueble."""
     if slug in TOWNS:
         return TOWNS[slug]
+    for p in PROPERTIES:
+        if p["zone"] == slug:
+            return p["town"]
     raise SystemExit(f"Localidad «{slug}» sin nombre: añádala a TOWNS en _build.py")
 
 
@@ -441,6 +675,34 @@ def places():
     """Localidades con algún inmueble publicado, por orden alfabético."""
     slugs = {p["zone"] for p in PROPERTIES}
     return sorted(((s, place_name(s)) for s in slugs), key=lambda item: item[1].casefold())
+
+
+def prop_title(ctx, p):
+    return p["title"][ctx.L["code"]]
+
+
+def prop_location(p):
+    return f"{p['town']} · {p['district']}" if p["district"] else p["town"]
+
+
+def type_label(L, p):
+    return L["search"]["options"]["tipo"][SEARCH_VALUES["tipo"].index(p["type"])]
+
+
+def srcset(ctx, image, fmt):
+    return ", ".join(f"{ctx.asset(image['base'])}-{w}.{fmt} {w}w" for w in image["formats"][fmt])
+
+
+def picture(ctx, image, alt, sizes, eager=False, extra=""):
+    """Foto en AVIF y WebP con JPEG de reserva, en varios anchos (el navegador elige el
+    adecuado a la pantalla). La primera foto de la ficha se carga con prioridad; el
+    resto, cuando se acercan a la pantalla."""
+    sources = "".join(f'<source type="image/{fmt}" srcset="{srcset(ctx, image, fmt)}" sizes="{sizes}">'
+                      for fmt in ("avif", "webp") if image["formats"].get(fmt))
+    jpg = image["formats"]["jpg"]
+    loading = 'fetchpriority="high"' if eager else 'loading="lazy" decoding="async"'
+    return (f'<picture>{sources}<img src="{ctx.asset(image["base"])}-{jpg[-1]}.jpg" srcset="{srcset(ctx, image, "jpg")}" '
+            f'sizes="{sizes}" alt="{esc(alt)}" width="{image["width"]}" height="{image["height"]}" {loading}{extra}></picture>')
 
 
 def field_options(L, name):
@@ -771,16 +1033,30 @@ def search_fields(ctx, prefix, names=None, indent=20):
     return "".join(out)
 
 
+def sort_field(ctx, prefix):
+    """Desplegable «Ordenar por» del listado (novedades, precio o superficie)."""
+    label, names = ctx.L["search"]["sort"]
+    choices = "".join(f'<option value="{v}">{esc(n)}</option>' for v, n in zip(SORT_VALUES, names))
+    return f"""
+                        <div class="field">
+                            <label for="{prefix}-orden">{label}</label>
+                            <select id="{prefix}-orden" name="orden">{choices}</select>
+                        </div>"""
+
+
 def property_card(ctx, p):
     L, P = ctx.L, ctx.L["prop"]
-    title, location, badge = L["properties"][p["ref"]]
-    badge_html = f'<span class="property__badge">{badge}</span>' if badge else ""
+    title, location, badge = prop_title(ctx, p), prop_location(p), p["badge"][L["code"]]
+    badge_html = f'<span class="property__badge">{esc(badge)}</span>' if badge else ""
     suffix = f' <small>{P["per_month"]}</small>' if p["op"] == "alquiler" else ""
     operation = P["rent"] if p["op"] == "alquiler" else P["sale"]
+    detail = ctx.page(f"inmueble/{p['ref']}.html")
+    media = (picture(ctx, p["photos"][0], "", "(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw")
+             if p["photos"] else icon(p["icon"]))
     return f"""
-                <article class="card property reveal tilt" data-operacion="{p['op']}" data-tipo="{p['type']}" data-zona="{p['zone']}" data-precio="{p['price']}" data-dormitorios="{p['beds']}">
-                    <div class="property__media">
-                        {icon(p['icon'])}
+                <article class="card property reveal tilt" data-ref="{p['ref']}" data-operacion="{p['op']}" data-tipo="{p['type']}" data-zona="{p['zone']}" data-precio="{p['price']}" data-dormitorios="{p['beds']}" data-superficie="{p['area']}" data-fecha="{p['date']}">
+                    <div class="property__media{' property__media--photo' if p['photos'] else ''}">
+                        {media}
                         {badge_html}
                         <button class="fav-btn" type="button" data-ref="{p['ref']}" aria-pressed="false" aria-label="{esc(P['fav'].format(title))}">{icon('heart')}</button>
                         <span class="property__ref">{P['ref']} {p['ref']}</span>
@@ -788,14 +1064,14 @@ def property_card(ctx, p):
                     <div class="property__body">
                         <p class="property__operation">{operation}</p>
                         <p class="property__price">{price(L, p['price'])}{suffix}</p>
-                        <h3 class="property__title">{title}</h3>
-                        <p class="property__location">{icon('map-pin')}{location}</p>
+                        <h3 class="property__title"><a href="{detail}">{esc(title)}</a></h3>
+                        <p class="property__location">{icon('map-pin')}{esc(location)}</p>
                         <ul class="property__features" aria-label="{esc(P['features_aria'])}">
                             <li>{icon('bed')}{count(p['beds'], P['bed'])}</li>
                             <li>{icon('bath')}{count(p['baths'], P['bath'])}</li>
                             <li>{icon('area')}{p['area']} m²</li>
                         </ul>
-                        <a class="link-arrow property__cta" href="{ctx.page('contacto.html')}?ref={p['ref']}#formulario">{P['request']} {icon('arrow-right')}<span class="visually-hidden"> {ctx.L['ui']['about']} {esc(title)}</span></a>
+                        <a class="link-arrow property__cta" href="{detail}">{L['detail']['view']} {icon('arrow-right')}<span class="visually-hidden"> {esc(title)}</span></a>
                     </div>
                 </article>"""
 
@@ -1427,7 +1703,7 @@ def build_properties(L):
             <div class="container">
                 <div class="search__panel reveal">
                     <h2 class="search__title" id="filtros-title">{S['title_filter']}</h2>
-                    <form class="search__form" id="filtro-inmuebles" action="{ctx.page('propiedades.html')}" method="get" role="search">{search_fields(ctx, 'filtro')}
+                    <form class="search__form" id="filtro-inmuebles" action="{ctx.page('propiedades.html')}" method="get" role="search">{search_fields(ctx, 'filtro')}{sort_field(ctx, 'filtro')}
                         <button class="btn btn--outline" type="reset">{S['reset']}</button>
                     </form>
                     <p class="filters__hint">{L['alert']['filter_hint']} <a class="link-arrow" href="#alerta">{L['alert']['filter_link']} {icon('arrow-right')}</a></p>
@@ -1740,6 +2016,213 @@ def build_towns(L):
         write(ctx, f(T["title"]), f(T["description"]), "", body, extra_head=ld)
 
 
+def energy_scale(D, label, letter, value, unit):
+    """Escala A–G con la letra del inmueble marcada (o «En trámite» / «Exento»)."""
+    if letter not in ENERGY_LETTERS:
+        state = D["energy_exempt"] if letter == "exento" else D["energy_pending"]
+        return f'\n                        <div class="energy"><p class="energy__label">{label}</p><p class="energy__state">{state}</p></div>'
+    current = ' aria-current="true"'
+    bars = "".join(f'<li class="energy__bar energy__bar--{l.lower()}{" is-current" if l == letter else ""}"'
+                   f'{current if l == letter else ""}><span>{l}</span></li>' for l in ENERGY_LETTERS)
+    figure = f'<span class="energy__value">{value:g} {unit}</span>' if value is not None else ""
+    return f"""
+                        <div class="energy">
+                            <p class="energy__label">{label}: <strong>{letter}</strong> {figure}</p>
+                            <ol class="energy__scale" aria-label="{esc(D['energy_scale'].format(letter=letter))}">{bars}</ol>
+                        </div>"""
+
+
+def similar_properties(p):
+    """Hasta tres inmuebles parecidos: misma operación y, mejor, mismo tipo o localidad."""
+    others = [o for o in PROPERTIES if o["ref"] != p["ref"] and o["op"] == p["op"]]
+    others.sort(key=lambda o: (o["type"] != p["type"], o["zone"] != p["zone"], abs(o["price"] - p["price"])))
+    return others[:3]
+
+
+def listing_ld(ctx, p, description):
+    """RealEstateListing: el anuncio, su precio y el inmueble (sin la dirección exacta)."""
+    if not SITE_URL:
+        return ""
+    residential = {"piso": "Apartment", "atico": "Apartment", "duplex": "Apartment", "estudio": "Apartment",
+                   "casa": "House", "rustica": "House"}
+    item = {
+        "@type": residential.get(p["type"], "Place"),
+        "name": prop_title(ctx, p),
+        "address": {"@type": "PostalAddress", "addressLocality": p["town"], "addressRegion": "Catalunya", "addressCountry": "ES"},
+    }
+    if item["@type"] != "Place":
+        item.update({"numberOfBedrooms": p["beds"], "numberOfBathroomsTotal": p["baths"],
+                     "floorSize": {"@type": "QuantitativeValue", "value": p["area"], "unitCode": "MTK"}})
+    return json_ld({
+        "@context": "https://schema.org",
+        "@type": "RealEstateListing",
+        "name": prop_title(ctx, p),
+        "description": description,
+        "url": url(ctx.file),
+        **({"datePosted": p["date"]} if p["date"] else {}),
+        **({"image": [url(f"{ph['base']}-{ph['formats']['jpg'][-1]}.jpg") for ph in p["photos"]]} if p["photos"] else {}),
+        "offers": {
+            "@type": "Offer", "price": p["price"], "priceCurrency": "EUR",
+            "businessFunction": "http://purl.org/goodrelations/v1#" + ("LeaseOut" if p["op"] == "alquiler" else "Sell"),
+            "seller": {"@id": ORGANIZATION_ID},
+        },
+        "about": item,
+    })
+
+
+def property_gallery(ctx, p, title):
+    D = ctx.L["detail"]
+    if not p["photos"]:
+        return f"""
+        <section class="listing-gallery listing-gallery--empty" aria-label="{esc(D['gallery_aria'])}">
+            <div class="container">
+                <div class="listing-gallery__placeholder">{icon(p['icon'])}<p>{D['no_photos']}</p></div>
+            </div>
+        </section>"""
+    total = len(p["photos"])
+    slides = "".join(
+        f'\n                <figure class="photo-slide">{picture(ctx, ph, D["photo_alt"].format(title=title, n=i, total=total), "(max-width: 900px) 92vw, 1100px", eager=i == 1)}</figure>'
+        for i, ph in enumerate(p["photos"], start=1))
+    nav = "" if total == 1 else f"""
+                <div class="gallery__nav">
+                    <p class="gallery__count" aria-hidden="true"><span data-gallery-current>01</span> / {total:02d}</p>
+                    <button class="gallery__btn" type="button" data-gallery-prev aria-label="{esc(ctx.L['ui']['prev'])}" aria-controls="fotos-{p['ref']}">{icon('arrow-left')}</button>
+                    <button class="gallery__btn" type="button" data-gallery-next aria-label="{esc(ctx.L['ui']['next'])}" aria-controls="fotos-{p['ref']}">{icon('arrow-right')}</button>
+                </div>"""
+    return f"""
+        <section class="gallery gallery--photos listing-gallery" aria-label="{esc(D['gallery_aria'])}">
+            <div class="gallery__track" id="fotos-{p['ref']}" role="region" aria-label="{esc(D['gallery_aria'])}" tabindex="0">{slides}
+            </div>
+            <div class="container">{nav}
+            </div>
+        </section>"""
+
+
+def build_property_pages(L):
+    """Una ficha por inmueble publicado, en cada idioma."""
+    P, D, ui = L["prop"], L["detail"], L["ui"]
+    for p in PROPERTIES:
+        ctx = Ctx(L, f"inmueble/{p['ref']}.html")
+        title = prop_title(ctx, p)
+        operation = P["rent"] if p["op"] == "alquiler" else P["sale"]
+        amount = price(L, p["price"]) + (f" {P['per_month']}" if p["op"] == "alquiler" else "")
+        description = D["description"].format(
+            operation=operation, type=type_label(L, p), town=p["town"], beds=count(p["beds"], P["bed"]),
+            baths=count(p["baths"], P["bath"]), area=p["area"], price=amount, ref=p["ref"])
+        facts = [(D["facts"]["ref"], p["ref"]), (D["facts"]["operation"], operation), (D["facts"]["type"], type_label(L, p)),
+                 (D["facts"]["beds"], p["beds"]), (D["facts"]["baths"], p["baths"]), (D["facts"]["area"], f"{p['area']} m²")]
+        if p["floor"]:
+            facts.append((D["facts"]["floor"], esc(p["floor"])))
+        if p["year"]:
+            facts.append((D["facts"]["year"], p["year"]))
+        facts_html = "".join(f"\n                            <div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
+        text = p["description"][L["code"]]
+        paragraphs = "".join(f"\n                        <p>{esc(par.strip())}</p>" for par in re.split(r"\n\s*\n", text) if par.strip())
+        sections = []
+        if paragraphs:
+            sections.append(f"""
+                    <section class="listing-block" aria-labelledby="descripcion-title">
+                        <h2 class="listing-block__title" id="descripcion-title">{D['description_title']}</h2>{paragraphs}
+                    </section>""")
+        if p["extras"]:
+            items = "".join(f'\n                            <li>{icon("check")}{D["extras"][e]}</li>' for e in p["extras"])
+            sections.append(f"""
+                    <section class="listing-block" aria-labelledby="caracteristicas-title">
+                        <h2 class="listing-block__title" id="caracteristicas-title">{D['extras_title']}</h2>
+                        <ul class="check-list check-list--cols">{items}
+                        </ul>
+                    </section>""")
+        e = p["energy"]
+        sections.append(f"""
+                    <section class="listing-block" aria-labelledby="energia-title">
+                        <h2 class="listing-block__title" id="energia-title">{icon('leaf')}{D['energy_title']}</h2>{energy_scale(D, D['energy_consumption'], e['rating'], e['consumption_value'], D['energy_units'][0])}{energy_scale(D, D['energy_emissions'], e['emissions'], e['emissions_value'], D['energy_units'][1]) if e['emissions'] else ''}
+                    </section>""")
+        map_link = ""
+        if p["lat"] is not None and p["lon"] is not None:
+            lat, lon = round(p["lat"], 2), round(p["lon"], 2)
+            osm = f"https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=14/{lat}/{lon}"
+            map_link = f'\n                        <p><a class="link-arrow" href="{osm}" target="_blank" rel="noopener noreferrer">{D["map_link"]} {icon("arrow-up-right")}<span class="visually-hidden"> {ui["new_tab"]}</span></a></p>'
+        sections.append(f"""
+                    <section class="listing-block" aria-labelledby="ubicacion-title">
+                        <h2 class="listing-block__title" id="ubicacion-title">{icon('map-pin')}{D['location_title']}</h2>
+                        <p class="listing-block__lead">{esc(prop_location(p))}</p>
+                        <p class="listing-block__note">{D['location_note']}</p>{map_link}
+                    </section>""")
+        if p["plan"]:
+            sections.append(f"""
+                    <section class="listing-block" aria-labelledby="plano-title">
+                        <h2 class="listing-block__title" id="plano-title">{icon('plan')}{D['plan_title']}</h2>
+                        <figure class="listing-plan">{picture(ctx, p['plan'], D['plan_alt'].format(title=title), "(max-width: 900px) 92vw, 720px")}</figure>
+                    </section>""")
+        media = [(p["video"], "play", D["video"]), (p["tour"], "cube", D["tour"])]
+        media_links = "".join(
+            f'\n                            <a class="btn btn--outline" href="{esc(link)}" target="_blank" rel="noopener noreferrer">{icon(ic)}{label}<span class="visually-hidden"> {ui["new_tab"]}</span></a>'
+            for link, ic, label in media if link)
+        if media_links:
+            sections.append(f"""
+                    <section class="listing-block" aria-labelledby="multimedia-title">
+                        <h2 class="listing-block__title" id="multimedia-title">{D['media_title']}</h2>
+                        <div class="listing-block__actions">{media_links}
+                        </div>
+                    </section>""")
+        whatsapp = ""
+        if WHATSAPP:
+            whatsapp = f'\n                        <a class="btn btn--outline" href="{esc(whatsapp_href(ui["whatsapp_ref"].format(ref=p["ref"])))}" target="_blank" rel="noopener noreferrer">{icon("message")}{ui["whatsapp"]}<span class="visually-hidden"> {ui["new_tab"]}</span></a>'
+        visit = ctx.page("contacto.html") + "?" + urlencode({"asunto": "visita", "ref": p["ref"]}) + "#formulario"
+        badge = p["badge"][L["code"]]
+        similar = similar_properties(p)
+        similar_html = ""
+        if similar:
+            cards = "".join(property_card(ctx, o) for o in similar)
+            similar_html = f"""
+        <section class="section section--alt" aria-labelledby="similares-title">
+            <div class="container">{section_header(None, D['similar_title'], 'similares-title')}
+                <div class="grid grid--3">{cards}
+                </div>
+            </div>
+        </section>"""
+        meta = (f'\n            <p class="listing-hero__meta"><span class="property__operation">{operation}</span>'
+                + (f'<span class="listing-hero__badge">{esc(badge)}</span>' if badge else "") + "</p>")
+        body = page_hero(ctx, esc(title), esc(prop_location(p)), [(ui["nav"]["propiedades.html"], "propiedades.html"), (esc(title), ctx.current)], meta, obj="house") + property_gallery(ctx, p, title) + f"""
+        <section class="section listing" aria-label="{esc(title)}">
+            <div class="container listing__grid">
+                <div class="listing__main">
+                    <section class="listing-block" aria-labelledby="datos-title">
+                        <h2 class="listing-block__title" id="datos-title">{D['facts_title']}</h2>
+                        <dl class="listing-facts">{facts_html}
+                        </dl>
+                    </section>{''.join(sections)}
+                </div>
+                <aside class="listing__aside" aria-label="{esc(D['aside_aria'])}">
+                    <div class="card listing-card">
+                        <p class="property__operation">{operation}</p>
+                        <p class="listing-card__price">{price(L, p['price'])}{f' <small>{P["per_month"]}</small>' if p['op'] == 'alquiler' else ''}</p>
+                        <ul class="property__features" aria-label="{esc(P['features_aria'])}">
+                            <li>{icon('bed')}{count(p['beds'], P['bed'])}</li>
+                            <li>{icon('bath')}{count(p['baths'], P['bath'])}</li>
+                            <li>{icon('area')}{p['area']} m²</li>
+                        </ul>
+                        <a class="btn btn--primary" href="{visit}">{D['visit']} {ARROW}</a>{whatsapp}
+                        <div class="listing-card__tools">
+                            <button class="btn btn--outline share-btn" type="button" data-share-title="{esc(title)}" data-copied="{esc(D['copied'])}" hidden>{icon('share')}{D['share']}</button>
+                            <button class="fav-btn fav-btn--inline" type="button" data-ref="{p['ref']}" aria-pressed="false" aria-label="{esc(P['fav'].format(title))}">{icon('heart')}</button>
+                        </div>
+                        <p class="visually-hidden share-status" role="status" aria-live="polite"></p>
+                        <p class="listing-card__ref">{P['ref']} {p['ref']}</p>
+                    </div>
+                </aside>
+            </div>
+        </section>{similar_html}
+{sell_section(ctx)}"""
+        extra = listing_ld(ctx, p, description)
+        if p["photos"]:
+            first = p["photos"][0]
+            fmt = "avif" if first["formats"].get("avif") else ("webp" if first["formats"].get("webp") else "jpg")
+            extra += (f'\n    <link rel="preload" as="image" type="image/{"jpeg" if fmt == "jpg" else fmt}" '
+                      f'imagesrcset="{srcset(ctx, first, fmt)}" imagesizes="(max-width: 900px) 92vw, 1100px" fetchpriority="high">')
+        write(ctx, title, description, "propiedades.html", body, extra_head=extra)
+
+
 def contact_phone_cards(ctx):
     """Tarjetas de teléfono y WhatsApp de «Contacto» (vacío si no hay número)."""
     ui, out = ctx.L["ui"], []
@@ -1976,7 +2459,7 @@ def build_legacy_redirects(L):
 def logical_pages(L):
     """Todas las páginas indexables de un idioma, con su nombre lógico."""
     return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS]
-            + [f"zona/{slug}.html" for slug in TOWNS])
+            + [f"zona/{slug}.html" for slug in TOWNS] + [f"inmueble/{p['ref']}.html" for p in PROPERTIES])
 
 
 def build_sitemap():
@@ -1984,6 +2467,7 @@ def build_sitemap():
     robots = "User-agent: *\nAllow: /\nDisallow: /404.html\n"
     if SITE_URL:
         dates = {f"blog/{slug}.html": date for slug, _, date, _ in POSTS}
+        dates.update({f"inmueble/{p['ref']}.html": p["date"] for p in PROPERTIES if p["date"]})
         entries = []
         for L in LANGS:
             for page in logical_pages(L):
@@ -2088,6 +2572,7 @@ def check_translations():
 
 def main():
     check_translations()
+    load_data()
     build_assets()
     for lang in LANGS:
         build_index(lang)
@@ -2098,6 +2583,7 @@ def main():
         build_contact(lang)
         build_legal(lang)
         build_towns(lang)
+        build_property_pages(lang)
     build_404(LANGS[0])
     build_legacy_redirects(LANGS[0])
     build_sitemap()

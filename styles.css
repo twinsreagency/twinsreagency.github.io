@@ -4881,3 +4881,341 @@ html[data-motion="reduced"]::view-transition-new(root) {
         margin-right: 0;
     }
 }
+
+/* Ficha de inmueble ------------------------------------------------------- */
+.property__title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--transition);
+}
+
+.property__title a:hover {
+    color: var(--accent);
+}
+
+.property__media--photo {
+    background: var(--media-b);
+}
+
+.property__media--photo picture,
+.property__media--photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.listing-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.1rem;
+}
+
+.listing-hero__meta .property__operation {
+    margin: 0;
+}
+
+.listing-hero__badge {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid rgba(199, 169, 125, 0.45);
+    border-radius: var(--pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+}
+
+.gallery--photos {
+    padding-block: 0 2rem;
+    background: transparent;
+}
+
+.gallery--photos .gallery__track > .photo-slide {
+    flex: 0 0 min(1100px, 88vw);
+    aspect-ratio: 3 / 2;
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--media-b);
+    scroll-snap-align: center;
+}
+
+.photo-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery--photos .gallery__nav {
+    justify-content: flex-end;
+}
+
+.listing-gallery--empty {
+    padding-bottom: 2rem;
+}
+
+.listing-gallery__placeholder {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.75rem;
+    aspect-ratio: 16 / 7;
+    border-radius: var(--radius-lg);
+    color: var(--text-2);
+    background:
+        radial-gradient(60% 60% at 50% 60%, rgba(199, 169, 125, 0.22), transparent 70%),
+        linear-gradient(180deg, var(--media-a), var(--media-b));
+}
+
+.listing-gallery__placeholder .icon {
+    width: 4rem;
+    height: 4rem;
+    stroke-width: 0.9;
+    color: var(--accent);
+}
+
+.listing {
+    padding-top: 1rem;
+}
+
+.listing__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+    gap: 3rem;
+}
+
+.listing__aside {
+    position: sticky;
+    top: 6.5rem;
+}
+
+.listing-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.75rem;
+}
+
+.listing-card .property__operation,
+.listing-card .property__features {
+    margin: 0;
+}
+
+.listing-card__price {
+    font-size: 2.1rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+}
+
+.listing-card__price small {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--text-2);
+}
+
+.listing-card .btn {
+    justify-content: center;
+    width: 100%;
+}
+
+.listing-card__tools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.listing-card__tools .share-btn {
+    flex: 1;
+}
+
+.fav-btn--inline {
+    position: static;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+}
+
+.listing-card__ref {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+}
+
+.listing-block {
+    padding-block: 2rem;
+    border-bottom: 1px solid var(--stroke);
+}
+
+.listing-block:first-child {
+    padding-top: 0;
+}
+
+.listing-block:last-child {
+    border-bottom: 0;
+}
+
+.listing-block__title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.1rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.listing-block__title .icon {
+    color: var(--accent);
+}
+
+.listing-block p {
+    margin-bottom: 0.9rem;
+    line-height: 1.7;
+    color: var(--prose);
+}
+
+.listing-block .listing-block__lead {
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+.listing-block .listing-block__note {
+    font-size: 0.9rem;
+    color: var(--text-2);
+}
+
+.listing-block__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.listing-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.listing-facts div {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    background: var(--glass);
+}
+
+.listing-facts dt {
+    margin-bottom: 0.3rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-2);
+}
+
+.listing-facts dd {
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.check-list--cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    column-gap: 1.5rem;
+    margin: 0;
+}
+
+/* Etiqueta energética: los colores oficiales de la escala, con texto oscuro legible. */
+.energy {
+    margin-bottom: 1.25rem;
+}
+
+.listing-block .energy__label {
+    margin-bottom: 0.6rem;
+    color: var(--text);
+}
+
+.energy__value {
+    margin-left: 0.35rem;
+    font-size: 0.9rem;
+    color: var(--text-2);
+}
+
+.listing-block .energy__state {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--stroke-2);
+    border-radius: var(--pill);
+    color: var(--text);
+}
+
+.energy__scale {
+    display: grid;
+    gap: 4px;
+    max-width: 360px;
+}
+
+.energy__bar {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    padding-inline: 0.6rem;
+    border-radius: 0 12px 12px 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.energy__bar--a { width: 40%; background: #00a651; }
+.energy__bar--b { width: 48%; background: #4cb847; }
+.energy__bar--c { width: 56%; background: #bfd730; }
+.energy__bar--d { width: 64%; background: #fff200; }
+.energy__bar--e { width: 72%; background: #fcb814; }
+.energy__bar--f { width: 80%; background: #f37021; }
+.energy__bar--g { width: 88%; background: #ed1c24; }
+
+.energy__bar.is-current {
+    height: 32px;
+    font-size: 0.95rem;
+    box-shadow: 0 0 0 2px var(--text);
+}
+
+.listing-plan {
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: #ffffff;
+}
+
+.listing-plan img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 900px) {
+    .listing__grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .listing__aside {
+        position: static;
+        order: -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .gallery--photos .gallery__track > .photo-slide {
+        flex-basis: 88vw;
+        aspect-ratio: 4 / 3;
+    }
+
+    .listing-card__price {
+        font-size: 1.8rem;
+    }
+}

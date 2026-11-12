@@ -6,7 +6,7 @@ C = {
     "locale": "ca_ES",
     "label": "Català",
     "abbr": "CA",
-    "slugs": {"zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
+    "slugs": {"inmueble": "immoble", "zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
 
     "ui": {
         "skip": "Salta al contingut principal",
@@ -93,6 +93,7 @@ C = {
             "zona": ("Localitat", "Totes"),
             "precio": ("Preu màxim", "Sense límit"),
             "dormitorios": ("Dormitoris", "Indiferent"),
+            "superficie": ("Superfície", "Indiferent"),
         },
         "options": {
             "operacion": ["Compra", "Lloguer"],
@@ -100,7 +101,9 @@ C = {
                      "Oficina", "Local o nau", "Garatge", "Traster", "Terreny", "Edifici"],
             "precio": ["Fins a 200.000 €", "Fins a 400.000 €", "Fins a 700.000 €", "Fins a 1.000.000 €"],
             "dormitorios": ["1 o més", "2 o més", "3 o més", "4 o més", "5 o més"],
+            "superficie": ["50 m² o més", "80 m² o més", "100 m² o més", "150 m² o més", "200 m² o més"],
         },
+        "sort": ("Ordena per", ["Novetats", "Preu: de menor a major", "Preu: de major a menor", "Superfície: de major a menor"]),
     },
 
     "prop": {
@@ -115,8 +118,44 @@ C = {
         "ref": "Ref.",
     },
 
-    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
-    "properties": {},
+    # Fitxa de cada immoble (_inmuebles/*.json).
+    "detail": {
+        "description": "{operation}: {type} a {town}. {beds}, {baths} i {area} m². {price}. Ref. {ref}.",
+        "gallery_aria": "Fotos de l’immoble",
+        "photo_alt": "{title}: foto {n} de {total}",
+        "plan_alt": "Plànol de {title}",
+        "no_photos": "Fotos aviat",
+        "facts_title": "Dades principals",
+        "facts": {"ref": "Referència", "operation": "Operació", "type": "Tipus", "beds": "Dormitoris",
+                  "baths": "Banys", "area": "Superfície construïda", "floor": "Planta", "year": "Any de construcció"},
+        "description_title": "Descripció",
+        "extras_title": "Característiques",
+        "extras": {"ascensor": "Ascensor", "terraza": "Terrassa", "balcon": "Balcó", "jardin": "Jardí",
+                   "piscina": "Piscina", "garaje": "Plaça d’aparcament", "trastero": "Traster",
+                   "aire": "Aire condicionat", "calefaccion": "Calefacció", "amueblado": "Moblat",
+                   "exterior": "Exterior", "accesible": "Accessible"},
+        "energy_title": "Certificat energètic",
+        "energy_consumption": "Consum d’energia",
+        "energy_emissions": "Emissions de CO₂",
+        "energy_units": ("kWh/m² any", "kg CO₂/m² any"),
+        "energy_pending": "En tràmit",
+        "energy_exempt": "Exempt",
+        "energy_scale": "Qualificació {letter} en una escala d’A (més eficient) a G (menys eficient)",
+        "location_title": "Ubicació",
+        "location_note": "Ubicació aproximada: l’adreça exacta es facilita en concertar la visita.",
+        "map_link": "Veure la zona a OpenStreetMap",
+        "plan_title": "Plànol",
+        "media_title": "Vídeo i visita virtual",
+        "video": "Veure el vídeo",
+        "tour": "Visita virtual 360º",
+        "visit": "Demaneu una visita",
+        "share": "Compartir",
+        "copied": "Enllaç copiat",
+        "similar_title": "Immobles similars",
+        "view": "Veure l’immoble",
+        "view_aria": "Veure {title}",
+        "aside_aria": "Preu i contacte",
+    },
 
     "commitments": [
         ("Informació verificada", "Revisem la nota simple, les càrregues i el certificat energètic abans de publicar cada immoble."),

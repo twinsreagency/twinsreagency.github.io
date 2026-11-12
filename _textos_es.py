@@ -6,7 +6,7 @@ C = {
     "locale": "es_ES",
     "label": "Español",
     "abbr": "ES",
-    "slugs": {"zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
+    "slugs": {"inmueble": "inmueble", "zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
 
     "ui": {
         "skip": "Saltar al contenido principal",
@@ -93,6 +93,7 @@ C = {
             "zona": ("Localidad", "Todas"),
             "precio": ("Precio máximo", "Sin límite"),
             "dormitorios": ("Dormitorios", "Indiferente"),
+            "superficie": ("Superficie", "Indiferente"),
         },
         "options": {
             "operacion": ["Compra", "Alquiler"],
@@ -100,7 +101,9 @@ C = {
                      "Oficina", "Local o nave", "Garaje", "Trastero", "Terreno", "Edificio"],
             "precio": ["Hasta 200.000 €", "Hasta 400.000 €", "Hasta 700.000 €", "Hasta 1.000.000 €"],
             "dormitorios": ["1 o más", "2 o más", "3 o más", "4 o más", "5 o más"],
+            "superficie": ["50 m² o más", "80 m² o más", "100 m² o más", "150 m² o más", "200 m² o más"],
         },
+        "sort": ("Ordenar por", ["Novedades", "Precio: de menor a mayor", "Precio: de mayor a menor", "Superficie: de mayor a menor"]),
     },
 
     "prop": {
@@ -115,9 +118,44 @@ C = {
         "ref": "Ref.",
     },
 
-    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia:
-    #     "TRE-001": ("Piso luminoso con terraza", "Igualada · Centro", "Novedad"),
-    "properties": {},
+    # Ficha de cada inmueble (_inmuebles/*.json).
+    "detail": {
+        "description": "{operation}: {type} en {town}. {beds}, {baths} y {area} m². {price}. Ref. {ref}.",
+        "gallery_aria": "Fotos del inmueble",
+        "photo_alt": "{title}: foto {n} de {total}",
+        "plan_alt": "Plano de {title}",
+        "no_photos": "Fotos próximamente",
+        "facts_title": "Datos principales",
+        "facts": {"ref": "Referencia", "operation": "Operación", "type": "Tipo", "beds": "Dormitorios",
+                  "baths": "Baños", "area": "Superficie construida", "floor": "Planta", "year": "Año de construcción"},
+        "description_title": "Descripción",
+        "extras_title": "Características",
+        "extras": {"ascensor": "Ascensor", "terraza": "Terraza", "balcon": "Balcón", "jardin": "Jardín",
+                   "piscina": "Piscina", "garaje": "Plaza de garaje", "trastero": "Trastero",
+                   "aire": "Aire acondicionado", "calefaccion": "Calefacción", "amueblado": "Amueblado",
+                   "exterior": "Exterior", "accesible": "Accesible"},
+        "energy_title": "Certificado energético",
+        "energy_consumption": "Consumo de energía",
+        "energy_emissions": "Emisiones de CO₂",
+        "energy_units": ("kWh/m² año", "kg CO₂/m² año"),
+        "energy_pending": "En trámite",
+        "energy_exempt": "Exento",
+        "energy_scale": "Calificación {letter} en una escala de A (más eficiente) a G (menos eficiente)",
+        "location_title": "Ubicación",
+        "location_note": "Ubicación aproximada: la dirección exacta se facilita al concertar la visita.",
+        "map_link": "Ver la zona en OpenStreetMap",
+        "plan_title": "Plano",
+        "media_title": "Vídeo y visita virtual",
+        "video": "Ver el vídeo",
+        "tour": "Visita virtual 360º",
+        "visit": "Solicitar visita",
+        "share": "Compartir",
+        "copied": "Enlace copiado",
+        "similar_title": "Inmuebles similares",
+        "view": "Ver inmueble",
+        "view_aria": "Ver {title}",
+        "aside_aria": "Precio y contacto",
+    },
 
     "commitments": [
         ("Información verificada", "Revisamos la nota simple, las cargas y el certificado energético antes de publicar cada inmueble."),

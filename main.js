@@ -790,7 +790,12 @@
         var cards = $$(".property", list);
         var count = document.getElementById("resultados-total");
         var empty = document.getElementById("sin-resultados");
-        var fields = ["operacion", "tipo", "zona", "precio", "dormitorios"];
+        var fields = ["operacion", "tipo", "zona", "precio", "dormitorios", "superficie"];
+        var sort = form.elements.orden;
+        /* Orden original (novedades primero), para volver a él y desempatar. */
+        cards.forEach(function (card, index) {
+            card.setAttribute("data-index", String(index));
+        });
         var params = new URLSearchParams(window.location.search);
         var alertForm = document.getElementById("formulario-alerta");
         /* Una localidad que ya viene rellenada (enlace de una página por localidad) cuenta como elegida. */
@@ -816,9 +821,9 @@
             });
         }
 
-        fields.forEach(function (name) {
+        fields.concat(sort ? ["orden"] : []).forEach(function (name) {
             var select = form.elements[name];
-            if (select) select.value = allowedParam(params, name, optionValues(select));
+            if (select) select.value = allowedParam(params, name, optionValues(select)) || select.options[0].value;
         });
 
         function matches(card, criteria) {
@@ -828,7 +833,23 @@
             if (criteria.zona && data.zona !== criteria.zona) return false;
             if (criteria.precio && Number(data.precio) > Number(criteria.precio)) return false;
             if (criteria.dormitorios && Number(data.dormitorios) < Number(criteria.dormitorios)) return false;
+            if (criteria.superficie && Number(data.superficie) < Number(criteria.superficie)) return false;
             return true;
+        }
+
+        /** Reordena las tarjetas: novedades, precio (de menor a mayor o al revés) o superficie. */
+        function order(by) {
+            var key = {
+                "precio-asc": function (c) { return Number(c.dataset.precio); },
+                "precio-desc": function (c) { return -Number(c.dataset.precio); },
+                "superficie-desc": function (c) { return -Number(c.dataset.superficie); }
+            }[by];
+            cards.slice().sort(function (a, b) {
+                var diff = key ? key(a) - key(b) : 0;
+                return diff || Number(a.dataset.index) - Number(b.dataset.index);
+            }).forEach(function (card) {
+                list.appendChild(card);
+            });
         }
 
         function apply() {
@@ -850,6 +871,10 @@
 
             if (count) count.textContent = String(visible);
             if (empty) empty.hidden = visible !== 0;
+            if (sort) {
+                order(sort.value);
+                if (sort.value !== sort.options[0].value) query.set("orden", sort.value);
+            }
             syncAlert();
 
             var search = query.toString();
@@ -868,6 +893,28 @@
         });
 
         apply();
+    }
+
+    /* Compartir una ficha: menú del sistema (móvil) o copia del enlace ------- */
+
+    function initShare() {
+        $$(".share-btn").forEach(function (button) {
+            var status = $(".share-status", button.closest(".listing-card") || document);
+            var canShare = typeof navigator.share === "function";
+            var canCopy = Boolean(navigator.clipboard && navigator.clipboard.writeText);
+            if (!canShare && !canCopy) return;
+            button.hidden = false;
+            button.addEventListener("click", function () {
+                var data = { title: button.getAttribute("data-share-title"), url: window.location.href.split("#")[0] };
+                if (canShare) {
+                    navigator.share(data).catch(function () {});
+                    return;
+                }
+                navigator.clipboard.writeText(data.url).then(function () {
+                    if (status) status.textContent = button.getAttribute("data-copied");
+                }).catch(function () {});
+            });
+        });
     }
 
     /* Formularios de contacto y de alerta de búsqueda --------------------- */
@@ -1223,5 +1270,6 @@
     initLeadForms();
     initCounters();
     initGalleries();
+    initShare();
     initYear();
 })();
