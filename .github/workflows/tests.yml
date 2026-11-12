@@ -13,7 +13,9 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Versión fija del sistema, como las acciones y Playwright: «ubuntu-latest» pasó a
+    # Ubuntu 26.04 y Playwright 1.56.1 no puede instalar Chromium allí.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
