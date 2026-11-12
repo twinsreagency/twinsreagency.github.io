@@ -100,7 +100,7 @@ def csp(meta=True):
              "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
              "base-uri 'self'", "object-src 'none'",
              # Lo que el sitio no usa, cerrado de forma explícita.
-             "frame-src 'none'", "worker-src 'none'", "media-src 'none'", "manifest-src 'none'",
+             "frame-src 'none'", "worker-src 'none'", "media-src 'none'", "manifest-src 'self'",
              # Trusted Types: el navegador rechaza cualquier intento de escribir HTML o
              # código desde JavaScript (innerHTML, eval…). main.js solo usa textContent.
              "require-trusted-types-for 'script'", "trusted-types 'none'"]
@@ -451,7 +451,9 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta name="twitter:card" content="summary_large_image">{og_image}{alternates}
     <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
     <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
+    <link rel="icon" href="{ctx.asset('favicon-96.png')}" type="image/png" sizes="96x96">
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
+    <link rel="manifest" href="{ctx.asset('site.webmanifest')}">
     <link rel="preload" href="{ctx.asset('fonts/inter-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{ctx.asset('fonts/playfair-display-600-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <script src="{ctx.asset(versioned('theme.js'))}"></script>
@@ -1933,6 +1935,26 @@ def build_headers():
         fh.write(text)
 
 
+def build_manifest():
+    """site.webmanifest: nombre, colores e iconos cuando se añade la web a la pantalla de
+    inicio (Android, Chrome). Se abre en el navegador, como un marcador ("display": "browser").
+    Los iconos los genera _iconos.py."""
+    data = {
+        "name": "Twins Real Estate",
+        "short_name": "Twins",
+        "description": LANGS[0]["index"]["description"],
+        "lang": LANGS[0]["lang"],
+        "start_url": "./",
+        "scope": "./",
+        "display": "browser",
+        "background_color": "#f2ede4",
+        "theme_color": "#f2ede4",
+        "icons": [{"src": f"icon-{size}.png", "sizes": f"{size}x{size}", "type": "image/png"} for size in (192, 512)],
+    }
+    with open(os.path.join(SITE_DIR, "site.webmanifest"), "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+
+
 def build_security_txt():
     """/.well-known/security.txt (RFC 9116): a quién avisar de un problema de seguridad.
     _config.yml indica a Jekyll (GitHub Pages) que publique la carpeta .well-known."""
@@ -1979,6 +2001,7 @@ def main():
     build_legacy_redirects(LANGS[0])
     build_sitemap()
     build_headers()
+    build_manifest()
     build_security_txt()
     print("Sitio generado en", SITE_DIR)
 

@@ -1,0 +1,23 @@
+{
+  "name": "Twins Real Estate",
+  "short_name": "Twins",
+  "description": "Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento personalizado, información verificada y acompañamiento hasta la notaría.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#f2ede4",
+  "theme_color": "#f2ede4",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

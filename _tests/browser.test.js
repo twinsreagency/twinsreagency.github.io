@@ -27,6 +27,7 @@ const TYPES = {
     ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
     ".png": "image/png", ".webp": "image/webp", ".ico": "image/x-icon", ".woff2": "font/woff2",
     ".xml": "application/xml", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml",
+    ".webmanifest": "application/manifest+json", ".jpg": "image/jpeg",
 };
 
 /** Servidor estático mínimo de una carpeta; devuelve su dirección. */
@@ -667,5 +668,21 @@ test("con «Más contraste», la frase de la portada se ve entera desde el princ
     await page.click("label[for='ajuste-contraste-more']");
     await page.waitForFunction(() => [...document.querySelectorAll(".statement__text .w")]
         .every((w) => getComputedStyle(w).opacity === "1"));
+    await close();
+});
+
+test("el manifiesto se carga sin errores y declara los iconos de 192 y 512 px", async () => {
+    const { page, errors, close } = await open("ca-inici.html");
+    const cdp = await page.context().newCDPSession(page);
+    const { url: manifestUrl, errors: problems, manifest } = await cdp.send("Page.getAppManifest");
+    assert.match(manifestUrl, /site\.webmanifest$/);
+    assert.deepEqual(problems, []);
+    assert.equal(manifest.name, "Twins Real Estate");
+    assert.deepEqual(manifest.icons.map((icon) => icon.sizes), ["192x192", "512x512"]);
+    for (const icon of manifest.icons) {
+        const response = await page.request.get(icon.url);
+        assert.equal(response.status(), 200, icon.url);
+    }
+    assert.deepEqual(errors, []);
     await close();
 });

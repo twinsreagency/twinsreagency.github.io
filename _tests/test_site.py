@@ -119,7 +119,7 @@ class BuildTest(unittest.TestCase):
             subprocess.run([sys.executable, "_build.py"], cwd=copy, check=True, capture_output=True,
                            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
             generated = [os.path.basename(f) for f in glob.glob(os.path.join(copy, "*"))
-                         if f.endswith((".html", ".xml", ".txt", ".min.css", ".min.js"))] + ["_headers", ".well-known/security.txt"]
+                         if f.endswith((".html", ".xml", ".txt", ".min.css", ".min.js", ".webmanifest"))] + ["_headers", ".well-known/security.txt"]
             match, mismatch, errors = filecmp.cmpfiles(SITE_DIR, copy, generated, shallow=False)
             self.assertEqual(mismatch + errors, [], "Vuelva a ejecutar «python3 _build.py» y publique el resultado")
 
@@ -227,6 +227,27 @@ class ContentTest(unittest.TestCase):
                 self.assertEqual(data["@context"], "https://schema.org", name)
                 self.assertNotIn("</", block, name)
 
+    def test_icons_and_manifest(self):
+        """Favicon en todos los tamaños habituales y manifiesto con los iconos de Android."""
+        def png_size(name):
+            with open(os.path.join(SITE_DIR, name), "rb") as fh:
+                header = fh.read(24)
+            self.assertEqual(header[:8], b"\x89PNG\r\n\x1a\n", name)
+            return int.from_bytes(header[16:20], "big"), int.from_bytes(header[20:24], "big")
+
+        for name, size in (("favicon-32.png", 32), ("favicon-96.png", 96), ("apple-touch-icon.png", 180),
+                           ("icon-192.png", 192), ("icon-512.png", 512)):
+            self.assertEqual(png_size(name), (size, size), name)
+        self.assertTrue(os.path.isfile(os.path.join(SITE_DIR, "favicon.ico")))
+        with open(os.path.join(SITE_DIR, "site.webmanifest"), encoding="utf-8") as fh:
+            manifest = json.load(fh)
+        self.assertEqual({icon["sizes"] for icon in manifest["icons"]}, {"192x192", "512x512"})
+        for icon in manifest["icons"]:
+            self.assertEqual(png_size(icon["src"]), tuple(map(int, icon["sizes"].split("x"))))
+        for name, page in CONTENT.items():
+            for link in ("favicon.ico", "favicon-96.png", "apple-touch-icon.png", "site.webmanifest"):
+                self.assertTrue(any(l.endswith(link) for l in page.links), f"{name}: {link}")
+
     def test_home_pages_describe_the_agency_and_the_website(self):
         """Cada portada declara la agencia (RealEstateAgent) y el sitio (WebSite), enlazados."""
         for lang in _build.LANGS:
@@ -299,7 +320,7 @@ class SecurityTest(unittest.TestCase):
                 self.assertEqual(set((a.get("rel") or "").split()), {"noopener", "noreferrer"}, f"{name}: {a.get('href')}")
 
     def test_only_public_files_are_published(self):
-        allowed = (".html", ".css", ".js", ".png", ".ico", ".woff2", ".webp", ".jpg", ".xml", ".txt")
+        allowed = (".html", ".css", ".js", ".png", ".ico", ".woff2", ".webp", ".jpg", ".xml", ".txt", ".webmanifest")
         for file in published_files():
             self.assertTrue(file.endswith(allowed), f"Se publicaría {file}")
             self.assertFalse(file.startswith(("_", ".git")) or "/_" in file, f"Se publicaría {file}")
