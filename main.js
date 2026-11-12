@@ -233,6 +233,13 @@
             if (event.target.closest("a")) setOpen(false);
         });
 
+        /* Un clic fuera del cajón (sobre el velo) también lo cierra. */
+        document.addEventListener("click", function (event) {
+            if (toggle.getAttribute("aria-expanded") === "true" && !nav.contains(event.target) && !toggle.contains(event.target)) {
+                setOpen(false);
+            }
+        });
+
         document.addEventListener("keydown", function (event) {
             if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
                 setOpen(false);
@@ -914,6 +921,34 @@
         });
     }
 
+    /* Portada pantalla a pantalla: los puntos laterales marcan la pantalla que
+       cruza el centro de la ventana y el contador muestra su número. ---------- */
+
+    function initScreens() {
+        var nav = $(".screens-nav");
+        if (!nav || !("IntersectionObserver" in window)) return;
+        var links = $$("a", nav);
+        var now = $("[data-screen-now]", nav);
+        var screens = links.map(function (link) {
+            return document.getElementById(link.getAttribute("href").slice(1));
+        });
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                var index = screens.indexOf(entry.target);
+                links.forEach(function (link, i) {
+                    if (i === index) link.setAttribute("aria-current", "true");
+                    else link.removeAttribute("aria-current");
+                });
+                if (now) now.textContent = ("0" + (index + 1)).slice(-2);
+                nav.classList.toggle("is-on-dark", entry.target.classList.contains("dusk"));
+            });
+        }, { rootMargin: "-50% 0px -50% 0px" });
+        screens.forEach(function (screen) {
+            if (screen) observer.observe(screen);
+        });
+    }
+
     /* Calculadora de hipoteca (sistema francés), en vivo al escribir. -------- */
 
     function initMortgage() {
@@ -1365,6 +1400,7 @@
     initShare();
     initMagnetic();
     initMortgage();
+    initScreens();
     initQuickValuation();
     initYear();
 })();

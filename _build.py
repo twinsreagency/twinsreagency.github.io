@@ -220,6 +220,9 @@ ARROW = icon("arrow-right", "icon-arrow")
 # Datos comunes (no traducibles)
 # --------------------------------------------------------------------------
 PAGES = ["index.html", "propiedades.html", "servicios.html", "nosotros.html", "blog.html", "contacto.html"]
+# Icono de cada página en el menú lateral.
+NAV_ICONS = {"index.html": "home", "propiedades.html": "building", "servicios.html": "key",
+             "nosotros.html": "users", "blog.html": "document", "contacto.html": "mail"}
 
 SEARCH_VALUES = {
     "operacion": ["venta", "alquiler"],
@@ -835,7 +838,8 @@ def site_header(ctx, active):
     items = []
     for name in PAGES:
         current = ' aria-current="page"' if name == active else ""
-        items.append(f'<li><a class="nav__link" href="{ctx.page(name)}"{current}>{ui["nav"][name]}</a></li>')
+        items.append(f'<li><a class="nav__link" href="{ctx.page(name)}"{current}>'
+                     f'{icon(NAV_ICONS[name])}<span>{ui["nav"][name]}</span></a></li>')
     links = "\n                    ".join(items)
     return f"""
 <body>
@@ -1014,18 +1018,19 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
     text_html = f'\n            <p class="page-hero__text">{text}</p>' if text else ""
     return f"""
     <section class="page-hero" data-scroll="view">
-        <div class="page-hero__panes" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="container">{object_3d(obj)}
+        <div class="container">
+            <div class="page-hero__card night">{object_3d(obj)}
             <nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
                 <ol>{''.join(trail)}</ol>
             </nav>{ld}{extra}
             <h1 class="page-hero__title">{title}</h1>{text_html}
+            </div>
         </div>
     </section>
 """
 
 
-def cta(ctx, title, text, secondary=None):
+def cta(ctx, title, text, secondary=None, ribbon=True):
     """Cierre de página. Su botón principal es la acción única de la web, la misma de la
     cabecera: la valoración gratuita (formulario de la portada)."""
     ui = ctx.L["ui"]
@@ -1033,7 +1038,7 @@ def cta(ctx, title, text, secondary=None):
     cube_faces = faces(WALLS + ["top", "bottom"], {
         "front": icon("key"), "back": icon("home"), "left": icon("chart"),
         "right": icon("search"), "top": icon("euro"), "bottom": icon("shield")})
-    return f"""{marquee(ctx)}
+    return f"""{marquee(ctx) if ribbon else ""}
         <section class="cta" aria-labelledby="cta-title" data-scroll="view">
             <div class="cta__glow" aria-hidden="true"></div>
             <div class="cta__cube" aria-hidden="true"><div class="cube">{cube_faces}</div></div>
@@ -1900,6 +1905,39 @@ def faq_section(ctx):
 """
 
 
+def screens(ctx, parts):
+    """Portada pantalla a pantalla: cada parte (id, html) se convierte en una pantalla
+    (su primera <section> recibe la clase «screen», un id y una etiqueta numerada) y
+    se añaden los puntos de navegación lateral."""
+    O = ctx.L["owners"]
+    out, links = [], []
+    parts = [(sid, html) for sid, html in parts if "<section" in html]  # sin las vacías
+    for n, (sid, html) in enumerate(parts, start=1):
+        start = html.index("<section")
+        end = html.index(">", start)
+        tag = html[start:end]
+        found = re.search(r' id="([^"]+)"', tag)
+        if found:
+            sid = found.group(1)
+        else:
+            tag = tag.replace("<section", f'<section id="{sid}"', 1)
+        tag = tag.replace(' class="', ' class="screen ', 1) + f' data-screen="{n}">'
+        label = O["screens"][sid]
+        marker = (f'\n            <p class="screen__tag" aria-hidden="true"><span>{n:02d}</span>{label}</p>'
+                  if n > 1 else "")
+        out.append(html[:start] + tag + marker + html[end + 1:])
+        current = ' aria-current="true"' if n == 1 else ""
+        links.append(f'\n                <li><a href="#{sid}"{current}><span class="screens-nav__label">{label}</span></a></li>')
+    nav = f"""
+        <nav class="screens-nav" aria-label="{esc(O['screens_aria'])}">
+            <ol>{''.join(links)}
+            </ol>
+            <p class="screens-nav__count" aria-hidden="true"><span data-screen-now>01</span> / {len(parts):02d}</p>
+        </nav>
+"""
+    return "".join(out) + nav
+
+
 def faq_ld(ctx):
     return {"@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}}
@@ -1925,8 +1963,14 @@ def build_index(L):
                **({"url": url(ctx.file), "publisher": {"@id": ORGANIZATION_ID}} if SITE_URL else {})}
     ld = json_ld({"@context": "https://schema.org", "@graph": [agency, website, faq_ld(ctx)]})
 
-    portfolio = home_portfolio(ctx) if PROPERTIES else ""
-    body = f"""{owner_hero(ctx)}{sale_process(ctx)}{valuation_section(ctx)}{zones_section(ctx)}{portfolio}{why_section(ctx)}{trust_section(ctx)}{mortgage_section(ctx, alt=True)}{faq_section(ctx)}{blog_gallery(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+    parts = [("inicio", owner_hero(ctx)), ("proceso", sale_process(ctx)),
+             ("valoracion", valuation_section(ctx)), ("zonas", zones_section(ctx))]
+    if PROPERTIES:
+        parts.append(("inmuebles", home_portfolio(ctx)))
+    parts += [("por-que", why_section(ctx)), ("opiniones", trust_section(ctx)),
+              ("calculadora", mortgage_section(ctx, alt=True)), ("preguntas", faq_section(ctx)),
+              ("blog", blog_gallery(ctx)), ("empezar", cta(ctx, T['cta_title'], T['cta_text'], ribbon=False))]
+    body = screens(ctx, parts)
     write(ctx, T["title"], T["description"], "index.html", body,
           extra_head=ld)
 

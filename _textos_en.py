@@ -135,6 +135,8 @@ C = {
 
     # Home page focused on owners (new sections).
     "owners": {
+        "screens_aria": "Home page screens",
+        "screens": {"inicio": "Home", "proceso": "Sales process", "valoracion": "Valuation", "zonas": "Areas", "inmuebles": "Properties", "por-que": "Why Twins", "opiniones": "Trust", "calculadora": "Mortgage", "preguntas": "FAQ", "blog": "Blog", "empezar": "Get started"},
         "hero_eyebrow": "Estate agency in Igualada and the Anoia region",
         "hero_title": "Sell your home at a realistic price, with <em>no surprises</em>.",
         "hero_text": "A free, no-obligation valuation, a clear sales plan and support at every step through to signing before a notary.",

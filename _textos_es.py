@@ -134,6 +134,8 @@ C = {
 
     # Portada centrada en propietarios (secciones nuevas).
     "owners": {
+        "screens_aria": "Pantallas de la portada",
+        "screens": {"inicio": "Inicio", "proceso": "Proceso de venta", "valoracion": "Valoración", "zonas": "Zonas", "inmuebles": "Inmuebles", "por-que": "Por qué Twins", "opiniones": "Confianza", "calculadora": "Hipoteca", "preguntas": "Preguntas", "blog": "Blog", "empezar": "Empezar"},
         "hero_eyebrow": "Agencia inmobiliaria en Igualada y l’Anoia",
         "hero_title": "Venda su vivienda con un precio realista y <em>sin sorpresas</em>.",
         "hero_text": "Valoración gratuita y sin compromiso, un plan de venta claro y acompañamiento en cada paso hasta la firma ante notario.",
