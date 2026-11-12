@@ -686,3 +686,24 @@ test("el manifiesto se carga sin errores y declara los iconos de 192 y 512 px", 
     assert.deepEqual(errors, []);
     await close();
 });
+
+test("la web no crea cookies: tema, ajustes, idioma y favoritos van al almacenamiento local", async () => {
+    const context = await browser.newContext({ locale: "ca-ES" });
+    const page = await context.newPage();
+    await page.goto(url("index.html"));
+    await page.click(".theme-toggle");
+    await page.click(".settings-toggle");
+    await page.click("label[for='ajuste-texto-l']");
+    await page.keyboard.press("Escape");
+    await page.locator(".lang-toast a").click();
+    await page.waitForURL(/ca-inici\.html$/);
+    await page.goto(url("es-inmuebles.html", fixture));
+    await page.locator(".fav-btn").first().click();
+    for (const file of ["es-contacto.html", "es-blog.html", "es-cookies.html"]) await page.goto(url(file));
+    assert.deepEqual(await context.cookies(), []);
+    assert.equal(await page.evaluate(() => document.cookie), "");
+    /* Solo las claves que describe la política de cookies (twins:…). */
+    const keys = await page.evaluate(() => Object.keys(localStorage));
+    assert.ok(keys.every((key) => /^twins:(tema|ajustes|idioma)$/.test(key)), keys.join(", "));
+    await context.close();
+});
