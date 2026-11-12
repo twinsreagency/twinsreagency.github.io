@@ -253,7 +253,16 @@ CASES = []
 # con el texto propio que se escriba en «towns» de _textos_*.py, y aparece en el pie,
 # en el sitemap y como sugerencia en la valoración y la alerta. El filtro «Localidad»
 # de «Inmuebles» solo muestra las que tienen algún inmueble publicado.
-TOWNS = {}
+TOWNS = {
+    "igualada": "Igualada",
+    "vilanova-del-cami": "Vilanova del Camí",
+    "santa-margarida-de-montbui": "Santa Margarida de Montbui",
+    "odena": "Òdena",
+    "capellades": "Capellades",
+    "piera": "Piera",
+    "masquefa": "Masquefa",
+    "calaf": "Calaf",
+}
 
 # Fotos reales del equipo para «Nosotros» (nunca de bancos de imágenes). Mientras la
 # lista esté vacía, la página mantiene su diseño actual. Para añadir una:
@@ -1711,10 +1720,195 @@ def home_portfolio(ctx):
         </section>"""
 
 
+
+# --------------------------------------------------------------------------
+# Portada para propietarios (rediseño)
+# --------------------------------------------------------------------------
+# Valores iniciales de la calculadora de hipoteca (el visitante los cambia).
+MORTGAGE = {"precio": 250000, "entrada": 20, "interes": 3, "plazo": 30}
+# Preguntas frecuentes que enlazan a un artículo del blog (por posición en la lista).
+FAQ_POSTS = {2: "documentos-vender-vivienda", 3: "gastos-impuestos-vender-piso-cataluna"}
+
+
+def mortgage(price_value, down, rate, years):
+    """Cuota mensual, importe y total de intereses (sistema francés)."""
+    loan = price_value * (1 - down / 100)
+    n, i = years * 12, rate / 100 / 12
+    pay = loan / n if i == 0 else loan * i / (1 - (1 + i) ** -n)
+    return round(pay), round(loan), round(pay * n - loan)
+
+
+def owner_hero(ctx):
+    L, O = ctx.L, ctx.L["owners"]
+    S = L["search"]
+    towns = "".join(f'<option value="{esc(name)}"></option>' for name in TOWNS.values())
+    types = options(SEARCH_VALUES["tipo"], S["options"]["tipo"], L["valuation"]["tipo_placeholder"])
+    trust = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in O["trust"])
+    chips = "".join(f'\n                        <li class="hero-chip hero-chip--{i}">{icon(ic)}<span>{text}</span></li>'
+                    for i, (ic, text) in enumerate(zip(PILLAR_ICONS, L["index"]["pillars"]), start=1))
+    return f"""
+        <section class="owner-hero" aria-labelledby="hero-title">
+            <div class="owner-hero__bg" aria-hidden="true"></div>
+            <div class="container owner-hero__grid">
+                <div class="owner-hero__copy">
+                    <p class="eyebrow">{O['hero_eyebrow']}</p>
+                    <h1 class="owner-hero__title" id="hero-title">{O['hero_title']}</h1>
+                    <p class="owner-hero__text">{O['hero_text']}</p>
+                    <form class="quick-valuation" id="valoracion-rapida" action="#valoracion" method="get" aria-labelledby="valoracion-rapida-title">
+                        <p class="quick-valuation__title" id="valoracion-rapida-title">{icon('key')}{O['quick_title']}</p>
+                        <div class="quick-valuation__fields">
+                            <div class="field">
+                                <label for="rapida-localidad">{S['fields']['zona'][0]}</label>
+                                <input id="rapida-localidad" name="localidad" type="text" list="rapida-localidades" autocomplete="address-level2" maxlength="80" placeholder="Igualada">
+                                <datalist id="rapida-localidades">{towns}</datalist>
+                            </div>
+                            <div class="field">
+                                <label for="rapida-tipo">{S['fields']['tipo'][0]}</label>
+                                <select id="rapida-tipo" name="tipo">{types}</select>
+                            </div>
+                            <button class="btn btn--primary" type="submit">{O['quick_btn']} {ARROW}</button>
+                        </div>
+                    </form>
+                    <ul class="owner-hero__trust">{trust}
+                    </ul>
+                </div>
+                <div class="owner-hero__visual night" role="img" aria-label="{esc(O['visual_aria'])}">
+                    <div class="owner-hero__grid-lines" aria-hidden="true"></div>{model_3d()}
+                    <ul class="hero-chips" aria-hidden="true">{chips}
+                    </ul>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def sale_process(ctx):
+    O = ctx.L["owners"]
+    steps = "".join(f"""
+                    <li class="timeline__step reveal">
+                        <span class="timeline__num" aria-hidden="true">{i:02d}</span>
+                        <h3 class="timeline__title">{title}</h3>
+                        <p class="timeline__text">{text}</p>
+                    </li>""" for i, (title, text) in enumerate(O["steps"], start=1))
+    return f"""
+        <section class="section sale-process" id="proceso" aria-labelledby="proceso-title">
+            <div class="container">{section_header(O['process_eyebrow'], O['process_title'], 'proceso-title', O['process_lead'])}
+                <ol class="timeline">{steps}
+                </ol>
+                <div class="section-footer">
+                    <a class="btn btn--primary" href="#valoracion">{O['process_btn']} {ARROW}</a>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def zones_section(ctx):
+    O = ctx.L["owners"]
+    cards = "".join(f"""
+                    <li>
+                        <a class="zone reveal" href="{ctx.page(f'zona/{slug}.html')}">
+                            <span class="zone__pin" aria-hidden="true">{icon('map-pin')}</span>
+                            <span class="zone__name">{esc(town)}</span>
+                            <span class="zone__link">{O['zones_link'].format(town=esc(town))} {icon('arrow-right')}</span>
+                        </a>
+                    </li>""" for slug, town in TOWNS.items())
+    return f"""
+        <section class="section section--alt zones" aria-labelledby="zonas-title">
+            <div class="container">{section_header(O['zones_eyebrow'], O['zones_title'], 'zonas-title', O['zones_lead'])}
+                <ul class="zones__grid">{cards}
+                </ul>
+            </div>
+        </section>
+"""
+
+
+def why_section(ctx):
+    O = ctx.L["owners"]
+    cards = "".join(feature_card(ic, title, text) for ic, (title, text)
+                    in zip(COMMITMENT_ICONS, ctx.L["commitments"]))
+    return f"""
+        <section class="section why" aria-labelledby="por-que-title">
+            <div class="container">{section_header(O['why_eyebrow'], O['why_title'], 'por-que-title', O['why_lead'])}
+                <div class="why__figures reveal">{figures(ctx)}
+                </div>
+                <div class="grid grid--4">{cards}
+                </div>
+            </div>
+        </section>
+"""
+
+
+def mortgage_section(ctx, alt=False):
+    O = ctx.L["owners"]
+    F, R = O["calc_fields"], O["calc_results"]
+    pay, loan, interest = mortgage(MORTGAGE["precio"], MORTGAGE["entrada"], MORTGAGE["interes"], MORTGAGE["plazo"])
+    limits = {"precio": (10000, 10000000, 1000), "entrada": (0, 100, 1), "interes": (0, 20, 0.05), "plazo": (1, 40, 1)}
+    fields = "".join(f"""
+                        <div class="field">
+                            <label for="calc-{name}">{F[name]}</label>
+                            <input id="calc-{name}" name="{name}" type="number" inputmode="decimal" min="{lo}" max="{hi}" step="{step}" value="{MORTGAGE[name]}" required>
+                        </div>""" for name, (lo, hi, step) in limits.items())
+    return f"""
+        <section class="section mortgage{' section--alt' if alt else ''}" id="calculadora" aria-labelledby="calculadora-title">
+            <div class="container mortgage__grid">
+                <div class="reveal">
+                    <span class="eyebrow">{O['calc_eyebrow']}</span>
+                    <h2 class="section-title" id="calculadora-title">{O['calc_title']}</h2>
+                    <p class="section-lead">{O['calc_lead']}</p>
+                    <form class="mortgage__form" id="calculadora-form" novalidate>
+                        <div class="form-grid">{fields}
+                        </div>
+                        <button class="btn btn--outline mortgage__submit" type="submit">{O['calc_btn']}</button>
+                    </form>
+                </div>
+                <div class="mortgage__result night reveal" aria-live="polite">
+                    <p class="mortgage__label">{R['cuota']}</p>
+                    <p class="mortgage__value" data-calc="cuota">{price(ctx.L, pay)}</p>
+                    <dl class="mortgage__details">
+                        <div><dt>{R['prestamo']}</dt><dd data-calc="prestamo">{price(ctx.L, loan)}</dd></div>
+                        <div><dt>{R['intereses']}</dt><dd data-calc="intereses">{price(ctx.L, interest)}</dd></div>
+                    </dl>
+                    <p class="mortgage__note">{O['calc_note']}</p>
+                </div>
+            </div>
+        </section>
+"""
+
+
+def faq_section(ctx):
+    O = ctx.L["owners"]
+    items = []
+    for i, (question, answer) in enumerate(O["faq"]):
+        more = ""
+        if i in FAQ_POSTS:
+            slug = FAQ_POSTS[i]
+            more = (f' <a class="link-arrow" href="{ctx.page(f"blog/{slug}.html")}">'
+                    f'{ctx.L["posts"][slug]["title"]} {icon("arrow-right")}</a>')
+        items.append(f"""
+                    <details class="faq__item">
+                        <summary>{question}</summary>
+                        <div class="faq__answer"><p>{answer}{more}</p></div>
+                    </details>""")
+    return f"""
+        <section class="section section--alt faq-section" aria-labelledby="faq-title">
+            <div class="container">{section_header(O['faq_eyebrow'], O['faq_title'], 'faq-title')}
+                <div class="faq__list reveal">{''.join(items)}
+                </div>
+            </div>
+        </section>
+"""
+
+
+def faq_ld(ctx):
+    return {"@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}}
+        for q, a in ctx.L["owners"]["faq"]]}
+
+
 def build_index(L):
     ctx = Ctx(L, "index.html")
-    T, ui = L["index"], L["ui"]
-    checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
+    T = L["index"]
     agency = {
         "@type": "RealEstateAgent",
         **({"@id": ORGANIZATION_ID} if SITE_URL else {}),
@@ -1729,71 +1923,10 @@ def build_index(L):
     # WebSite: el nombre del sitio que muestran los buscadores junto a la dirección.
     website = {"@type": "WebSite", "name": "Twins Real Estate", "inLanguage": L["lang"],
                **({"url": url(ctx.file), "publisher": {"@id": ORGANIZATION_ID}} if SITE_URL else {})}
-    ld = json_ld({"@context": "https://schema.org", "@graph": [agency, website]})
+    ld = json_ld({"@context": "https://schema.org", "@graph": [agency, website, faq_ld(ctx)]})
 
-    portfolio = home_portfolio(ctx)
-    if PROPERTIES:
-        hero_button = f'<a class="btn btn--primary" href="{ctx.page("propiedades.html")}">{T["btn_props"]} {ARROW}</a>'
-    else:
-        hero_button = f'<a class="btn btn--primary" href="#valoracion">{T["btn_valuation"]} {ARROW}</a>'
-    callouts = "".join(
-        f'\n                    <li class="callout callout--{i}">{icon(ic)}<span>{text}</span></li>'
-        for i, (ic, text) in enumerate(zip(PILLAR_ICONS, T["pillars"]), start=1))
-
-    body = f"""
-        <section class="hero3d" data-scroll="sticky" aria-labelledby="hero-title">
-            <div class="hero3d__sticky">
-                <div class="hero3d__glow" aria-hidden="true"></div>
-                <div class="container hero3d__grid">
-                    <div class="hero3d__copy">
-                        <p class="eyebrow">{T['eyebrow']}</p>
-                        <h1 class="hero3d__title" id="hero-title">{T['h1']}</h1>
-                        <p class="hero3d__text">{T['text']}</p>
-                        <div class="hero3d__actions">
-                            {hero_button}
-                            <a class="btn btn--glass" href="{ctx.page('contacto.html')}#formulario">{T['btn_advice']}</a>
-                        </div>
-                    </div>
-                    <div class="hero3d__stage">{model_3d()}
-                        <ul class="callouts">{callouts}
-                        </ul>
-                    </div>
-                </div>
-                <p class="scroll-hint" aria-hidden="true"><span>{ui['scroll_hint']}</span></p>
-            </div>
-        </section>
-
-{portfolio}{marquee(ctx)}{valuation_section(ctx)}{process_scene(ctx)}
-        <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
-            <div class="statement__sticky">
-                <div class="container">
-                    <p class="eyebrow">{T['about_eyebrow']}</p>
-                    <h2 class="visually-hidden" id="nosotros-title">{T['about_eyebrow']}</h2>{figures(ctx)}
-                    <p class="statement__text" data-words>{T['about_paras'][0]}</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section section--alt" aria-labelledby="confianza-title">
-            <div class="container split">
-                <div class="split__visual reveal tilt">
-                    <div class="split__frame">
-                        {logos(ctx, small=False, extra=' loading="lazy" decoding="async"')}
-                        <p class="split__quote">{T['quote']}</p>
-                    </div>
-                </div>
-                <div class="reveal">
-                    <h2 class="section-title" id="confianza-title">{T['about_title']}</h2>
-                    <div class="prose-block">
-                        <p>{T['about_paras'][1]}</p>
-                    </div>
-                    <ul class="check-list">{checks}
-                    </ul>
-                    <a class="btn btn--primary" href="{ctx.page('nosotros.html')}">{T['about_btn']} {ARROW}</a>
-                </div>
-            </div>
-        </section>
-{service_panels(ctx)}{blog_gallery(ctx)}{sell_section(ctx)}{trust_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+    portfolio = home_portfolio(ctx) if PROPERTIES else ""
+    body = f"""{owner_hero(ctx)}{sale_process(ctx)}{valuation_section(ctx)}{zones_section(ctx)}{portfolio}{why_section(ctx)}{trust_section(ctx)}{mortgage_section(ctx, alt=True)}{faq_section(ctx)}{blog_gallery(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "index.html", body,
           extra_head=ld)
 

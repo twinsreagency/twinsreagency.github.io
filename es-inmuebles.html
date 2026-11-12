@@ -36,8 +36,8 @@
     <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="theme.js?v=6d60904f67"></script>
-    <link rel="stylesheet" href="styles.min.css?v=5e65a86a5f">
-    <script src="main.min.js?v=f2b2de0046" defer></script>
+    <link rel="stylesheet" href="styles.min.css?v=dd075b775d">
+    <script src="main.min.js?v=b19c669725" defer></script>
 </head>
 <body>
     <div class="scroll-progress" aria-hidden="true"></div>
@@ -120,7 +120,7 @@
                             <div class="field field--full">
                                 <label for="alerta-localidad">Localidad en la que busca *</label>
                                 <input id="alerta-localidad" name="localidad" type="text" list="alerta-localidades" autocomplete="address-level2" maxlength="80" required placeholder="Por ejemplo, Santa Margarida de Montbui" aria-describedby="alerta-error-localidad">
-                                <datalist id="alerta-localidades"></datalist>
+                                <datalist id="alerta-localidades"><option value="Calaf"></option><option value="Capellades"></option><option value="Igualada"></option><option value="Masquefa"></option><option value="Piera"></option><option value="Santa Margarida de Montbui"></option><option value="Vilanova del Camí"></option><option value="Òdena"></option></datalist>
                                 <p class="field__error" id="alerta-error-localidad" aria-live="polite"></p>
                             </div>
                             <div class="field">
@@ -254,7 +254,19 @@
                     </ul>
                 </div>
             </div>
-
+            <nav class="footer-areas" aria-labelledby="zonas-title">
+                <h2 class="footer-title" id="zonas-title">Dónde trabajamos</h2>
+                <ul>
+                    <li><a href="es-inmobiliaria-calaf.html">Calaf</a></li>
+                    <li><a href="es-inmobiliaria-capellades.html">Capellades</a></li>
+                    <li><a href="es-inmobiliaria-igualada.html">Igualada</a></li>
+                    <li><a href="es-inmobiliaria-masquefa.html">Masquefa</a></li>
+                    <li><a href="es-inmobiliaria-piera.html">Piera</a></li>
+                    <li><a href="es-inmobiliaria-santa-margarida-de-montbui.html">Santa Margarida de Montbui</a></li>
+                    <li><a href="es-inmobiliaria-vilanova-del-cami.html">Vilanova del Camí</a></li>
+                    <li><a href="es-inmobiliaria-odena.html">Òdena</a></li>
+                </ul>
+            </nav>
             <p class="footer-wordmark" aria-hidden="true">Twins <em>Real Estate</em></p>
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. Todos los derechos reservados.</p>
