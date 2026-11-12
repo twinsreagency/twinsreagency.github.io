@@ -622,6 +622,8 @@ html[data-framed] body {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
+    /* Zona de toque de al menos 24 px de alto (WCAG 2.5.8), aunque el texto ocupe una línea. */
+    min-height: 1.5rem;
     line-height: 1.55;
     color: var(--text-2);
 }
@@ -1475,6 +1477,18 @@ html.is-theme-switch::view-transition-new(root) {
 .js-scroll .statement__text .w {
     opacity: clamp(0.14, calc(var(--p) * (var(--n) + 6) * 1.25 - var(--i)), 1);
     transition: opacity 0.2s linear;
+}
+
+/* Con «Más contraste» (Ajustes) o si el sistema lo pide, la frase se ve entera desde el
+   principio: las palabras aún sin iluminar no llegan al contraste mínimo de WCAG. */
+html[data-contrast="more"] .statement__text .w {
+    opacity: 1;
+}
+
+@media (prefers-contrast: more) {
+    .js-scroll .statement__text .w {
+        opacity: 1;
+    }
 }
 
 /* Objetos 3D de las páginas interiores ------------------------------------ */

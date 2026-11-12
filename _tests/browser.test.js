@@ -646,3 +646,26 @@ test("en el móvil: botón de menú completo, zonas de toque cómodas y cristal 
     assert.deepEqual(small, []);
     await context.close();
 });
+
+test("la casilla de consentimiento mide al menos 24 px de alto (WCAG 2.5.8)", async () => {
+    for (const file of ["es-contacto.html", "index.html", "es-inmuebles.html"]) {
+        const { page, close } = await open(file);
+        const heights = await page.evaluate(() => [...document.querySelectorAll("label.checkbox")]
+            .filter((label) => label.getClientRects().length).map((label) => label.getBoundingClientRect().height));
+        assert.ok(heights.length > 0, file);
+        assert.ok(Math.min(...heights) >= 24, `${file}: ${Math.min(...heights)} px`);
+        await close();
+    }
+});
+
+test("con «Más contraste», la frase de la portada se ve entera desde el principio", async () => {
+    const { page, close } = await open("index.html");
+    const faintest = () => page.evaluate(() => Math.min(...[...document.querySelectorAll(".statement__text .w")]
+        .map((w) => Number(getComputedStyle(w).opacity))));
+    assert.ok(await faintest() < 1, "sin el ajuste, las palabras se iluminan al desplazar");
+    await page.click(".settings-toggle");
+    await page.click("label[for='ajuste-contraste-more']");
+    await page.waitForFunction(() => [...document.querySelectorAll(".statement__text .w")]
+        .every((w) => getComputedStyle(w).opacity === "1"));
+    await close();
+});
