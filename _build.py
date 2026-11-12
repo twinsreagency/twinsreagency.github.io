@@ -64,6 +64,7 @@ OWNER = {
 OG_IMAGE = "og-image.jpg"  # imagen para compartir en redes (1200 × 630); se genera con _og/make.js
 # Agencia en línea con base en Igualada (sin oficina abierta al público).
 LOCALITY = "Igualada"
+POSTAL_CODE = "08700"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
@@ -87,6 +88,16 @@ def form_endpoint():
         raise SystemExit("CONFIG.endpoint debe ser una dirección https://")
     return endpoint
 
+def form_action():
+    """Destino de los formularios sin JavaScript: el servicio de formularios por HTTPS si
+    está configurado o, si no, el programa de correo. Con JavaScript, main.js valida los
+    campos y envía los datos él mismo (o prepara el correo)."""
+    endpoint = form_endpoint()
+    if endpoint:
+        return f'action="{html.escape(endpoint, quote=True)}" method="post"'
+    return f'action="mailto:{EMAIL}" method="post" enctype="text/plain"'
+
+
 def csp(meta=True):
     """Política de seguridad de contenidos: solo recursos del propio sitio, sin código
     en línea. Se publica como <meta> en cada página (GitHub Pages no permite enviar
@@ -99,7 +110,7 @@ def csp(meta=True):
              "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
              "base-uri 'self'", "object-src 'none'",
              # Lo que el sitio no usa, cerrado de forma explícita.
-             "frame-src 'none'", "worker-src 'none'", "media-src 'none'", "manifest-src 'none'",
+             "frame-src 'none'", "worker-src 'none'", "media-src 'none'", "manifest-src 'self'",
              # Trusted Types: el navegador rechaza cualquier intento de escribir HTML o
              # código desde JavaScript (innerHTML, eval…). main.js solo usa textContent.
              "require-trusted-types-for 'script'", "trusted-types 'none'"]
@@ -344,6 +355,19 @@ def esc(text):
     return html.escape(text, quote=True)
 
 
+# Identificador de la agencia en los datos estructurados (se define en la portada).
+ORGANIZATION_ID = f"{SITE_URL}/#organizacion"
+
+
+def organization():
+    """La agencia como autora y editora de los artículos, con su dirección y su logotipo."""
+    data = {"@type": "Organization", "name": "Twins Real Estate"}
+    if SITE_URL:
+        data.update({"@id": ORGANIZATION_ID, "url": url("index.html"),
+                     "logo": {"@type": "ImageObject", "url": url("logo-icon.png"), "width": 151, "height": 200}})
+    return data
+
+
 def json_ld(data):
     """Bloque de datos estructurados. Se escapa «<» para que ningún texto pueda cerrar
     la etiqueta <script> ni abrir otra (p. ej. un «</script>» en un título)."""
@@ -437,7 +461,9 @@ def head(ctx, title, description, noindex=False, extra=""):
     <meta name="twitter:card" content="summary_large_image">{og_image}{alternates}
     <link rel="icon" href="{ctx.asset('favicon.ico')}" sizes="any">
     <link rel="icon" href="{ctx.asset('favicon-32.png')}" type="image/png" sizes="32x32">
+    <link rel="icon" href="{ctx.asset('favicon-96.png')}" type="image/png" sizes="96x96">
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
+    <link rel="manifest" href="{ctx.asset('site.webmanifest')}">
     <link rel="preload" href="{ctx.asset('fonts/inter-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{ctx.asset('fonts/playfair-display-600-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <script src="{ctx.asset(versioned('theme.js'))}"></script>
@@ -998,7 +1024,7 @@ def alert_section(ctx):
                 <div class="card form-card reveal">
                     <h3 class="form-card__title">{T['form_title']}</h3>
                     <p class="form-card__lead">{C['form_lead']}</p>
-                    <form class="lead-form" id="formulario-alerta" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                    <form class="lead-form" id="formulario-alerta" {form_action()} novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
                         <div class="form-grid">
                             <div class="field field--full">
                                 <label for="alerta-localidad">{T['localidad']}</label>
@@ -1078,7 +1104,7 @@ def valuation_section(ctx):
                 <div class="card form-card reveal">
                     <h3 class="form-card__title">{T['form_title']}</h3>
                     <p class="form-card__lead">{C['form_lead']}</p>
-                    <form class="lead-form" id="formulario-valoracion" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                    <form class="lead-form" id="formulario-valoracion" {form_action()} novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
                         <div class="form-grid">
                             <div class="field">
                                 <label for="valoracion-localidad">{lab['localidad']}</label>
@@ -1247,18 +1273,28 @@ def build_index(L):
     ctx = Ctx(L, "index.html")
     T, ui = L["index"], L["ui"]
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
-    ld = json_ld({
-        "@context": "https://schema.org",
+    agency = {
         "@type": "RealEstateAgent",
+        **({"@id": ORGANIZATION_ID} if SITE_URL else {}),
         "name": "Twins Real Estate",
         "slogan": T["slogan"],
         "email": EMAIL,
         "sameAs": [INSTAGRAM_URL],
-        **({"url": url(ctx.file), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
-        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
-        "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
+        **({"url": url("index.html"), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
+        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "postalCode": POSTAL_CODE,
+                    "addressRegion": "Catalunya", "addressCountry": "ES"},
+        # El mismo horario que la página de contacto (hours_html), en el formato que prefiere Google.
+        "openingHoursSpecification": [
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+             "opens": "09:00", "closes": "18:00"},
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "14:00"},
+        ],
         "knowsLanguage": [lang["lang"] for lang in LANGS],
-    })
+    }
+    # WebSite: el nombre del sitio que muestran los buscadores junto a la dirección.
+    website = {"@type": "WebSite", "name": "Twins Real Estate", "inLanguage": L["lang"],
+               **({"url": url(ctx.file), "publisher": {"@id": ORGANIZATION_ID}} if SITE_URL else {})}
+    ld = json_ld({"@context": "https://schema.org", "@graph": [agency, website]})
 
     portfolio = home_portfolio(ctx)
     if PROPERTIES:
@@ -1547,8 +1583,8 @@ def build_blog(L):
             **({"image": url(OG_IMAGE)} if SITE_URL else {}),
             "inLanguage": L["lang"],
             **({"url": url(ctx.file), "mainEntityOfPage": url(ctx.file)} if SITE_URL else {}),
-            "author": {"@type": "Organization", "name": "Twins Real Estate"},
-            "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
+            "author": organization(),
+            "publisher": organization(),
         })
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
         if slug in OWNER_POSTS:  # artículos para propietarios: llevan a la valoración gratuita
@@ -1705,7 +1741,7 @@ def build_contact(L):
                 <div class="card form-card reveal" id="formulario">
                     <h2 class="form-card__title">{T['form_title']}</h2>
                     <p class="form-card__lead">{T['form_lead']}</p>
-                    <form class="lead-form" id="formulario-contacto" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate>
+                    <form class="lead-form" id="formulario-contacto" {form_action()} novalidate>
                         <div class="form-grid">
                             <div class="field">
                                 <label for="contacto-nombre">{lab['nombre']}</label>
@@ -1909,6 +1945,26 @@ def build_headers():
         fh.write(text)
 
 
+def build_manifest():
+    """site.webmanifest: nombre, colores e iconos cuando se añade la web a la pantalla de
+    inicio (Android, Chrome). Se abre en el navegador, como un marcador ("display": "browser").
+    Los iconos los genera _iconos.py."""
+    data = {
+        "name": "Twins Real Estate",
+        "short_name": "Twins",
+        "description": LANGS[0]["index"]["description"],
+        "lang": LANGS[0]["lang"],
+        "start_url": "./",
+        "scope": "./",
+        "display": "browser",
+        "background_color": "#f2ede4",
+        "theme_color": "#f2ede4",
+        "icons": [{"src": f"icon-{size}.png", "sizes": f"{size}x{size}", "type": "image/png"} for size in (192, 512)],
+    }
+    with open(os.path.join(SITE_DIR, "site.webmanifest"), "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+
+
 def build_security_txt():
     """/.well-known/security.txt (RFC 9116): a quién avisar de un problema de seguridad.
     _config.yml indica a Jekyll (GitHub Pages) que publique la carpeta .well-known."""
@@ -1955,6 +2011,7 @@ def main():
     build_legacy_redirects(LANGS[0])
     build_sitemap()
     build_headers()
+    build_manifest()
     build_security_txt()
     print("Sitio generado en", SITE_DIR)
 
