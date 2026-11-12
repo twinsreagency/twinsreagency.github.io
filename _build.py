@@ -830,6 +830,7 @@ def site_header(ctx, active):
     links = "\n                    ".join(items)
     return f"""
 <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
     <a class="skip-link" href="#contenido">{ui['skip']}</a>
 
     <header class="site-header">
@@ -968,6 +969,7 @@ def site_footer(ctx):
                 </div>
             </div>
 {footer_areas(ctx)}
+            <p class="footer-wordmark" aria-hidden="true">Twins <em>Real Estate</em></p>
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. {ui['rights']}{aicat_note(ctx)}</p>
                 <nav class="footer-legal" aria-label="{esc(ui['legal_aria'])}">{legal_links}
@@ -1019,9 +1021,13 @@ def cta(ctx, title, text, secondary=None):
     cabecera: la valoración gratuita (formulario de la portada)."""
     ui = ctx.L["ui"]
     secondary = secondary or (f"mailto:{EMAIL}", ui["cta_mail"])
-    return f"""
+    cube_faces = faces(WALLS + ["top", "bottom"], {
+        "front": icon("key"), "back": icon("home"), "left": icon("chart"),
+        "right": icon("search"), "top": icon("euro"), "bottom": icon("shield")})
+    return f"""{marquee(ctx)}
         <section class="cta" aria-labelledby="cta-title" data-scroll="view">
             <div class="cta__glow" aria-hidden="true"></div>
+            <div class="cta__cube" aria-hidden="true"><div class="cube">{cube_faces}</div></div>
             <div class="container reveal">
                 <h2 class="cta__title" id="cta-title">{title}</h2>
                 <p class="cta__text">{text}</p>
@@ -1133,6 +1139,23 @@ def house_box():
             '<span class="slope slope--left"></span><span class="slope slope--right"></span></span>')
 
 
+def gems(count=3):
+    """Cubos de cristal dorado que flotan y giran alrededor de un modelo 3D."""
+    return "".join(f'<span class="gem gem--{i}"><span class="gem__cube">{faces(WALLS + ["top", "bottom"])}</span></span>'
+                   for i in range(1, count + 1))
+
+
+def marquee(ctx, items=None):
+    """Cinta que se desplaza sin fin con los servicios (decorativa: el contenido ya está
+    en la página, así que los lectores de pantalla la saltan)."""
+    items = items or ctx.L["footer_services"]
+    run = "".join(f'<span class="marquee__item">{esc(text)}</span><span class="marquee__gem"></span>' for text in items)
+    return f"""
+        <div class="marquee" aria-hidden="true">
+            <div class="marquee__track">{run}{run}</div>
+        </div>"""
+
+
 def model_3d():
     """Modelo 3D decorativo del logotipo (torre y casa) construido con CSS."""
     return f"""
@@ -1142,8 +1165,9 @@ def model_3d():
                             <span class="orbit orbit--1"></span>
                             <span class="orbit orbit--2"></span>
                             <span class="floor"></span>
+                            <span class="floor-shadow"></span>
                             <span class="box box--tower">{faces(WALLS + ["top"])}</span>
-                            {house_box()}
+                            {house_box()}{gems()}
                         </div>
                     </div>
                 </div>"""
@@ -1372,7 +1396,7 @@ def object_3d(kind):
         inner = '<span class="ring ring--1"></span><span class="ring ring--2"></span><span class="ring ring--3"></span>'
     core = '<span class="obj3d__core"></span>' if kind == "rings" else ""
     return (f'\n            <div class="obj3d obj3d--{kind}" aria-hidden="true"><span class="obj3d__glow"></span>{core}'
-            f'<div class="obj3d__tilt"><div class="obj3d__spin">{inner}</div></div></div>')
+            f'<div class="obj3d__tilt"><div class="obj3d__spin">{inner}</div>{gems(2)}</div></div>')
 
 
 def section_header(eyebrow, title, title_id, lead=None):
@@ -1739,7 +1763,7 @@ def build_index(L):
             </div>
         </section>
 
-{portfolio}{valuation_section(ctx)}{process_scene(ctx)}
+{portfolio}{marquee(ctx)}{valuation_section(ctx)}{process_scene(ctx)}
         <section class="statement" data-scroll="sticky" aria-labelledby="nosotros-title">
             <div class="statement__sticky">
                 <div class="container">
