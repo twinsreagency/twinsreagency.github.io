@@ -6,7 +6,7 @@ C = {
     "locale": "en_GB",
     "label": "English",
     "abbr": "EN",
-    "slugs": {"zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
+    "slugs": {"inmueble": "property", "zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
               "contacto": "contact", "aviso-legal": "legal-notice", "privacidad": "privacy", "cookies": "cookies"},
 
     "ui": {
@@ -21,7 +21,7 @@ C = {
             "blog.html": "Blog",
             "contacto.html": "Contact",
         },
-        "cta_nav": "Book a meeting",
+        "cta_nav": "Free valuation",
         "menu_open": "Open menu",
         "menu_close": "Close menu",
         "lang_aria": "Language",
@@ -44,8 +44,13 @@ C = {
         "back_top": "Back to top",
         "breadcrumb_aria": "Breadcrumb",
         "home": "Home",
-        "cta_primary": "Book a meeting",
+        "cta_primary": "Request a free valuation",
         "cta_mail": "Email us",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "whatsapp_link": "Message us on WhatsApp",
+        "whatsapp_hello": "Hello, I am writing from the Twins Real Estate website.",
+        "whatsapp_ref": "Hello, I am interested in property {ref}.",
         "more_info": "Learn more",
         "about": "about",
         "read_article": "Read article",
@@ -89,6 +94,7 @@ C = {
             "zona": ("Town", "All"),
             "precio": ("Maximum price", "No limit"),
             "dormitorios": ("Bedrooms", "Any"),
+            "superficie": ("Size", "Any"),
         },
         "options": {
             "operacion": ["To buy", "To rent"],
@@ -96,7 +102,9 @@ C = {
                      "Office", "Commercial premises or warehouse", "Garage", "Storage room", "Plot of land", "Building"],
             "precio": ["Up to €200,000", "Up to €400,000", "Up to €700,000", "Up to €1,000,000"],
             "dormitorios": ["1 or more", "2 or more", "3 or more", "4 or more", "5 or more"],
+            "superficie": ["50 m² or more", "80 m² or more", "100 m² or more", "150 m² or more", "200 m² or more"],
         },
+        "sort": ("Sort by", ["Newest", "Price: low to high", "Price: high to low", "Size: largest first"]),
     },
 
     "prop": {
@@ -111,8 +119,59 @@ C = {
         "ref": "Ref.",
     },
 
-    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
-    "properties": {},
+    # Trust blocks: shown only with real data (_datos/, panel).
+    "trust": {
+        "reviews_eyebrow": "Reviews",
+        "reviews_title": "What our clients say",
+        "stars": "{n} out of 5 stars",
+        "source": "Review published on {source}",
+        "all_reviews": "See all reviews on Google",
+        "cases_eyebrow": "Success stories",
+        "cases_title": "Transactions we have handled",
+        "since": "The year we began helping our clients",
+        "aicat": "Agent registered in the Register of Real Estate Agents of Catalonia, no. {n}.",
+        "google": "Reviews on Google",
+    },
+
+    # Page of each property (_inmuebles/*.json).
+    "detail": {
+        "page_title": "{type} in {town} · {ref}",
+        "description": "{operation}: {type} in {town}. {beds}, {baths} and {area} m². {price}. Ref. {ref}.",
+        "gallery_aria": "Property photos",
+        "photo_alt": "{title}: photo {n} of {total}",
+        "plan_alt": "Floor plan of {title}",
+        "no_photos": "Photos coming soon",
+        "facts_title": "Key facts",
+        "facts": {"ref": "Reference", "operation": "Transaction", "type": "Type", "beds": "Bedrooms",
+                  "baths": "Bathrooms", "area": "Built area", "floor": "Floor", "year": "Year built"},
+        "description_title": "Description",
+        "extras_title": "Features",
+        "extras": {"ascensor": "Lift", "terraza": "Terrace", "balcon": "Balcony", "jardin": "Garden",
+                   "piscina": "Swimming pool", "garaje": "Parking space", "trastero": "Storage room",
+                   "aire": "Air conditioning", "calefaccion": "Heating", "amueblado": "Furnished",
+                   "exterior": "Exterior-facing", "accesible": "Accessible"},
+        "energy_title": "Energy certificate",
+        "energy_consumption": "Energy consumption",
+        "energy_emissions": "CO₂ emissions",
+        "energy_units": ("kWh/m² year", "kg CO₂/m² year"),
+        "energy_pending": "In progress",
+        "energy_exempt": "Exempt",
+        "energy_scale": "Rating {letter} on a scale from A (most efficient) to G (least efficient)",
+        "location_title": "Location",
+        "location_note": "Approximate location: the exact address is provided when arranging a viewing.",
+        "map_link": "See the area on OpenStreetMap",
+        "plan_title": "Floor plan",
+        "media_title": "Video and virtual tour",
+        "video": "Watch the video",
+        "tour": "360º virtual tour",
+        "visit": "Request a viewing",
+        "share": "Share",
+        "copied": "Link copied",
+        "similar_title": "Similar properties",
+        "view": "View property",
+        "view_aria": "View {title}",
+        "aside_aria": "Price and contact",
+    },
 
     "commitments": [
         ("Verified information", "We review the land registry extract, any charges and the energy certificate before listing each property."),
@@ -170,7 +229,7 @@ C = {
 
     "town_page": {
         "title": "Selling or buying a home in {town}",
-        "description": "Twins Real Estate helps you sell, buy or let a home in {town}: a free valuation, property alerts and support through to completion.",
+        "description": "Twins Real Estate helps you sell, buy or let a home in {town}: a free valuation and property alerts.",
         "h1": "Selling or buying a home in {town}",
         "text": "We support you in selling, buying and letting property in {town}, with personal, rigorous and transparent advice.",
         "crumb": "Areas",
@@ -280,7 +339,7 @@ C = {
 
     "propiedades": {
         "title": "Properties for sale and rent",
-        "description": "Flats, penthouses, houses and villas for sale and rent. Browse the Twins Real Estate portfolio and filter by area, property type, price and number of bedrooms.",
+        "description": "Flats, penthouses, houses and villas for sale and rent. Browse the Twins Real Estate portfolio and filter by area, type, price and bedrooms.",
         "h1": "Properties for sale and rent",
         "text": "Browse our portfolio and use the filters to find the property that best suits your needs.",
         "list_title": "Property listings",
@@ -629,6 +688,8 @@ C = {
     "privacy_forms": {
         "mail": '<p><strong>How the forms are sent.</strong> When you submit a form, your email application opens with the message ready, and it is only sent if you confirm it. The website itself does not store or transmit the data entered in the forms.</p>',
         "endpoint": '<p><strong>How the forms are sent.</strong> Form data is sent in encrypted form to the Formspree service (Formspree, Inc., USA), which forwards it to our email address and acts as a data processor.</p>',
+        "google": '<p><strong>How the forms are sent.</strong> Form data is sent in encrypted form to our own service hosted by Google (Google Apps Script), which stores it in a spreadsheet in our Google account, notifies us by email and sends you a confirmation email. Google acts as a data processor. Enquiries are deleted automatically after one year unless a contractual relationship has begun.</p>',
+        "whatsapp": '<p><strong>WhatsApp.</strong> If you message us on WhatsApp, the conversation is handled through that service (WhatsApp Ireland Ltd., Meta group), subject to its own terms and privacy policy. We will only use your data to deal with your enquiry.</p>',
     },
 
     "owner": {

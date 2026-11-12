@@ -46,13 +46,16 @@ function serve(root) {
     }));
 }
 
-let browser, site, fixture;
+const APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbPRUEBA/exec";
+let browser, site, fixture, google;
 const url = (file, root = site) => `${root.origin}/${file}`;
 
 before(async () => {
     execFileSync("python3", [path.join(__dirname, "fixture.py"), path.join(FIXTURE, "site")]);
+    execFileSync("python3", [path.join(__dirname, "fixture.py"), path.join(FIXTURE, "google"), APPS_SCRIPT]);
     site = await serve(SITE);
     fixture = await serve(path.join(FIXTURE, "site"));
+    google = await serve(path.join(FIXTURE, "google"));
     browser = await chromium.launch();
 });
 
@@ -60,6 +63,7 @@ after(async () => {
     await browser.close();
     site.server.close();
     fixture.server.close();
+    google.server.close();
     fs.rmSync(FIXTURE, { recursive: true, force: true });
 });
 
@@ -346,7 +350,7 @@ test("la alerta de búsqueda recoge los criterios del filtro y valida la localid
 
     /* Lo que escribe el visitante no se sobrescribe al cambiar el filtro. */
     await page.fill("#alerta-localidad", "Òdena");
-    await page.selectOption("#filtro-zona", "montbui");
+    await page.selectOption("#filtro-zona", "santa-margarida-de-montbui");
     assert.equal(await page.inputValue("#alerta-localidad"), "Òdena");
 
     await page.fill("#alerta-localidad", "");
@@ -369,11 +373,11 @@ test("sin resultados, el aviso lleva a la alerta de búsqueda", async () => {
 test("cada localidad tiene su página en los tres idiomas, enlazada desde el pie y el sitemap", async () => {
     const root = path.join(FIXTURE, "site");
     const sitemap = fs.readFileSync(path.join(root, "sitemap.xml"), "utf8");
-    for (const file of ["es-inmobiliaria-montbui.html", "ca-immobiliaria-montbui.html", "en-estate-agent-montbui.html"]) {
+    for (const file of ["es-inmobiliaria-santa-margarida-de-montbui.html", "ca-immobiliaria-santa-margarida-de-montbui.html", "en-estate-agent-santa-margarida-de-montbui.html"]) {
         assert.ok(fs.existsSync(path.join(root, file)), file);
         assert.match(sitemap, new RegExp(file.replace(".", "\\.")), file);
     }
-    const { page, errors, close } = await open("es-inmobiliaria-montbui.html", { fixture: true });
+    const { page, errors, close } = await open("es-inmobiliaria-santa-margarida-de-montbui.html", { fixture: true });
     assert.match(await page.textContent("h1"), /Santa Margarida de Montbui/);
     assert.equal(await page.locator(".footer-areas a[href='es-inmobiliaria-igualada.html']").count(), 1);
     const areas = await page.$$eval("script[type='application/ld+json']", (nodes) => nodes.map((n) => JSON.stringify(JSON.parse(n.textContent))));
@@ -706,4 +710,138 @@ test("la web no crea cookies: tema, ajustes, idioma y favoritos van al almacenam
     const keys = await page.evaluate(() => Object.keys(localStorage));
     assert.ok(keys.every((key) => /^twins:(tema|ajustes|idioma)$/.test(key)), keys.join(", "));
     await context.close();
+});
+
+test("con Google Apps Script, los formularios envían los datos y muestran la respuesta", async () => {
+    const context = await browser.newContext();
+    const sent = [];
+    let reply = { ok: true };
+    await context.route(`${APPS_SCRIPT}**`, async (route) => {
+        sent.push({ type: route.request().headers()["content-type"], body: JSON.parse(route.request().postData()) });
+        await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: JSON.stringify(reply) });
+    });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("console", (msg) => msg.type() === "error" && errors.push(msg.text()));
+    await page.goto(url("index.html", google));
+    const fill = async () => {
+        await page.fill("#valoracion-localidad", "Igualada");
+        await page.selectOption("#valoracion-tipo", "casa");
+        await page.fill("#valoracion-metros", "180");
+        await page.fill("#valoracion-nombre", "Persona de Prueba");
+        await page.fill("#valoracion-telefono", "+34 600 000 000");
+        await page.fill("#valoracion-email", "cliente@example.com");
+        await page.$eval("#valoracion-privacidad", (box) => { if (!box.checked) box.click(); });
+    };
+    const status = () => page.locator("#formulario-valoracion .form-status");
+    await fill();
+    await page.waitForTimeout(3100);
+    await page.$eval("#formulario-valoracion button[type='submit']", (b) => b.click());
+    await page.waitForFunction(() => document.querySelector("#formulario-valoracion .form-status").classList.contains("form-status--success") &&
+        !document.querySelector("#formulario-valoracion button[type='submit']").disabled);
+    assert.equal(sent.length, 1);
+    /* Petición «simple» (sin consulta previa de CORS) con el JSON en el cuerpo. */
+    assert.match(sent[0].type, /^text\/plain/);
+    const body = sent[0].body;
+    assert.equal(body.formulario, "formulario-valoracion");
+    assert.equal(body.idioma, "es");
+    assert.equal(body.tipo, "casa", "los desplegables van con su valor, que el servidor valida");
+    assert.equal(body.web, "");
+    assert.equal(body.consentimiento, true);
+    assert.equal(body.pagina, "/index.html");
+    assert.ok(body.t >= 3000, `tiempo de rellenado: ${body.t}`);
+    assert.equal(await page.inputValue("#valoracion-localidad"), "", "el formulario se vacía al enviarse");
+
+    /* Si el servidor rechaza los datos, se pide revisarlos y no se borra nada. */
+    reply = { ok: false, error: "validacion", campos: ["email"] };
+    await fill();
+    await page.waitForTimeout(3100);
+    await page.$eval("#formulario-valoracion button[type='submit']", (b) => b.click());
+    await page.waitForFunction(() => document.querySelector("#formulario-valoracion .form-status").classList.contains("form-status--error"));
+    assert.match(await status().textContent(), /revise|campos/i);
+    assert.equal(await page.inputValue("#valoracion-localidad"), "Igualada");
+    assert.deepEqual(errors, []);
+    await context.close();
+});
+
+test("cada inmueble tiene su ficha: galería, datos, certificado, ubicación aproximada y visita", async () => {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: fixture.origin });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (msg) => msg.type() === "error" && errors.push(msg.text()));
+    await page.goto(url("es-inmueble-tre-001.html", fixture));
+    assert.match(await page.textContent("h1"), /Casa con jardín en Les Comes/);
+    assert.equal(await page.getAttribute(".nav__link[aria-current='page']", "href"), "es-inmuebles.html");
+
+    /* Galería: la primera foto con prioridad, el resto diferidas; las flechas avanzan. */
+    const imgs = page.locator(".photo-slide img");
+    assert.equal(await imgs.count(), 2);
+    assert.equal(await imgs.nth(0).getAttribute("fetchpriority"), "high");
+    assert.equal(await imgs.nth(1).getAttribute("loading"), "lazy");
+    assert.match(await imgs.nth(1).getAttribute("alt"), /foto 2 de 2/);
+    assert.equal(await page.locator("link[rel='preload'][as='image']").count(), 1);
+    await page.click(".listing-gallery [data-gallery-next]");
+    await page.waitForFunction(() => document.querySelector(".listing-gallery [data-gallery-current]").textContent === "02");
+
+    /* Certificado energético obligatorio, con la letra marcada en la escala. */
+    assert.deepEqual(await page.$$eval(".energy__bar[aria-current='true']", (bars) => bars.map((b) => b.textContent)), ["C", "D"]);
+    /* Ubicación aproximada: coordenadas redondeadas (unos 1 km), nunca la dirección. */
+    const map = await page.getAttribute("a[href*='openstreetmap.org']", "href");
+    assert.match(map, /mlat=41\.58&mlon=1\.62/);
+    assert.equal(await page.locator("a[href*='youtube.com']").count(), 1);
+    assert.equal(await page.locator(".listing-plan img").count(), 1);
+
+    /* Similares: misma operación, sin el propio inmueble ni los de alquiler. */
+    const similar = await page.$$eval("#similares-title ~ .grid .property, .section--alt .property", (c) => c.map((x) => x.dataset.ref));
+    assert.ok(similar.length >= 1 && !similar.includes("TRE-001") && !similar.includes("TRE-003"), similar.join());
+
+    /* Datos estructurados del anuncio. */
+    const listing = (await page.$$eval("script[type='application/ld+json']", (n) => n.map((x) => JSON.parse(x.textContent))))
+        .find((d) => d["@type"] === "RealEstateListing");
+    assert.equal(listing.offers.price, 485000);
+    assert.equal(listing.offers.priceCurrency, "EUR");
+    assert.equal(listing.about["@type"], "House");
+    assert.equal(listing.about.address.addressLocality, "Igualada");
+
+    /* Compartir (copia el enlace si el sistema no tiene menú de compartir) y favorito. */
+    await page.click(".share-btn");
+    await page.waitForFunction(() => document.querySelector(".share-status").textContent === "Enlace copiado");
+    const fav = page.locator(".listing-card .fav-btn");
+    await fav.click();
+    assert.equal(await fav.getAttribute("aria-pressed"), "true");
+
+    /* «Solicitar visita» abre el contacto con la referencia y el motivo ya elegidos. */
+    await page.click(".listing-card .btn--primary");
+    await page.waitForURL(/es-contacto\.html/);
+    assert.equal(await page.inputValue("#contacto-referencia"), "TRE-001");
+    assert.equal(await page.inputValue("#contacto-asunto"), "visita");
+    assert.deepEqual(errors, []);
+    await context.close();
+
+    /* Sin fotos: aviso en su lugar; certificado «en trámite»; traducción o castellano. */
+    const other = await open("es-inmueble-tre-002.html", { fixture: true });
+    assert.equal(await other.page.locator(".listing-gallery__placeholder").count(), 1);
+    assert.match(await other.page.textContent(".energy__state"), /En trámite/);
+    await other.page.goto(url("ca-immoble-tre-001.html", fixture));
+    assert.match(await other.page.textContent("h1"), /Casa amb jardí a Les Comes/);
+    await other.page.goto(url("en-property-tre-002.html", fixture));
+    assert.match(await other.page.textContent("h1"), /Ático con terraza/);
+    await other.close();
+});
+
+test("el listado filtra por superficie y se ordena por precio, con todo en la URL", async () => {
+    const { page, close } = await open("es-inmuebles.html", { search: "?orden=precio-asc", fixture: true });
+    const refs = () => page.$$eval("#listado-inmuebles .property:not([hidden])", (c) => c.map((x) => x.dataset.ref));
+    assert.deepEqual(await refs(), ["TRE-003", "TRE-002", "TRE-001", "TRE-004"]);
+    await page.selectOption("#filtro-superficie", "200");
+    assert.deepEqual(await refs(), ["TRE-001", "TRE-004"]);
+    assert.match(page.url(), /superficie=200&orden=precio-asc$/);
+    await page.selectOption("#filtro-orden", "novedad");
+    assert.deepEqual(await refs(), ["TRE-001", "TRE-004"], "novedades: la más reciente primero");
+    assert.doesNotMatch(page.url(), /orden=/);
+    /* Las tarjetas enlazan a su ficha. */
+    assert.equal(await page.getAttribute(".property[data-ref='TRE-004'] .property__title a", "href"), "es-inmueble-tre-004.html");
+    await close();
 });

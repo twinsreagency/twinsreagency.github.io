@@ -6,7 +6,7 @@ C = {
     "locale": "ca_ES",
     "label": "Català",
     "abbr": "CA",
-    "slugs": {"zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
+    "slugs": {"inmueble": "immoble", "zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
 
     "ui": {
         "skip": "Salta al contingut principal",
@@ -20,7 +20,7 @@ C = {
             "blog.html": "Blog",
             "contacto.html": "Contacte",
         },
-        "cta_nav": "Demaneu cita",
+        "cta_nav": "Valoració gratuïta",
         "menu_open": "Obre el menú",
         "menu_close": "Tanca el menú",
         "lang_aria": "Idioma",
@@ -43,8 +43,13 @@ C = {
         "back_top": "Torna a l’inici de la pàgina",
         "breadcrumb_aria": "Ruta de navegació",
         "home": "Inici",
-        "cta_primary": "Demaneu una cita",
+        "cta_primary": "Demaneu una valoració gratuïta",
         "cta_mail": "Escriviu-nos per correu",
+        "phone": "Telèfon",
+        "whatsapp": "WhatsApp",
+        "whatsapp_link": "Escriviu-nos per WhatsApp",
+        "whatsapp_hello": "Hola, us escric des del web de Twins Real Estate.",
+        "whatsapp_ref": "Hola, m’interessa l’immoble {ref}.",
         "more_info": "Més informació",
         "about": "sobre",
         "read_article": "Llegiu l’article",
@@ -88,6 +93,7 @@ C = {
             "zona": ("Localitat", "Totes"),
             "precio": ("Preu màxim", "Sense límit"),
             "dormitorios": ("Dormitoris", "Indiferent"),
+            "superficie": ("Superfície", "Indiferent"),
         },
         "options": {
             "operacion": ["Compra", "Lloguer"],
@@ -95,7 +101,9 @@ C = {
                      "Oficina", "Local o nau", "Garatge", "Traster", "Terreny", "Edifici"],
             "precio": ["Fins a 200.000 €", "Fins a 400.000 €", "Fins a 700.000 €", "Fins a 1.000.000 €"],
             "dormitorios": ["1 o més", "2 o més", "3 o més", "4 o més", "5 o més"],
+            "superficie": ["50 m² o més", "80 m² o més", "100 m² o més", "150 m² o més", "200 m² o més"],
         },
+        "sort": ("Ordena per", ["Novetats", "Preu: de menor a major", "Preu: de major a menor", "Superfície: de major a menor"]),
     },
 
     "prop": {
@@ -110,8 +118,59 @@ C = {
         "ref": "Ref.",
     },
 
-    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
-    "properties": {},
+    # Blocs de confiança: només apareixen amb dades reals (_datos/, panell).
+    "trust": {
+        "reviews_eyebrow": "Opinions",
+        "reviews_title": "El que diuen els nostres clients",
+        "stars": "{n} de 5 estrelles",
+        "source": "Opinió publicada a {source}",
+        "all_reviews": "Veure totes les opinions a Google",
+        "cases_eyebrow": "Casos d’èxit",
+        "cases_title": "Operacions que hem acompanyat",
+        "since": "Any en què vam començar a acompanyar els nostres clients",
+        "aicat": "Agent inscrit al Registre d’Agents Immobiliaris de Catalunya amb el núm. {n}.",
+        "google": "Opinions a Google",
+    },
+
+    # Fitxa de cada immoble (_inmuebles/*.json).
+    "detail": {
+        "page_title": "{type} a {town} · {ref}",
+        "description": "{operation}: {type} a {town}. {beds}, {baths} i {area} m². {price}. Ref. {ref}.",
+        "gallery_aria": "Fotos de l’immoble",
+        "photo_alt": "{title}: foto {n} de {total}",
+        "plan_alt": "Plànol de {title}",
+        "no_photos": "Fotos aviat",
+        "facts_title": "Dades principals",
+        "facts": {"ref": "Referència", "operation": "Operació", "type": "Tipus", "beds": "Dormitoris",
+                  "baths": "Banys", "area": "Superfície construïda", "floor": "Planta", "year": "Any de construcció"},
+        "description_title": "Descripció",
+        "extras_title": "Característiques",
+        "extras": {"ascensor": "Ascensor", "terraza": "Terrassa", "balcon": "Balcó", "jardin": "Jardí",
+                   "piscina": "Piscina", "garaje": "Plaça d’aparcament", "trastero": "Traster",
+                   "aire": "Aire condicionat", "calefaccion": "Calefacció", "amueblado": "Moblat",
+                   "exterior": "Exterior", "accesible": "Accessible"},
+        "energy_title": "Certificat energètic",
+        "energy_consumption": "Consum d’energia",
+        "energy_emissions": "Emissions de CO₂",
+        "energy_units": ("kWh/m² any", "kg CO₂/m² any"),
+        "energy_pending": "En tràmit",
+        "energy_exempt": "Exempt",
+        "energy_scale": "Qualificació {letter} en una escala d’A (més eficient) a G (menys eficient)",
+        "location_title": "Ubicació",
+        "location_note": "Ubicació aproximada: l’adreça exacta es facilita en concertar la visita.",
+        "map_link": "Veure la zona a OpenStreetMap",
+        "plan_title": "Plànol",
+        "media_title": "Vídeo i visita virtual",
+        "video": "Veure el vídeo",
+        "tour": "Visita virtual 360º",
+        "visit": "Demaneu una visita",
+        "share": "Compartir",
+        "copied": "Enllaç copiat",
+        "similar_title": "Immobles similars",
+        "view": "Veure l’immoble",
+        "view_aria": "Veure {title}",
+        "aside_aria": "Preu i contacte",
+    },
 
     "commitments": [
         ("Informació verificada", "Revisem la nota simple, les càrregues i el certificat energètic abans de publicar cada immoble."),
@@ -169,7 +228,7 @@ C = {
 
     "town_page": {
         "title": "Vendre o comprar habitatge a {town}",
-        "description": "Twins Real Estate us ajuda a vendre, comprar o llogar habitatge a {town}: valoració gratuïta, alerta de cerca i acompanyament fins a la signatura.",
+        "description": "Twins Real Estate us ajuda a vendre, comprar o llogar habitatge a {town}: valoració gratuïta i alerta de cerca.",
         "h1": "Vendre o comprar habitatge a {town}",
         "text": "Us acompanyem en la venda, la compra i el lloguer d’immobles a {town}, amb un assessorament proper, rigorós i transparent.",
         "crumb": "Zones",
@@ -279,7 +338,7 @@ C = {
 
     "propiedades": {
         "title": "Immobles en venda i lloguer",
-        "description": "Pisos, àtics, cases i xalets en venda i lloguer. Consulteu la cartera de Twins Real Estate i filtreu per zona, tipus d’immoble, preu i nombre de dormitoris.",
+        "description": "Pisos, àtics, cases i xalets en venda i lloguer. Consulteu la cartera de Twins Real Estate i filtreu per zona, tipus, preu i dormitoris.",
         "h1": "Immobles en venda i lloguer",
         "text": "Consulteu la nostra cartera d’habitatges i utilitzeu els filtres per trobar l’immoble que millor s’adapta a les vostres necessitats.",
         "list_title": "Llistat d’immobles",
@@ -628,6 +687,8 @@ C = {
     "privacy_forms": {
         "mail": '<p><strong>Com s’envien els formularis.</strong> En enviar un formulari s’obre el vostre programa de correu electrònic amb el missatge preparat, que només s’envia si vós ho confirmeu. El web no desa ni transmet per si mateix les dades dels formularis.</p>',
         "endpoint": '<p><strong>Com s’envien els formularis.</strong> Les dades dels formularis s’envien de manera xifrada al servei Formspree (Formspree, Inc., EUA), que les reenvia al nostre correu electrònic i actua com a encarregat del tractament.</p>',
+        "google": '<p><strong>Com s’envien els formularis.</strong> Les dades dels formularis s’envien de manera xifrada a un servei propi allotjat a Google (Google Apps Script), que les desa en un full de càlcul del nostre compte de Google, ens n’avisa per correu electrònic i us envia un correu de confirmació. Google actua com a encarregat del tractament. Les consultes s’eliminen automàticament al cap d’un any, llevat que s’hagi iniciat una relació contractual.</p>',
+        "whatsapp": '<p><strong>WhatsApp.</strong> Si ens escriviu per WhatsApp, la conversa es tracta a través d’aquest servei (WhatsApp Ireland Ltd., grup Meta), subjecte a les seves pròpies condicions i política de privacitat. Només farem servir les vostres dades per atendre la vostra consulta.</p>',
     },
 
     "owner": {

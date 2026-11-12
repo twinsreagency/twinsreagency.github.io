@@ -1,0 +1,80 @@
+name: Publicar cambios del panel
+
+# Cuando el panel (Pages CMS) guarda un inmueble, una foto o los datos de la agencia, este
+# flujo prepara las fotos, genera la web, la prueba y guarda el resultado en main. GitHub
+# Pages lo publica en uno o dos minutos. Si algo no es válido (p. ej. falta el certificado
+# energético), no se publica nada y el error explica qué corregir.
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "_inmuebles/**"
+      - "_datos/**"
+      - "_fotos/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Un cambio detrás de otro: dos publicaciones a la vez se pisarían.
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write   # guardar en main la web generada
+      pages: write      # pedir a GitHub Pages que la publique
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Instalar Pillow (fotos) y PyYAML (prueba del panel)
+        run: python3 -m pip install --disable-pip-version-check pillow==13.0.0 pyyaml==6.0.2
+
+      - name: Preparar las fotos (AVIF, WebP y JPEG, sin ubicación GPS)
+        run: python3 _fotos.py --inmuebles
+
+      - name: Generar la web
+        run: python3 _build.py
+
+      - name: Comprobaciones del sitio generado
+        run: python3 -m unittest discover -s _tests -v
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+
+      - name: Instalar Playwright y Chromium (fuera del sitio)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" --no-audit --no-fund --ignore-scripts playwright@1.56.1
+          "$RUNNER_TEMP/pw/node_modules/.bin/playwright" install --with-deps chromium
+
+      - name: Pruebas en el navegador
+        env:
+          NODE_PATH: ${{ runner.temp }}/pw/node_modules
+        run: node --test _tests/browser.test.js
+
+      - name: Guardar la web generada
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "La web ya estaba al día."
+            exit 0
+          fi
+          git commit -m "web: regenera tras los cambios del panel"
+          # Si mientras tanto el panel ha guardado otro cambio, su propia publicación lo
+          # generará todo de nuevo: no hace falta reintentar.
+          git push || echo "main ha cambiado mientras tanto; la siguiente publicación lo incluye."
+
+      - name: Pedir a GitHub Pages que publique
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds" || echo "GitHub Pages publicará el commit por sí solo."

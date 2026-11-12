@@ -21,6 +21,8 @@
      */
     var CONFIG = {
         endpoint: "",
+        /* Con Google Apps Script (_backend/LEEME.md) es la URL de la aplicación web, p. ej.
+           "https://script.google.com/macros/s/AKfy…/exec". */
         fallbackEmail: "twinsreagency@gmail.com",
         minFillTimeMs: 3000,
         maxMailBody: 3000,
@@ -788,7 +790,12 @@
         var cards = $$(".property", list);
         var count = document.getElementById("resultados-total");
         var empty = document.getElementById("sin-resultados");
-        var fields = ["operacion", "tipo", "zona", "precio", "dormitorios"];
+        var fields = ["operacion", "tipo", "zona", "precio", "dormitorios", "superficie"];
+        var sort = form.elements.orden;
+        /* Orden original (novedades primero), para volver a él y desempatar. */
+        cards.forEach(function (card, index) {
+            card.setAttribute("data-index", String(index));
+        });
         var params = new URLSearchParams(window.location.search);
         var alertForm = document.getElementById("formulario-alerta");
         /* Una localidad que ya viene rellenada (enlace de una página por localidad) cuenta como elegida. */
@@ -814,9 +821,9 @@
             });
         }
 
-        fields.forEach(function (name) {
+        fields.concat(sort ? ["orden"] : []).forEach(function (name) {
             var select = form.elements[name];
-            if (select) select.value = allowedParam(params, name, optionValues(select));
+            if (select) select.value = allowedParam(params, name, optionValues(select)) || select.options[0].value;
         });
 
         function matches(card, criteria) {
@@ -826,7 +833,23 @@
             if (criteria.zona && data.zona !== criteria.zona) return false;
             if (criteria.precio && Number(data.precio) > Number(criteria.precio)) return false;
             if (criteria.dormitorios && Number(data.dormitorios) < Number(criteria.dormitorios)) return false;
+            if (criteria.superficie && Number(data.superficie) < Number(criteria.superficie)) return false;
             return true;
+        }
+
+        /** Reordena las tarjetas: novedades, precio (de menor a mayor o al revés) o superficie. */
+        function order(by) {
+            var key = {
+                "precio-asc": function (c) { return Number(c.dataset.precio); },
+                "precio-desc": function (c) { return -Number(c.dataset.precio); },
+                "superficie-desc": function (c) { return -Number(c.dataset.superficie); }
+            }[by];
+            cards.slice().sort(function (a, b) {
+                var diff = key ? key(a) - key(b) : 0;
+                return diff || Number(a.dataset.index) - Number(b.dataset.index);
+            }).forEach(function (card) {
+                list.appendChild(card);
+            });
         }
 
         function apply() {
@@ -848,6 +871,10 @@
 
             if (count) count.textContent = String(visible);
             if (empty) empty.hidden = visible !== 0;
+            if (sort) {
+                order(sort.value);
+                if (sort.value !== sort.options[0].value) query.set("orden", sort.value);
+            }
             syncAlert();
 
             var search = query.toString();
@@ -866,6 +893,28 @@
         });
 
         apply();
+    }
+
+    /* Compartir una ficha: menú del sistema (móvil) o copia del enlace ------- */
+
+    function initShare() {
+        $$(".share-btn").forEach(function (button) {
+            var status = $(".share-status", button.closest(".listing-card") || document);
+            var canShare = typeof navigator.share === "function";
+            var canCopy = Boolean(navigator.clipboard && navigator.clipboard.writeText);
+            if (!canShare && !canCopy) return;
+            button.hidden = false;
+            button.addEventListener("click", function () {
+                var data = { title: button.getAttribute("data-share-title"), url: window.location.href.split("#")[0] };
+                if (canShare) {
+                    navigator.share(data).catch(function () {});
+                    return;
+                }
+                navigator.clipboard.writeText(data.url).then(function () {
+                    if (status) status.textContent = button.getAttribute("data-copied");
+                }).catch(function () {});
+            });
+        });
     }
 
     /* Formularios de contacto y de alerta de búsqueda --------------------- */
@@ -998,11 +1047,23 @@
             return value.slice(0, max);
         }
 
-        function collect() {
+        /**
+         * Datos del formulario. Para el servicio de formularios (codes), los desplegables
+         * van con su valor (p. ej. «casa») para que el servidor los valide, y se añaden el
+         * campo trampa, el tiempo de rellenado, la página y el consentimiento; para el
+         * correo, con el texto que ve el visitante.
+         */
+        function collect(codes) {
             var data = { idioma: LANG, formulario: form.id };
             fields().forEach(function (field) {
-                data[field.name] = valueOf(field);
+                data[field.name] = codes && field.tagName === "SELECT" ? field.value : valueOf(field);
             });
+            if (codes) {
+                data.web = form.elements.web.value;
+                data.t = Date.now() - startedAt;
+                data.pagina = window.location.pathname;
+                data.consentimiento = Boolean(form.elements.privacidad && form.elements.privacidad.checked);
+            }
             return data;
         }
 
@@ -1049,9 +1110,8 @@
                 return;
             }
 
-            var data = collect();
-
             if (!CONFIG.endpoint) {
+                var data = collect(false);
                 openMailClient(data);
                 setStatus("success", format(T.mailOpened, { email: CONFIG.fallbackEmail }));
                 return;
@@ -1060,19 +1120,27 @@
             submit.disabled = true;
             setStatus("success", T.sending);
 
+            /* Google Apps Script no responde a la consulta previa de CORS: se envía como
+               texto plano (petición «simple»), y el script lee el JSON del cuerpo. */
+            var appsScript = /^https:\/\/script\.google\.com\//.test(CONFIG.endpoint);
             window.fetch(CONFIG.endpoint, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify(data),
+                headers: appsScript ? { "Content-Type": "text/plain;charset=utf-8" }
+                    : { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(collect(true)),
                 credentials: "omit",
                 referrerPolicy: "strict-origin-when-cross-origin"
             }).then(function (response) {
                 if (!response.ok) throw new Error("HTTP " + response.status);
+                return response.json().catch(function () { return {}; });
+            }).then(function (result) {
+                if (result && result.ok === false) throw new Error(result.error || "error");
                 form.reset();
                 startedAt = Date.now();
                 setStatus("success", T.sent);
-            }).catch(function () {
-                setStatus("error", format(T.failed, { email: CONFIG.fallbackEmail }));
+            }).catch(function (error) {
+                /* Datos rechazados por el servidor: se pide revisarlos; si no, se ofrece el correo. */
+                setStatus("error", error.message === "validacion" ? T.invalid : format(T.failed, { email: CONFIG.fallbackEmail }));
             }).then(function () {
                 submit.disabled = false;
             });
@@ -1202,5 +1270,6 @@
     initLeadForms();
     initCounters();
     initGalleries();
+    initShare();
     initYear();
 })();

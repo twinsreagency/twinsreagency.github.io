@@ -6,7 +6,7 @@ C = {
     "locale": "es_ES",
     "label": "Español",
     "abbr": "ES",
-    "slugs": {"zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
+    "slugs": {"inmueble": "inmueble", "zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
 
     "ui": {
         "skip": "Saltar al contenido principal",
@@ -20,7 +20,7 @@ C = {
             "blog.html": "Blog",
             "contacto.html": "Contacto",
         },
-        "cta_nav": "Solicitar cita",
+        "cta_nav": "Valoración gratuita",
         "menu_open": "Abrir menú",
         "menu_close": "Cerrar menú",
         "lang_aria": "Idioma",
@@ -43,8 +43,13 @@ C = {
         "back_top": "Volver al inicio de la página",
         "breadcrumb_aria": "Ruta de navegación",
         "home": "Inicio",
-        "cta_primary": "Solicitar una cita",
+        "cta_primary": "Solicitar valoración gratuita",
         "cta_mail": "Escríbanos por correo",
+        "phone": "Teléfono",
+        "whatsapp": "WhatsApp",
+        "whatsapp_link": "Escríbanos por WhatsApp",
+        "whatsapp_hello": "Hola, les escribo desde la web de Twins Real Estate.",
+        "whatsapp_ref": "Hola, me interesa el inmueble {ref}.",
         "more_info": "Más información",
         "about": "sobre",
         "read_article": "Leer artículo",
@@ -88,6 +93,7 @@ C = {
             "zona": ("Localidad", "Todas"),
             "precio": ("Precio máximo", "Sin límite"),
             "dormitorios": ("Dormitorios", "Indiferente"),
+            "superficie": ("Superficie", "Indiferente"),
         },
         "options": {
             "operacion": ["Compra", "Alquiler"],
@@ -95,7 +101,9 @@ C = {
                      "Oficina", "Local o nave", "Garaje", "Trastero", "Terreno", "Edificio"],
             "precio": ["Hasta 200.000 €", "Hasta 400.000 €", "Hasta 700.000 €", "Hasta 1.000.000 €"],
             "dormitorios": ["1 o más", "2 o más", "3 o más", "4 o más", "5 o más"],
+            "superficie": ["50 m² o más", "80 m² o más", "100 m² o más", "150 m² o más", "200 m² o más"],
         },
+        "sort": ("Ordenar por", ["Novedades", "Precio: de menor a mayor", "Precio: de mayor a menor", "Superficie: de mayor a menor"]),
     },
 
     "prop": {
@@ -110,9 +118,59 @@ C = {
         "ref": "Ref.",
     },
 
-    # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia:
-    #     "TRE-001": ("Piso luminoso con terraza", "Igualada · Centro", "Novedad"),
-    "properties": {},
+    # Bloques de confianza: solo aparecen con datos reales (_datos/, panel).
+    "trust": {
+        "reviews_eyebrow": "Opiniones",
+        "reviews_title": "Lo que dicen nuestros clientes",
+        "stars": "{n} de 5 estrellas",
+        "source": "Opinión publicada en {source}",
+        "all_reviews": "Ver todas las opiniones en Google",
+        "cases_eyebrow": "Casos de éxito",
+        "cases_title": "Operaciones que hemos acompañado",
+        "since": "Año en que empezamos a acompañar a nuestros clientes",
+        "aicat": "Agente inscrito en el Registro de Agentes Inmobiliarios de Cataluña con el n.º {n}.",
+        "google": "Opiniones en Google",
+    },
+
+    # Ficha de cada inmueble (_inmuebles/*.json).
+    "detail": {
+        "page_title": "{type} en {town} · {ref}",
+        "description": "{operation}: {type} en {town}. {beds}, {baths} y {area} m². {price}. Ref. {ref}.",
+        "gallery_aria": "Fotos del inmueble",
+        "photo_alt": "{title}: foto {n} de {total}",
+        "plan_alt": "Plano de {title}",
+        "no_photos": "Fotos próximamente",
+        "facts_title": "Datos principales",
+        "facts": {"ref": "Referencia", "operation": "Operación", "type": "Tipo", "beds": "Dormitorios",
+                  "baths": "Baños", "area": "Superficie construida", "floor": "Planta", "year": "Año de construcción"},
+        "description_title": "Descripción",
+        "extras_title": "Características",
+        "extras": {"ascensor": "Ascensor", "terraza": "Terraza", "balcon": "Balcón", "jardin": "Jardín",
+                   "piscina": "Piscina", "garaje": "Plaza de garaje", "trastero": "Trastero",
+                   "aire": "Aire acondicionado", "calefaccion": "Calefacción", "amueblado": "Amueblado",
+                   "exterior": "Exterior", "accesible": "Accesible"},
+        "energy_title": "Certificado energético",
+        "energy_consumption": "Consumo de energía",
+        "energy_emissions": "Emisiones de CO₂",
+        "energy_units": ("kWh/m² año", "kg CO₂/m² año"),
+        "energy_pending": "En trámite",
+        "energy_exempt": "Exento",
+        "energy_scale": "Calificación {letter} en una escala de A (más eficiente) a G (menos eficiente)",
+        "location_title": "Ubicación",
+        "location_note": "Ubicación aproximada: la dirección exacta se facilita al concertar la visita.",
+        "map_link": "Ver la zona en OpenStreetMap",
+        "plan_title": "Plano",
+        "media_title": "Vídeo y visita virtual",
+        "video": "Ver el vídeo",
+        "tour": "Visita virtual 360º",
+        "visit": "Solicitar visita",
+        "share": "Compartir",
+        "copied": "Enlace copiado",
+        "similar_title": "Inmuebles similares",
+        "view": "Ver inmueble",
+        "view_aria": "Ver {title}",
+        "aside_aria": "Precio y contacto",
+    },
 
     "commitments": [
         ("Información verificada", "Revisamos la nota simple, las cargas y el certificado energético antes de publicar cada inmueble."),
@@ -172,7 +230,7 @@ C = {
     # nombre de la localidad. El texto propio de cada una va en «towns», por clave de TOWNS.
     "town_page": {
         "title": "Vender o comprar vivienda en {town}",
-        "description": "Twins Real Estate le ayuda a vender, comprar o alquilar vivienda en {town}: valoración gratuita, alerta de búsqueda y acompañamiento hasta la firma.",
+        "description": "Twins Real Estate le ayuda a vender, comprar o alquilar vivienda en {town}: valoración gratuita y alerta de búsqueda.",
         "h1": "Vender o comprar vivienda en {town}",
         "text": "Le acompañamos en la venta, la compra y el alquiler de inmuebles en {town}, con un asesoramiento cercano, riguroso y transparente.",
         "crumb": "Zonas",
@@ -283,7 +341,7 @@ C = {
 
     "propiedades": {
         "title": "Inmuebles en venta y alquiler",
-        "description": "Pisos, áticos, casas y chalets en venta y alquiler. Consulte la cartera de Twins Real Estate y filtre por zona, tipo de inmueble, precio y número de dormitorios.",
+        "description": "Pisos, áticos, casas y chalets en venta y alquiler. Consulte la cartera de Twins Real Estate y filtre por zona, tipo, precio y dormitorios.",
         "h1": "Inmuebles en venta y alquiler",
         "text": "Consulte nuestra cartera de viviendas y utilice los filtros para encontrar el inmueble que mejor se adapta a sus necesidades.",
         "list_title": "Listado de inmuebles",
@@ -634,6 +692,8 @@ C = {
     "privacy_forms": {
         "mail": '<p><strong>Cómo se envían los formularios.</strong> Al enviar un formulario se abre su programa de correo electrónico con el mensaje preparado, que solo se envía si usted lo confirma. La web no guarda ni transmite por sí misma los datos de los formularios.</p>',
         "endpoint": '<p><strong>Cómo se envían los formularios.</strong> Los datos de los formularios se envían de forma cifrada al servicio Formspree (Formspree, Inc., EE. UU.), que los reenvía a nuestro correo electrónico y actúa como encargado del tratamiento.</p>',
+        "google": '<p><strong>Cómo se envían los formularios.</strong> Los datos de los formularios se envían de forma cifrada a un servicio propio alojado en Google (Google Apps Script), que los guarda en una hoja de cálculo de nuestra cuenta de Google, nos avisa por correo electrónico y le envía a usted un correo de confirmación. Google actúa como encargado del tratamiento. Las consultas se eliminan automáticamente al cabo de un año, salvo que se haya iniciado una relación contractual.</p>',
+        "whatsapp": '<p><strong>WhatsApp.</strong> Si nos escribe por WhatsApp, la conversación se trata a través de ese servicio (WhatsApp Ireland Ltd., grupo Meta), sujeto a sus propias condiciones y política de privacidad. Solo usaremos sus datos para atender su consulta.</p>',
     },
 
     "owner": {
