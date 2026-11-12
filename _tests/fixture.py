@@ -1,7 +1,10 @@
 """Genera una copia del sitio con inmuebles de prueba, para comprobar en el navegador
 el listado, el filtro, los destacados y los favoritos aunque la cartera real esté vacía.
 
-Uso: python3 _tests/fixture.py <carpeta de destino>
+Uso: python3 _tests/fixture.py <carpeta de destino> [dirección del servicio de formularios]
+
+Con la dirección, la copia se genera como si los formularios enviaran a ese servicio
+(p. ej. Google Apps Script), para probar el envío sin el programa de correo.
 """
 import os
 import shutil
@@ -20,10 +23,16 @@ PROPERTIES = [
 ]
 
 
-def main(target):
+def main(target, endpoint=""):
     if os.path.exists(target):
         shutil.rmtree(target)
     shutil.copytree(SITE_DIR, target, ignore=shutil.ignore_patterns(".git", "node_modules", "__pycache__"))
+    if endpoint:
+        script = os.path.join(target, "main.js")
+        with open(script, encoding="utf-8") as fh:
+            code = fh.read()
+        with open(script, "w", encoding="utf-8") as fh:
+            fh.write(code.replace('endpoint: "",', f'endpoint: "{endpoint}",', 1))
     sys.path.insert(0, target)
     import _build
 
@@ -42,4 +51,4 @@ def main(target):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:3])

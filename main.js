@@ -21,6 +21,8 @@
      */
     var CONFIG = {
         endpoint: "",
+        /* Con Google Apps Script (_backend/LEEME.md) es la URL de la aplicación web, p. ej.
+           "https://script.google.com/macros/s/AKfy…/exec". */
         fallbackEmail: "twinsreagency@gmail.com",
         minFillTimeMs: 3000,
         maxMailBody: 3000,
@@ -998,11 +1000,23 @@
             return value.slice(0, max);
         }
 
-        function collect() {
+        /**
+         * Datos del formulario. Para el servicio de formularios (codes), los desplegables
+         * van con su valor (p. ej. «casa») para que el servidor los valide, y se añaden el
+         * campo trampa, el tiempo de rellenado, la página y el consentimiento; para el
+         * correo, con el texto que ve el visitante.
+         */
+        function collect(codes) {
             var data = { idioma: LANG, formulario: form.id };
             fields().forEach(function (field) {
-                data[field.name] = valueOf(field);
+                data[field.name] = codes && field.tagName === "SELECT" ? field.value : valueOf(field);
             });
+            if (codes) {
+                data.web = form.elements.web.value;
+                data.t = Date.now() - startedAt;
+                data.pagina = window.location.pathname;
+                data.consentimiento = Boolean(form.elements.privacidad && form.elements.privacidad.checked);
+            }
             return data;
         }
 
@@ -1049,9 +1063,8 @@
                 return;
             }
 
-            var data = collect();
-
             if (!CONFIG.endpoint) {
+                var data = collect(false);
                 openMailClient(data);
                 setStatus("success", format(T.mailOpened, { email: CONFIG.fallbackEmail }));
                 return;
@@ -1060,19 +1073,27 @@
             submit.disabled = true;
             setStatus("success", T.sending);
 
+            /* Google Apps Script no responde a la consulta previa de CORS: se envía como
+               texto plano (petición «simple»), y el script lee el JSON del cuerpo. */
+            var appsScript = /^https:\/\/script\.google\.com\//.test(CONFIG.endpoint);
             window.fetch(CONFIG.endpoint, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-                body: JSON.stringify(data),
+                headers: appsScript ? { "Content-Type": "text/plain;charset=utf-8" }
+                    : { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(collect(true)),
                 credentials: "omit",
                 referrerPolicy: "strict-origin-when-cross-origin"
             }).then(function (response) {
                 if (!response.ok) throw new Error("HTTP " + response.status);
+                return response.json().catch(function () { return {}; });
+            }).then(function (result) {
+                if (result && result.ok === false) throw new Error(result.error || "error");
                 form.reset();
                 startedAt = Date.now();
                 setStatus("success", T.sent);
-            }).catch(function () {
-                setStatus("error", format(T.failed, { email: CONFIG.fallbackEmail }));
+            }).catch(function (error) {
+                /* Datos rechazados por el servidor: se pide revisarlos; si no, se ofrece el correo. */
+                setStatus("error", error.message === "validacion" ? T.invalid : format(T.failed, { email: CONFIG.fallbackEmail }));
             }).then(function () {
                 submit.disabled = false;
             });

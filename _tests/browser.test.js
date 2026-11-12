@@ -46,13 +46,16 @@ function serve(root) {
     }));
 }
 
-let browser, site, fixture;
+const APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbPRUEBA/exec";
+let browser, site, fixture, google;
 const url = (file, root = site) => `${root.origin}/${file}`;
 
 before(async () => {
     execFileSync("python3", [path.join(__dirname, "fixture.py"), path.join(FIXTURE, "site")]);
+    execFileSync("python3", [path.join(__dirname, "fixture.py"), path.join(FIXTURE, "google"), APPS_SCRIPT]);
     site = await serve(SITE);
     fixture = await serve(path.join(FIXTURE, "site"));
+    google = await serve(path.join(FIXTURE, "google"));
     browser = await chromium.launch();
 });
 
@@ -60,6 +63,7 @@ after(async () => {
     await browser.close();
     site.server.close();
     fixture.server.close();
+    google.server.close();
     fs.rmSync(FIXTURE, { recursive: true, force: true });
 });
 
@@ -705,5 +709,57 @@ test("la web no crea cookies: tema, ajustes, idioma y favoritos van al almacenam
     /* Solo las claves que describe la política de cookies (twins:…). */
     const keys = await page.evaluate(() => Object.keys(localStorage));
     assert.ok(keys.every((key) => /^twins:(tema|ajustes|idioma)$/.test(key)), keys.join(", "));
+    await context.close();
+});
+
+test("con Google Apps Script, los formularios envían los datos y muestran la respuesta", async () => {
+    const context = await browser.newContext();
+    const sent = [];
+    let reply = { ok: true };
+    await context.route(`${APPS_SCRIPT}**`, async (route) => {
+        sent.push({ type: route.request().headers()["content-type"], body: JSON.parse(route.request().postData()) });
+        await route.fulfill({ status: 200, contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: JSON.stringify(reply) });
+    });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("console", (msg) => msg.type() === "error" && errors.push(msg.text()));
+    await page.goto(url("index.html", google));
+    const fill = async () => {
+        await page.fill("#valoracion-localidad", "Igualada");
+        await page.selectOption("#valoracion-tipo", "casa");
+        await page.fill("#valoracion-metros", "180");
+        await page.fill("#valoracion-nombre", "Persona de Prueba");
+        await page.fill("#valoracion-telefono", "+34 600 000 000");
+        await page.fill("#valoracion-email", "cliente@example.com");
+        await page.$eval("#valoracion-privacidad", (box) => { if (!box.checked) box.click(); });
+    };
+    const status = () => page.locator("#formulario-valoracion .form-status");
+    await fill();
+    await page.waitForTimeout(3100);
+    await page.$eval("#formulario-valoracion button[type='submit']", (b) => b.click());
+    await page.waitForFunction(() => document.querySelector("#formulario-valoracion .form-status").classList.contains("form-status--success") &&
+        !document.querySelector("#formulario-valoracion button[type='submit']").disabled);
+    assert.equal(sent.length, 1);
+    /* Petición «simple» (sin consulta previa de CORS) con el JSON en el cuerpo. */
+    assert.match(sent[0].type, /^text\/plain/);
+    const body = sent[0].body;
+    assert.equal(body.formulario, "formulario-valoracion");
+    assert.equal(body.idioma, "es");
+    assert.equal(body.tipo, "casa", "los desplegables van con su valor, que el servidor valida");
+    assert.equal(body.web, "");
+    assert.equal(body.consentimiento, true);
+    assert.equal(body.pagina, "/index.html");
+    assert.ok(body.t >= 3000, `tiempo de rellenado: ${body.t}`);
+    assert.equal(await page.inputValue("#valoracion-localidad"), "", "el formulario se vacía al enviarse");
+
+    /* Si el servidor rechaza los datos, se pide revisarlos y no se borra nada. */
+    reply = { ok: false, error: "validacion", campos: ["email"] };
+    await fill();
+    await page.waitForTimeout(3100);
+    await page.$eval("#formulario-valoracion button[type='submit']", (b) => b.click());
+    await page.waitForFunction(() => document.querySelector("#formulario-valoracion .form-status").classList.contains("form-status--error"));
+    assert.match(await status().textContent(), /revise|campos/i);
+    assert.equal(await page.inputValue("#valoracion-localidad"), "Igualada");
+    assert.deepEqual(errors, []);
     await context.close();
 });

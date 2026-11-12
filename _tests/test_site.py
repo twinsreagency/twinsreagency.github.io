@@ -195,6 +195,11 @@ class ContentTest(unittest.TestCase):
             _build.form_endpoint = lambda: "https://formspree.io/f/abcdefgh"
             self.assertEqual(_build.form_action(), 'action="https://formspree.io/f/abcdefgh" method="post"')
             self.assertIn("form-action 'self' mailto: https://formspree.io", _build.csp())
+            self.assertEqual(_build.form_service(), "endpoint")
+            _build.form_endpoint = lambda: "https://script.google.com/macros/s/AKfycbx123/exec"
+            self.assertEqual(_build.form_service(), "google")
+            self.assertIn("connect-src 'self' https://script.google.com https://script.googleusercontent.com", _build.csp())
+            self.assertIn("Google Apps Script", _build.forms_privacy(_build._textos_es.C))
         finally:
             _build.form_endpoint = saved
 

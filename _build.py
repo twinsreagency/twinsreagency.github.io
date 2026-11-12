@@ -131,6 +131,9 @@ def csp(meta=True):
     Los bloques JSON-LD no son scripts ejecutables y la CSP no los bloquea."""
     endpoint = form_endpoint()
     service = f" {urlparse(endpoint).scheme}://{urlparse(endpoint).netloc}" if endpoint else ""
+    if form_service() == "google":
+        # Apps Script responde redirigiendo a script.googleusercontent.com.
+        service += " https://script.googleusercontent.com"
     rules = ["default-src 'self'", "script-src 'self'", "style-src 'self'", "img-src 'self' data:",
              "font-src 'self'", f"connect-src 'self'{service}", f"form-action 'self' mailto:{service}",
              "base-uri 'self'", "object-src 'none'",
