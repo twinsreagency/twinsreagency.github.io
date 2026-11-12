@@ -81,6 +81,9 @@ async function open(file, { width = 1280, search = "", fixture: useFixture = fal
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (msg) => {
+        /* Chromium avisa cuando aborta la animación entre páginas porque se navega otra vez
+           antes de que termine (las pruebas navegan muy rápido): no es un error de la web. */
+        if (/Transition was aborted/.test(msg.text())) return;
         if (msg.type() === "error" || (msg.type() === "warning" && /preload|Content Security Policy/i.test(msg.text()))) {
             errors.push(msg.text());
         }
@@ -655,8 +658,10 @@ test("en el móvil: botón de menú completo, zonas de toque cómodas y cristal 
 test("la casilla de consentimiento mide al menos 24 px de alto (WCAG 2.5.8)", async () => {
     for (const file of ["es-contacto.html", "index.html", "es-inmuebles.html"]) {
         const { page, close } = await open(file);
+        /* offsetHeight: el tamaño real, sin la animación de entrada (que inclina y reduce
+           un instante los bloques que aún no se han mostrado). */
         const heights = await page.evaluate(() => [...document.querySelectorAll("label.checkbox")]
-            .filter((label) => label.getClientRects().length).map((label) => label.getBoundingClientRect().height));
+            .filter((label) => label.getClientRects().length).map((label) => label.offsetHeight));
         assert.ok(heights.length > 0, file);
         assert.ok(Math.min(...heights) >= 24, `${file}: ${Math.min(...heights)} px`);
         await close();

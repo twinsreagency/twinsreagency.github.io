@@ -895,6 +895,25 @@
         apply();
     }
 
+    /* Botones con efecto imán: se acercan un poco al cursor (solo con ratón). -- */
+
+    function initMagnetic() {
+        if (REDUCED_MOTION || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+        $$(".btn--primary, .btn--orb, .gallery__btn").forEach(function (button) {
+            button.classList.add("magnetic");
+            button.addEventListener("pointermove", function (event) {
+                var box = button.getBoundingClientRect();
+                var x = (event.clientX - box.left - box.width / 2) * 0.22;
+                var y = (event.clientY - box.top - box.height / 2) * 0.32;
+                button.style.translate = Math.max(-8, Math.min(8, x)).toFixed(1) + "px " +
+                    Math.max(-6, Math.min(6, y)).toFixed(1) + "px";
+            });
+            button.addEventListener("pointerleave", function () {
+                button.style.translate = "";
+            });
+        });
+    }
+
     /* Compartir una ficha: menú del sistema (móvil) o copia del enlace ------- */
 
     function initShare() {
@@ -1271,5 +1290,6 @@
     initCounters();
     initGalleries();
     initShare();
+    initMagnetic();
     initYear();
 })();

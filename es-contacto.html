@@ -36,10 +36,11 @@
     <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/playfair-display-600-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="theme.js?v=6d60904f67"></script>
-    <link rel="stylesheet" href="styles.min.css?v=95f82d828b">
-    <script src="main.min.js?v=eb1b3a2749" defer></script>
+    <link rel="stylesheet" href="styles.min.css?v=52d4fb7dba">
+    <script src="main.min.js?v=f2b2de0046" defer></script>
 </head>
 <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
     <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
 
     <header class="site-header">
@@ -72,7 +73,7 @@
     <section class="page-hero" data-scroll="view">
         <div class="page-hero__panes" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="container">
-            <div class="obj3d obj3d--rings" aria-hidden="true"><span class="obj3d__glow"></span><span class="obj3d__core"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="ring ring--1"></span><span class="ring ring--2"></span><span class="ring ring--3"></span></div></div></div>
+            <div class="obj3d obj3d--rings" aria-hidden="true"><span class="obj3d__glow"></span><span class="obj3d__core"></span><div class="obj3d__tilt"><div class="obj3d__spin"><span class="ring ring--1"></span><span class="ring ring--2"></span><span class="ring ring--3"></span></div><span class="gem gem--1"><span class="gem__cube"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span><span class="face face--bottom"></span></span></span><span class="gem gem--2"><span class="gem__cube"><span class="face face--front"></span><span class="face face--back"></span><span class="face face--left"></span><span class="face face--right"></span><span class="face face--top"></span><span class="face face--bottom"></span></span></span></div></div>
             <nav class="breadcrumb" aria-label="Ruta de navegación">
                 <ol><li><a href="index.html">Inicio</a></li><li aria-current="page">Contacto</li></ol>
             </nav>
@@ -214,6 +215,7 @@
                 </div>
             </div>
 
+            <p class="footer-wordmark" aria-hidden="true">Twins <em>Real Estate</em></p>
             <div class="footer-bottom">
                 <p>© <span data-year>2026</span> Twins Real Estate. Todos los derechos reservados.</p>
                 <nav class="footer-legal" aria-label="Información legal">
