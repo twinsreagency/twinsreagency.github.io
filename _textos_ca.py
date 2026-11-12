@@ -227,7 +227,7 @@ C = {
 
     "index": {
         "title": "Twins Real Estate | Agència immobiliària",
-        "description": "Agència immobiliària especialitzada en compravenda, lloguer i inversió. Assessorament personalitzat, informació verificada i acompanyament fins a la signatura davant notari.",
+        "description": "Agència immobiliària especialitzada en compravenda, lloguer i inversió. Assessorament personalitzat, informació verificada i acompanyament fins a la notaria.",
         "eyebrow": "Agència immobiliària",
         "h1": "Perquè cada nova etapa mereix un lloc al qual anomenar <em>llar</em>.",
         "slogan": "Perquè cada nova etapa mereix un lloc al qual anomenar llar.",
@@ -732,7 +732,7 @@ C = {
 
     "error404": {
         "title": "Pàgina no trobada",
-        "description": "La pàgina que busqueu no existeix o ha canviat d’adreça.",
+        "description": "La pàgina que busqueu no existeix o ha canviat d’adreça. Us convidem a tornar a l’inici o a consultar la nostra cartera d’immobles.",
         "h1": "Pàgina no trobada",
         "text": "La pàgina que busqueu no existeix o ha canviat d’adreça. Us convidem a tornar a l’inici o a consultar la nostra cartera d’immobles.",
         "home": "Torna a l’inici",

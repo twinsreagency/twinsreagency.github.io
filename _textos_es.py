@@ -230,7 +230,7 @@ C = {
 
     "index": {
         "title": "Twins Real Estate | Agencia inmobiliaria",
-        "description": "Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento personalizado, información verificada y acompañamiento hasta la firma ante notario.",
+        "description": "Agencia inmobiliaria especializada en compraventa, alquiler e inversión. Asesoramiento personalizado, información verificada y acompañamiento hasta la notaría.",
         "eyebrow": "Agencia inmobiliaria",
         "h1": "Porque cada nueva etapa merece un lugar al que llamar <em>hogar</em>.",
         "slogan": "Porque cada nueva etapa merece un lugar al que llamar hogar.",
@@ -341,7 +341,7 @@ C = {
 
     "servicios": {
         "title": "Servicios inmobiliarios",
-        "description": "Compraventa, alquiler, gestión integral de alquileres, inversión, valoración de inmuebles y asesoramiento documental. Conozca los servicios de Twins Real Estate.",
+        "description": "Compraventa, alquiler, gestión integral de alquileres, inversión, valoración y asesoramiento documental. Conozca los servicios de Twins Real Estate.",
         "h1": "Servicios inmobiliarios",
         "text": "Soluciones completas para propietarios, compradores, inquilinos e inversores, con el mismo nivel de exigencia en cada gestión.",
         "list_title": "Nuestros servicios",
@@ -738,7 +738,7 @@ C = {
 
     "error404": {
         "title": "Página no encontrada",
-        "description": "La página que busca no existe o ha cambiado de dirección.",
+        "description": "La página que busca no existe o ha cambiado de dirección. Le invitamos a volver al inicio o a consultar nuestra cartera de inmuebles.",
         "h1": "Página no encontrada",
         "text": "La página que busca no existe o ha cambiado de dirección. Le invitamos a volver al inicio o a consultar nuestra cartera de inmuebles.",
         "home": "Volver al inicio",

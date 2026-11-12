@@ -228,7 +228,7 @@ C = {
 
     "index": {
         "title": "Twins Real Estate | Real estate agency",
-        "description": "Real estate agency specialising in sales, lettings and investment in Spain. Personal advice, verified information and support through to signing before a notary.",
+        "description": "Real estate agency specialising in sales, lettings and investment. Personal advice, verified information and support through to signing before a notary.",
         "eyebrow": "Real estate agency",
         "h1": "Because every new chapter deserves a place to call <em>home</em>.",
         "slogan": "Because every new chapter deserves a place to call home.",
@@ -733,7 +733,7 @@ C = {
 
     "error404": {
         "title": "Page not found",
-        "description": "The page you are looking for does not exist or has moved.",
+        "description": "The page you are looking for does not exist or has moved. Please return to the home page or browse our property portfolio.",
         "h1": "Page not found",
         "text": "The page you are looking for does not exist or has moved. Please return to the home page or browse our property portfolio.",
         "home": "Back to home",

@@ -190,6 +190,12 @@ class ContentTest(unittest.TestCase):
         long = {n: p.title for n, p in CONTENT.items() if len(p.title) > 60}
         self.assertEqual(long, {})
 
+    def test_descriptions_fit_in_search_results(self):
+        """Entre 70 y 160 caracteres: más cortas desaprovechan el resultado de búsqueda y
+        más largas aparecen cortadas."""
+        wrong = {n: len(p.description) for n, p in CONTENT.items() if not 70 <= len(p.description) <= 160}
+        self.assertEqual(wrong, {})
+
     def test_share_image_is_declared_and_exists(self):
         self.assertTrue(os.path.isfile(os.path.join(SITE_DIR, _build.OG_IMAGE)))
         for name, page in CONTENT.items():
