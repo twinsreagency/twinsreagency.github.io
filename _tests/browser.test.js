@@ -471,17 +471,25 @@ test("ninguna página se desborda horizontalmente en móvil, tableta ni escritor
 test("en escritorio el menú es una barra lateral fija; en el móvil, un cajón que se cierra al tocar fuera", async () => {
     const { page, errors, close } = await open("es-servicios.html");
     const rail = async () => page.locator(".site-header").boundingBox();
+    /* Panel flotante: un margen pequeño alrededor y toda la altura de la ventana. */
     let box = await rail();
-    assert.equal(Math.round(box.x), 0);
-    assert.equal(Math.round(box.y), 0);
-    assert.equal(Math.round(box.height), 900, "ocupa toda la altura");
-    assert.ok(box.width > 200 && box.width < 320, `ancho de la barra (${box.width})`);
-    /* El contenido empieza a la derecha de la barra y la barra no se mueve al desplazar. */
+    assert.ok(box.x > 0 && box.x < 24, `margen izquierdo (${box.x})`);
+    assert.ok(box.y > 0 && box.y < 24, `margen superior (${box.y})`);
+    assert.ok(Math.abs(box.y + box.height + box.y - 900) < 2, `toda la altura (${box.height})`);
+    assert.ok(box.width > 200 && box.width < 320, `ancho del panel (${box.width})`);
+    /* El contenido empieza a la derecha del panel y el panel no se mueve al desplazar. */
     const left = await page.evaluate(() => document.getElementById("contenido").getBoundingClientRect().left);
-    assert.ok(left >= box.width - 1, `contenido a la derecha (${left})`);
+    assert.ok(left >= box.x + box.width - 1, `contenido a la derecha (${left})`);
+    const y = box.y;
     await page.evaluate(() => window.scrollTo(0, 1500));
     box = await rail();
-    assert.equal(Math.round(box.y), 0);
+    assert.equal(box.y, y);
+    /* Abajo, la tarjeta de valoración y la fila de idiomas, ajustes y tema, todo a la vista. */
+    const promo = await page.locator(".nav__promo .nav__cta").boundingBox();
+    assert.ok(promo && promo.y + promo.height <= 900, "botón de valoración visible");
+    const row = await page.$$eval(".site-header .lang-switch, .site-header .settings-toggle, .site-header .theme-toggle",
+        (els) => els.map((el) => Math.round(el.getBoundingClientRect().bottom)));
+    assert.ok(Math.max(...row) - Math.min(...row) <= 3, `misma fila (${row.join()})`);
     /* La página actual se marca, con su icono. */
     const current = page.locator(".nav__link[aria-current='page']");
     assert.match(await current.textContent(), /Servicios/);

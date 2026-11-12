@@ -21,6 +21,8 @@ C = {
             "contacto.html": "Contacte",
         },
         "cta_nav": "Valoració gratuïta",
+        "rail_title": "Veneu el vostre habitatge?",
+        "rail_text": "Us diem quant val, gratis i sense compromís.",
         "menu_open": "Obre el menú",
         "menu_close": "Tanca el menú",
         "lang_aria": "Idioma",

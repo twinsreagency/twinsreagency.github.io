@@ -180,18 +180,24 @@
         /* En el siguiente fotograma, para no forzar un recálculo del diseño al cargar. */
         window.requestAnimationFrame(update);
 
-        /* Sobre una sección oscura (.dusk), la cápsula pasa a cristal oscuro, como en Apple.
-           La franja observada es la de la cabecera: el 8 % superior de la pantalla. */
+        /* Sobre una sección oscura (.dusk), la barra superior del móvil pasa a cristal
+           oscuro, como en Apple. La franja observada es la de la cabecera: el 8 % superior
+           de la pantalla. En escritorio el menú es un panel lateral que no cambia. */
         var darkSections = $$(".dusk, .tone__dark");
         if (darkSections.length && "IntersectionObserver" in window) {
             var under = [];
+            var desktop = window.matchMedia("(min-width: 1101px)");
+            var paint = function () {
+                header.classList.toggle("is-on-dark", under.length > 0 && !desktop.matches);
+            };
+            if (desktop.addEventListener) desktop.addEventListener("change", paint);
             var observer = new IntersectionObserver(function (entries) {
                 entries.forEach(function (entry) {
                     var index = under.indexOf(entry.target);
                     if (entry.isIntersecting && index === -1) under.push(entry.target);
                     if (!entry.isIntersecting && index !== -1) under.splice(index, 1);
                 });
-                header.classList.toggle("is-on-dark", under.length > 0);
+                paint();
             }, { rootMargin: "0px 0px -92% 0px" });
             darkSections.forEach(function (section) {
                 observer.observe(section);
@@ -941,7 +947,7 @@
                     else link.removeAttribute("aria-current");
                 });
                 if (now) now.textContent = ("0" + (index + 1)).slice(-2);
-                nav.classList.toggle("is-on-dark", entry.target.classList.contains("dusk"));
+                nav.classList.toggle("is-on-dark", entry.target.getAttribute("data-screen-tone") === "dark");
             });
         }, { rootMargin: "-50% 0px -50% 0px" });
         screens.forEach(function (screen) {
