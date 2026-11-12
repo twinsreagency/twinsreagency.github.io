@@ -316,12 +316,14 @@ class ContentTest(unittest.TestCase):
                 self.assertTrue(any(l.endswith(link) for l in page.links), f"{name}: {link}")
 
     def test_home_pages_describe_the_agency_and_the_website(self):
-        """Cada portada declara la agencia (RealEstateAgent) y el sitio (WebSite), enlazados."""
+        """Cada portada declara la agencia (RealEstateAgent), el sitio (WebSite), enlazados, y
+        sus preguntas frecuentes (FAQPage)."""
         for lang in _build.LANGS:
             page = PAGES[_build.filename(lang, "index.html")]
             graph = [node for block in page.json_ld for node in json.loads(block).get("@graph", [])]
             types = {node["@type"]: node for node in graph}
-            self.assertEqual(set(types), {"RealEstateAgent", "WebSite"}, lang["lang"])
+            self.assertEqual(set(types), {"RealEstateAgent", "WebSite", "FAQPage"}, lang["lang"])
+            self.assertEqual(len(types["FAQPage"]["mainEntity"]), len(lang["owners"]["faq"]))
             self.assertEqual(types["WebSite"]["publisher"]["@id"], types["RealEstateAgent"]["@id"])
             self.assertEqual(types["WebSite"]["url"], page.canonical)
 

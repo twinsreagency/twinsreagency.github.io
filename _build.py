@@ -1814,8 +1814,8 @@ def zones_section(ctx):
                         </a>
                     </li>""" for slug, town in TOWNS.items())
     return f"""
-        <section class="section section--alt zones" aria-labelledby="zonas-title">
-            <div class="container">{section_header(O['zones_eyebrow'], O['zones_title'], 'zonas-title', O['zones_lead'])}
+        <section class="section section--alt zones" aria-labelledby="donde-trabajamos-title">
+            <div class="container">{section_header(O['zones_eyebrow'], O['zones_title'], 'donde-trabajamos-title', O['zones_lead'])}
                 <ul class="zones__grid">{cards}
                 </ul>
             </div>

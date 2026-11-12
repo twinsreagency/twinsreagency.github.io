@@ -184,11 +184,21 @@ test("sin inmuebles publicados, la web invita a crear una alerta y a vender", as
     await close();
 });
 
-test("sin inmuebles, la portada ofrece un camino a propietarios y otro a compradores", async () => {
-    const { page, close } = await open("index.html");
-    const links = await page.locator(".paths .feature__more a").evaluateAll((a) => a.map((x) => x.getAttribute("href")));
-    assert.deepEqual(links, ["#valoracion", "es-inmuebles.html#alerta"]);
-    assert.equal(await page.getAttribute(".hero3d__actions a.btn--primary", "href"), "#valoracion");
+test("la valoración rápida de la portada rellena el formulario completo y lleva a él", async () => {
+    const { page, errors, close } = await open("index.html");
+    await page.fill("#rapida-localidad", "Òdena");
+    await page.selectOption("#rapida-tipo", "casa");
+    await page.click("#valoracion-rapida button[type='submit']");
+    await page.waitForFunction(() => document.activeElement && document.activeElement.id === "valoracion-metros");
+    assert.equal(await page.inputValue("#valoracion-localidad"), "Òdena");
+    assert.equal(await page.inputValue("#valoracion-tipo"), "casa");
+    const top = await page.evaluate(() => document.getElementById("valoracion").getBoundingClientRect().top);
+    assert.ok(Math.abs(top) < 200, `la sección de valoración queda a la vista (${top})`);
+    /* El tipo también llega por la URL (enlaces de otras páginas). */
+    await page.goto(url("index.html?tipo=piso&localidad=Igualada"));
+    assert.equal(await page.inputValue("#valoracion-tipo"), "piso");
+    assert.equal(await page.inputValue("#valoracion-localidad"), "Igualada");
+    assert.deepEqual(errors, []);
     await close();
 });
 
@@ -456,45 +466,16 @@ test("ninguna página se desborda horizontalmente en móvil, tableta ni escritor
     }
 });
 
-test("la escena de la villa avanza por los pasos al desplazarse y es estática sin animaciones", async () => {
-    const { page, errors, close } = await open("index.html");
-    const scene = page.locator(".villa-scene");
-    assert.equal(await page.locator(".villa .vb").count(), 7);
-    assert.equal(await scene.locator(".vstep").count(), 4);
-    for (const [fraction, step] of [[0.1, "0"], [0.6, "2"], [0.95, "3"]]) {
-        await page.evaluate((f) => {
-            const s = document.querySelector(".villa-scene");
-            window.scrollTo(0, s.offsetTop + (s.offsetHeight - window.innerHeight) * f);
-        }, fraction);
-        await page.waitForFunction((expected) => document.querySelector(".villa-scene").getAttribute("data-active") === expected, step);
-    }
-    /* Solo el paso activo muestra su texto. */
-    await scene.locator(".vstep:nth-child(4) .vstep__text").waitFor({ state: "visible", timeout: 3000 });
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".vstep:nth-child(1) .vstep__text")).opacity), "0");
-    assert.deepEqual(errors, []);
-    await close();
-
-    /* Con «reducir movimiento», la sección es normal y se leen los cuatro pasos. */
-    const context = await browser.newContext({ reducedMotion: "reduce" });
-    const still = await context.newPage();
-    await still.goto(url("index.html"));
-    const height = await still.evaluate(() => document.querySelector(".villa-scene").offsetHeight / window.innerHeight);
-    assert.ok(height < 2, `la sección no debe alargarse (mide ${height.toFixed(1)} pantallas)`);
-    for (let i = 1; i <= 4; i++) {
-        assert.equal(await still.locator(`.vstep:nth-child(${i}) .vstep__text`).isVisible(), true);
-    }
-    await context.close();
-});
-
 test("la cabecera flota como cápsula al desplazar y se oscurece sobre la sección oscura", async () => {
     const { page, errors, close } = await open("index.html");
     const header = page.locator(".site-header");
     await page.evaluate(() => window.scrollTo(0, 300));
     await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-scrolled"));
     assert.equal(await header.evaluate((h) => h.classList.contains("is-on-dark")), false);
+    /* La galería del blog es una sección oscura (azul marino). */
     await page.evaluate(() => {
-        const s = document.querySelector(".villa-scene");
-        window.scrollTo(0, s.offsetTop + window.innerHeight);
+        const s = document.querySelector(".gallery.dusk");
+        window.scrollTo(0, s.offsetTop + 120);
     });
     await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-on-dark"));
     /* El menú del móvil sigue ocupando toda la pantalla aunque la cabecera sea una cápsula. */
@@ -502,26 +483,6 @@ test("la cabecera flota como cápsula al desplazar y se oscurece sobre la secci�
     await page.click(".nav-toggle");
     const nav = await page.locator("#menu-principal").boundingBox();
     assert.equal(Math.round(nav.width), 390);
-    assert.deepEqual(errors, []);
-    await close();
-});
-
-test("los paneles de servicios se expanden con el cursor y el foco", async () => {
-    const { page, errors, close } = await open("index.html");
-    const panels = page.locator(".panel");
-    assert.equal(await panels.count(), 4);
-    await page.locator(".panels").scrollIntoViewIfNeeded();
-    const width = (i) => panels.nth(i).evaluate((el) => el.getBoundingClientRect().width);
-    await page.waitForTimeout(1200);
-    assert.ok(await width(0) > await width(1) * 1.5, "sin cursor, el primer panel está abierto");
-    await panels.nth(2).hover();
-    await page.waitForTimeout(1200);
-    assert.ok(await width(2) > await width(0) * 1.5, "el panel con el cursor se abre");
-    /* Con el teclado: el enlace del cuarto panel lo abre. */
-    await page.mouse.move(5, 5);
-    await panels.nth(3).locator("a").focus();
-    await page.waitForTimeout(1200);
-    assert.ok(await width(3) > await width(0) * 1.5, "el panel con el foco se abre");
     assert.deepEqual(errors, []);
     await close();
 });
@@ -579,11 +540,11 @@ test("los ajustes cambian el texto, el contraste y el movimiento, y se recuerdan
     assert.equal(await panel.isVisible(), false);
     assert.equal(await page.evaluate(() => document.activeElement.classList.contains("settings-toggle")), true);
 
-    /* Se aplican antes de pintar en la siguiente página; con movimiento reducido la villa es estática. */
+    /* Se aplican antes de pintar en la siguiente página; con movimiento reducido el 3D no se mueve. */
     await page.goto(url("index.html"));
     assert.deepEqual(await attrs(), ["xl", "more", "reduced"]);
-    const screens = await page.evaluate(() => document.querySelector(".villa-scene").offsetHeight / window.innerHeight);
-    assert.ok(screens < 2, `la escena no debe alargarse (${screens.toFixed(1)} pantallas)`);
+    const duration = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector(".gem__cube")).animationDuration));
+    assert.ok(duration < 0.01, `animación detenida (${duration}s)`);
 
     /* «Restablecer» vuelve a los valores de fábrica. */
     await page.click(".settings-toggle");
@@ -666,18 +627,6 @@ test("la casilla de consentimiento mide al menos 24 px de alto (WCAG 2.5.8)", as
         assert.ok(Math.min(...heights) >= 24, `${file}: ${Math.min(...heights)} px`);
         await close();
     }
-});
-
-test("con «Más contraste», la frase de la portada se ve entera desde el principio", async () => {
-    const { page, close } = await open("index.html");
-    const faintest = () => page.evaluate(() => Math.min(...[...document.querySelectorAll(".statement__text .w")]
-        .map((w) => Number(getComputedStyle(w).opacity))));
-    assert.ok(await faintest() < 1, "sin el ajuste, las palabras se iluminan al desplazar");
-    await page.click(".settings-toggle");
-    await page.click("label[for='ajuste-contraste-more']");
-    await page.waitForFunction(() => [...document.querySelectorAll(".statement__text .w")]
-        .every((w) => getComputedStyle(w).opacity === "1"));
-    await close();
 });
 
 test("el manifiesto se carga sin errores y declara los iconos de 192 y 512 px", async () => {
@@ -848,5 +797,36 @@ test("el listado filtra por superficie y se ordena por precio, con todo en la UR
     assert.doesNotMatch(page.url(), /orden=/);
     /* Las tarjetas enlazan a su ficha. */
     assert.equal(await page.getAttribute(".property[data-ref='TRE-004'] .property__title a", "href"), "es-inmueble-tre-004.html");
+    await close();
+});
+
+test("la calculadora de hipoteca calcula la cuota al escribir", async () => {
+    const { page, errors, close } = await open("index.html");
+    const value = (name) => page.textContent(`[data-calc='${name}']`);
+    /* 250.000 €, 20 % de entrada, 3 % a 30 años: 200.000 € a 843 €/mes. */
+    assert.match(await value("cuota"), /843/);
+    assert.match(await value("prestamo"), /200\.000/);
+    await page.fill("#calc-interes", "0");
+    assert.match(await value("cuota"), /556/, "sin intereses, 200.000 / 360 meses");
+    assert.match(await value("intereses"), /^0/);
+    await page.fill("#calc-plazo", "99");
+    assert.equal((await value("cuota")).trim(), "—", "un plazo fuera de rango no se calcula");
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("las zonas enlazan a su página y las preguntas frecuentes se despliegan", async () => {
+    const { page, errors, close } = await open("index.html");
+    const zones = await page.$$eval(".zones .zone", (a) => a.map((x) => x.getAttribute("href")));
+    assert.ok(zones.length >= 4);
+    assert.ok(zones.includes("es-inmobiliaria-igualada.html"), zones.join());
+    const first = page.locator(".faq__item").first();
+    assert.equal(await first.getAttribute("open"), null);
+    await first.locator("summary").click();
+    assert.equal(await first.getAttribute("open"), "");
+    assert.ok(await first.locator(".faq__answer").isVisible());
+    await page.goto(url(zones[0]));
+    assert.match(await page.textContent("h1"), /Igualada/);
+    assert.deepEqual(errors, []);
     await close();
 });
