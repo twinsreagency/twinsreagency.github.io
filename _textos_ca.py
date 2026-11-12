@@ -20,7 +20,7 @@ C = {
             "blog.html": "Blog",
             "contacto.html": "Contacte",
         },
-        "cta_nav": "Demaneu cita",
+        "cta_nav": "Valoració gratuïta",
         "menu_open": "Obre el menú",
         "menu_close": "Tanca el menú",
         "lang_aria": "Idioma",
@@ -43,8 +43,13 @@ C = {
         "back_top": "Torna a l’inici de la pàgina",
         "breadcrumb_aria": "Ruta de navegació",
         "home": "Inici",
-        "cta_primary": "Demaneu una cita",
+        "cta_primary": "Demaneu una valoració gratuïta",
         "cta_mail": "Escriviu-nos per correu",
+        "phone": "Telèfon",
+        "whatsapp": "WhatsApp",
+        "whatsapp_link": "Escriviu-nos per WhatsApp",
+        "whatsapp_hello": "Hola, us escric des del web de Twins Real Estate.",
+        "whatsapp_ref": "Hola, m’interessa l’immoble {ref}.",
         "more_info": "Més informació",
         "about": "sobre",
         "read_article": "Llegiu l’article",
@@ -628,6 +633,8 @@ C = {
     "privacy_forms": {
         "mail": '<p><strong>Com s’envien els formularis.</strong> En enviar un formulari s’obre el vostre programa de correu electrònic amb el missatge preparat, que només s’envia si vós ho confirmeu. El web no desa ni transmet per si mateix les dades dels formularis.</p>',
         "endpoint": '<p><strong>Com s’envien els formularis.</strong> Les dades dels formularis s’envien de manera xifrada al servei Formspree (Formspree, Inc., EUA), que les reenvia al nostre correu electrònic i actua com a encarregat del tractament.</p>',
+        "google": '<p><strong>Com s’envien els formularis.</strong> Les dades dels formularis s’envien de manera xifrada a un servei propi allotjat a Google (Google Apps Script), que les desa en un full de càlcul del nostre compte de Google, ens n’avisa per correu electrònic i us envia un correu de confirmació. Google actua com a encarregat del tractament. Les consultes s’eliminen automàticament al cap d’un any, llevat que s’hagi iniciat una relació contractual.</p>',
+        "whatsapp": '<p><strong>WhatsApp.</strong> Si ens escriviu per WhatsApp, la conversa es tracta a través d’aquest servei (WhatsApp Ireland Ltd., grup Meta), subjecte a les seves pròpies condicions i política de privacitat. Només farem servir les vostres dades per atendre la vostra consulta.</p>',
     },
 
     "owner": {

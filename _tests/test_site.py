@@ -198,6 +198,40 @@ class ContentTest(unittest.TestCase):
         finally:
             _build.form_endpoint = saved
 
+    def test_single_main_call_to_action(self):
+        """La acción principal es la misma en toda la web: la valoración gratuita."""
+        for name in CONTENT:
+            with open(os.path.join(SITE_DIR, name), encoding="utf-8") as fh:
+                text = fh.read()
+            header = re.findall(r'class="btn btn--primary nav__cta" href="([^"]+)"', text)
+            self.assertEqual(len(header), 1, name)
+            self.assertTrue(header[0].endswith("index.html#valoracion") or header[0] == "#valoracion"
+                            or header[0].endswith(("-inici.html#valoracion", "-home.html#valoracion")), f"{name}: {header[0]}")
+            closing = re.search(r'<section class="cta".*?</section>', text, re.S)
+            if closing:
+                self.assertRegex(closing.group(0), r'class="btn btn--primary" href="[^"]*#valoracion"', name)
+
+    def test_phone_and_whatsapp_appear_only_when_configured(self):
+        L = _build._textos_es.C
+        ctx = _build.Ctx(L, "contacto.html")
+        self.assertEqual(_build.phone_items(ctx) + _build.contact_phone_cards(ctx), "")
+        for name in CONTENT:
+            with open(os.path.join(SITE_DIR, name), encoding="utf-8") as fh:
+                self.assertNotRegex(fh.read(), r'href="(tel:|https://wa\.me)', name)
+        saved = (_build.PHONE, _build.WHATSAPP)
+        try:
+            _build.PHONE = _build.WHATSAPP = "+34 600 11 22 33"
+            footer = _build.phone_items(ctx)
+            self.assertIn('href="tel:+34600112233"', footer)
+            self.assertIn("https://wa.me/34600112233?text=Hola%2C", footer)
+            self.assertIn('rel="noopener noreferrer"', footer)
+            self.assertIn("WhatsApp Ireland", _build.forms_privacy(L))
+            _build.PHONE = "600 11 22 33"
+            with self.assertRaises(SystemExit):
+                _build.phone_items(ctx)
+        finally:
+            _build.PHONE, _build.WHATSAPP = saved
+
     def test_titles_fit_in_search_results(self):
         long = {n: p.title for n, p in CONTENT.items() if len(p.title) > 60}
         self.assertEqual(long, {})

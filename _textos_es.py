@@ -20,7 +20,7 @@ C = {
             "blog.html": "Blog",
             "contacto.html": "Contacto",
         },
-        "cta_nav": "Solicitar cita",
+        "cta_nav": "Valoración gratuita",
         "menu_open": "Abrir menú",
         "menu_close": "Cerrar menú",
         "lang_aria": "Idioma",
@@ -43,8 +43,13 @@ C = {
         "back_top": "Volver al inicio de la página",
         "breadcrumb_aria": "Ruta de navegación",
         "home": "Inicio",
-        "cta_primary": "Solicitar una cita",
+        "cta_primary": "Solicitar valoración gratuita",
         "cta_mail": "Escríbanos por correo",
+        "phone": "Teléfono",
+        "whatsapp": "WhatsApp",
+        "whatsapp_link": "Escríbanos por WhatsApp",
+        "whatsapp_hello": "Hola, les escribo desde la web de Twins Real Estate.",
+        "whatsapp_ref": "Hola, me interesa el inmueble {ref}.",
         "more_info": "Más información",
         "about": "sobre",
         "read_article": "Leer artículo",
@@ -634,6 +639,8 @@ C = {
     "privacy_forms": {
         "mail": '<p><strong>Cómo se envían los formularios.</strong> Al enviar un formulario se abre su programa de correo electrónico con el mensaje preparado, que solo se envía si usted lo confirma. La web no guarda ni transmite por sí misma los datos de los formularios.</p>',
         "endpoint": '<p><strong>Cómo se envían los formularios.</strong> Los datos de los formularios se envían de forma cifrada al servicio Formspree (Formspree, Inc., EE. UU.), que los reenvía a nuestro correo electrónico y actúa como encargado del tratamiento.</p>',
+        "google": '<p><strong>Cómo se envían los formularios.</strong> Los datos de los formularios se envían de forma cifrada a un servicio propio alojado en Google (Google Apps Script), que los guarda en una hoja de cálculo de nuestra cuenta de Google, nos avisa por correo electrónico y le envía a usted un correo de confirmación. Google actúa como encargado del tratamiento. Las consultas se eliminan automáticamente al cabo de un año, salvo que se haya iniciado una relación contractual.</p>',
+        "whatsapp": '<p><strong>WhatsApp.</strong> Si nos escribe por WhatsApp, la conversación se trata a través de ese servicio (WhatsApp Ireland Ltd., grupo Meta), sujeto a sus propias condiciones y política de privacidad. Solo usaremos sus datos para atender su consulta.</p>',
     },
 
     "owner": {

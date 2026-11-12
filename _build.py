@@ -21,7 +21,7 @@ import json
 import os
 import re
 import sys
-from urllib.parse import urlencode, urlparse
+from urllib.parse import quote, urlencode, urlparse
 
 sys.dont_write_bytecode = True  # no crear la carpeta __pycache__ en el sitio
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -68,6 +68,14 @@ POSTAL_CODE = "08700"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
+# Teléfono y WhatsApp, con prefijo internacional (p. ej. "+34 600 00 00 00"). Mientras
+# estén vacíos no se muestran en ninguna parte. Con un número aparecen en el pie, en
+# «Contacto», en los datos para buscadores y, el WhatsApp, en cada ficha de inmueble
+# (con su referencia escrita en el mensaje). La política de privacidad añade entonces
+# el párrafo sobre WhatsApp.
+PHONE = ""
+WHATSAPP = ""
+
 
 
 # Caducidad de /.well-known/security.txt (RFC 9116 recomienda menos de un año).
@@ -87,6 +95,23 @@ def form_endpoint():
     if endpoint and urlparse(endpoint).scheme != "https":
         raise SystemExit("CONFIG.endpoint debe ser una dirección https://")
     return endpoint
+
+def phone_number(value, name):
+    """Número validado («+34 600 00 00 00»), solo cifras y espacios tras el prefijo."""
+    if value and not re.fullmatch(r"\+\d{1,3}( ?\d){6,14}", value):
+        raise SystemExit(f"{name} debe tener prefijo internacional, p. ej. «+34 600 00 00 00»: «{value}»")
+    return value
+
+
+def tel_href(number):
+    return "tel:" + re.sub(r"[^\d+]", "", number)
+
+
+def whatsapp_href(text=""):
+    """Enlace de WhatsApp (wa.me) con el mensaje ya escrito; abre la app o WhatsApp Web."""
+    digits = re.sub(r"\D", "", WHATSAPP)
+    return f"https://wa.me/{digits}" + (f"?text={quote(text)}" if text else "")
+
 
 def form_action():
     """Destino de los formularios sin JavaScript: el servicio de formularios por HTTPS si
@@ -123,6 +148,15 @@ def csp(meta=True):
 # Iconos (trazo, 24x24, heredan el color del texto)
 # --------------------------------------------------------------------------
 ICONS = {
+    "phone": '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
+    "message": '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+    "share": '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.6M8.2 13.2l7.6 4.6"/>',
+    "link": '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    "play": '<circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/>',
+    "cube": '<path d="M12 3 4 7.5v9L12 21l8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>',
+    "plan": '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 11h8V4M11 15v5M15 11h6"/>',
+    "leaf": '<path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15z"/><path d="M5 19 13 11"/>',
+    "star": '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
     "home": '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
     "building": '<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/>',
     "penthouse": '<path d="M4 21V8l8-5 8 5v13"/><path d="M4 12h16"/><path d="M9 16h2M13 16h2"/><path d="M9 21v-2h6v2"/>',
@@ -521,7 +555,7 @@ def site_header(ctx, active):
                     {links}
                 </ul>
                 {lang_switch(ctx)}
-                <a class="btn btn--primary nav__cta" href="{ctx.page('contacto.html')}?asunto=visita#formulario">{ui['cta_nav']}</a>
+                <a class="btn btn--primary nav__cta" href="{valuation_link(ctx)}">{ui['cta_nav']}</a>
             </nav>
             <button class="settings-toggle" type="button" aria-label="{esc(ui['settings']['open'])}" title="{esc(ui['settings']['open'])}" aria-expanded="false" aria-controls="ajustes" hidden>{icon('sliders')}</button>
             <button class="theme-toggle" type="button" aria-label="{esc(ui['theme_to_dark'])}" data-label-light="{esc(ui['theme_to_light'])}" data-label-dark="{esc(ui['theme_to_dark'])}">{icon('sun', 'icon-sun')}{icon('moon', 'icon-moon')}</button>
@@ -586,6 +620,17 @@ def settings_panel(ctx):
 """
 
 
+def phone_items(ctx):
+    """Teléfono y WhatsApp del pie (vacío si no hay número)."""
+    ui, out = ctx.L["ui"], []
+    if phone_number(PHONE, "PHONE"):
+        out.append(f'\n                        <li>{icon("phone")}<a href="{tel_href(PHONE)}">{PHONE}</a></li>')
+    if phone_number(WHATSAPP, "WHATSAPP"):
+        out.append(f'\n                        <li>{icon("message")}<a href="{esc(whatsapp_href(ui["whatsapp_hello"]))}" '
+                   f'target="_blank" rel="noopener noreferrer">{ui["whatsapp_link"]}<span class="visually-hidden"> {ui["new_tab"]}</span></a></li>')
+    return "".join(out)
+
+
 def site_footer(ctx):
     L, ui = ctx.L, ctx.L["ui"]
     nav_links = "".join(f'\n                        <li><a href="{ctx.page(n)}">{ui["nav"][n]}</a></li>' for n in PAGES)
@@ -618,6 +663,7 @@ def site_footer(ctx):
                 <div>
                     <h2 class="footer-title">{ui['footer_contact_title']}</h2>
                     <ul class="footer-contact">
+{phone_items(ctx)}
                         <li>{icon('mail')}<a href="mailto:{EMAIL}">{EMAIL}</a></li>
                         <li>{icon('instagram')}<a href="{INSTAGRAM_URL}" target="_blank" rel="noopener noreferrer">{INSTAGRAM_HANDLE}<span class="visually-hidden"> {ui['new_tab']}</span></a></li>
                         <li>{icon('clock')}<span>{ui['hours_html']}</span></li>
@@ -672,6 +718,8 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
 
 
 def cta(ctx, title, text, secondary=None):
+    """Cierre de página. Su botón principal es la acción única de la web, la misma de la
+    cabecera: la valoración gratuita (formulario de la portada)."""
     ui = ctx.L["ui"]
     secondary = secondary or (f"mailto:{EMAIL}", ui["cta_mail"])
     return f"""
@@ -681,7 +729,7 @@ def cta(ctx, title, text, secondary=None):
                 <h2 class="cta__title" id="cta-title">{title}</h2>
                 <p class="cta__text">{text}</p>
                 <div class="cta__actions">
-                    <a class="btn btn--primary" href="{ctx.page('contacto.html')}?asunto=visita#formulario">{ui['cta_primary']} {ARROW}</a>
+                    <a class="btn btn--primary" href="{valuation_link(ctx)}">{ui['cta_primary']} {ARROW}</a>
                     <a class="btn btn--outline-light" href="{secondary[0]}">{secondary[1]}</a>
                 </div>
             </div>
@@ -1279,6 +1327,7 @@ def build_index(L):
         "name": "Twins Real Estate",
         "slogan": T["slogan"],
         "email": EMAIL,
+        **({"telephone": PHONE} if PHONE else {}),
         "sameAs": [INSTAGRAM_URL],
         **({"url": url("index.html"), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
         "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "postalCode": POSTAL_CODE,
@@ -1688,6 +1737,30 @@ def build_towns(L):
         write(ctx, f(T["title"]), f(T["description"]), "", body, extra_head=ld)
 
 
+def contact_phone_cards(ctx):
+    """Tarjetas de teléfono y WhatsApp de «Contacto» (vacío si no hay número)."""
+    ui, out = ctx.L["ui"], []
+    if phone_number(PHONE, "PHONE"):
+        out.append(f"""
+                    <div class="card contact-item">
+                        <div class="feature__icon">{icon('phone')}</div>
+                        <div>
+                            <h2>{ui['phone']}</h2>
+                            <a href="{tel_href(PHONE)}">{PHONE}</a>
+                        </div>
+                    </div>""")
+    if phone_number(WHATSAPP, "WHATSAPP"):
+        out.append(f"""
+                    <div class="card contact-item">
+                        <div class="feature__icon">{icon('message')}</div>
+                        <div>
+                            <h2>{ui['whatsapp']}</h2>
+                            <a href="{esc(whatsapp_href(ui['whatsapp_hello']))}" target="_blank" rel="noopener noreferrer">{ui['whatsapp_link']}<span class="visually-hidden"> {ui['new_tab']}</span></a>
+                        </div>
+                    </div>""")
+    return "".join(out)
+
+
 def build_contact(L):
     ctx = Ctx(L, "contacto.html")
     T, ui = L["contacto"], L["ui"]
@@ -1707,7 +1780,7 @@ def build_contact(L):
     body = page_hero(ctx, T["h1"], T["text"], [(ui["nav"]["contacto.html"], "contacto.html")]) + f"""
         <section class="section" aria-label="{esc(T['section_aria'])}">
             <div class="container contact-grid">
-                <div class="contact-info reveal">
+                <div class="contact-info reveal">{contact_phone_cards(ctx)}
                     <div class="card contact-item">
                         <div class="feature__icon">{icon('mail')}</div>
                         <div>
@@ -1807,11 +1880,26 @@ def owner_table(L):
     return '<div class="table-scroll">\n<table>\n<tbody>\n' + "\n".join(rows) + "\n</tbody>\n</table>\n</div>"
 
 
+def form_service():
+    """Cómo llegan los formularios: «google» (Google Apps Script, ver _backend/), «endpoint»
+    (otro servicio, p. ej. Formspree) o «mail» (programa de correo del visitante)."""
+    endpoint = form_endpoint()
+    if not endpoint:
+        return "mail"
+    return "google" if urlparse(endpoint).netloc == "script.google.com" else "endpoint"
+
+
+def forms_privacy(L):
+    """Párrafo de la política de privacidad sobre los formularios (y WhatsApp, si lo hay)."""
+    text = L["privacy_forms"][form_service()]
+    return text + (L["privacy_forms"]["whatsapp"] if WHATSAPP else "")
+
+
 def build_legal(L):
     ui = L["ui"]
     for filename, page in L["legal"].items():
         ctx = Ctx(L, filename)
-        forms = L["privacy_forms"]["endpoint" if form_endpoint() else "mail"]
+        forms = forms_privacy(L)
         content = resolve(ctx, page["body"].replace("%%OWNER%%", owner_table(L)).replace("%%FORMS%%", forms))
         # Las tablas con desplazamiento horizontal deben poder desplazarse con el teclado.
         content = content.replace('<div class="table-scroll">', '<div class="table-scroll" tabindex="0">')

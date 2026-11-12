@@ -21,7 +21,7 @@ C = {
             "blog.html": "Blog",
             "contacto.html": "Contact",
         },
-        "cta_nav": "Book a meeting",
+        "cta_nav": "Free valuation",
         "menu_open": "Open menu",
         "menu_close": "Close menu",
         "lang_aria": "Language",
@@ -44,8 +44,13 @@ C = {
         "back_top": "Back to top",
         "breadcrumb_aria": "Breadcrumb",
         "home": "Home",
-        "cta_primary": "Book a meeting",
+        "cta_primary": "Request a free valuation",
         "cta_mail": "Email us",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "whatsapp_link": "Message us on WhatsApp",
+        "whatsapp_hello": "Hello, I am writing from the Twins Real Estate website.",
+        "whatsapp_ref": "Hello, I am interested in property {ref}.",
         "more_info": "Learn more",
         "about": "about",
         "read_article": "Read article",
@@ -629,6 +634,8 @@ C = {
     "privacy_forms": {
         "mail": '<p><strong>How the forms are sent.</strong> When you submit a form, your email application opens with the message ready, and it is only sent if you confirm it. The website itself does not store or transmit the data entered in the forms.</p>',
         "endpoint": '<p><strong>How the forms are sent.</strong> Form data is sent in encrypted form to the Formspree service (Formspree, Inc., USA), which forwards it to our email address and acts as a data processor.</p>',
+        "google": '<p><strong>How the forms are sent.</strong> Form data is sent in encrypted form to our own service hosted by Google (Google Apps Script), which stores it in a spreadsheet in our Google account, notifies us by email and sends you a confirmation email. Google acts as a data processor. Enquiries are deleted automatically after one year unless a contractual relationship has begun.</p>',
+        "whatsapp": '<p><strong>WhatsApp.</strong> If you message us on WhatsApp, the conversation is handled through that service (WhatsApp Ireland Ltd., Meta group), subject to its own terms and privacy policy. We will only use your data to deal with your enquiry.</p>',
     },
 
     "owner": {
