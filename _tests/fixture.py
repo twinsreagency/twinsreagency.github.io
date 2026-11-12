@@ -13,7 +13,8 @@ SITE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOWNS = {"igualada": "Igualada", "montbui": "Santa Margarida de Montbui"}
 
 PROPERTIES = [
-    dict(ref="TRE-001", op="venta", type="casa", zone="igualada", price=485000, beds=4, baths=3, area=320, icon="home"),
+    dict(ref="TRE-001", op="venta", type="casa", zone="igualada", price=485000, beds=4, baths=3, area=320, icon="home",
+         energy="D", year=2004, extras=["terraza", "parking", "piscina", "jardin"]),
     dict(ref="TRE-002", op="venta", type="atico", zone="igualada", price=320000, beds=3, baths=2, area=180, icon="penthouse"),
     dict(ref="TRE-003", op="alquiler", type="piso", zone="montbui", price=1350, beds=2, baths=2, area=95, icon="building"),
     dict(ref="TRE-004", op="venta", type="casa", zone="montbui", price=1200000, beds=5, baths=4, area=550, icon="villa"),
@@ -33,6 +34,7 @@ def main(target):
     for lang in _build.LANGS:
         for p in PROPERTIES:
             lang["properties"][p["ref"]] = (f"Inmueble de prueba {p['ref']}", TOWNS[p["zone"]], None)
+        lang["property_descriptions"]["TRE-001"] = ["Descripción de prueba del inmueble TRE-001."]
     with open(os.devnull, "w") as quiet:
         stdout, sys.stdout = sys.stdout, quiet
         try:

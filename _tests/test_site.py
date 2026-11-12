@@ -337,6 +337,54 @@ class FormsTest(unittest.TestCase):
         self.assertEqual(found, {"formulario-valoracion", "formulario-alerta", "formulario-contacto"})
 
 
+class ListingTest(unittest.TestCase):
+    """Fichas de inmueble, con la cartera de prueba de _tests/fixture.py (la real puede estar vacía)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.dir = os.path.join(cls.tmp.name, "site")
+        subprocess.run([sys.executable, os.path.join(SITE_DIR, "_tests", "fixture.py"), cls.dir], check=True,
+                       env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def page(self, name):
+        with open(os.path.join(self.dir, name), encoding="utf-8") as fh:
+            return Page(fh.read())
+
+    def test_every_property_has_a_page_in_each_language(self):
+        for name in ("es-inmueble-tre-001.html", "ca-immoble-tre-001.html", "en-property-tre-001.html",
+                     "es-inmueble-tre-004.html"):
+            self.assertTrue(os.path.isfile(os.path.join(self.dir, name)), name)
+        with open(os.path.join(self.dir, "sitemap.xml"), encoding="utf-8") as fh:
+            self.assertIn(f"{_build.SITE_URL}/en-property-tre-003.html", fh.read())
+
+    def test_listing_data_and_links(self):
+        page = self.page("es-inmueble-tre-001.html")
+        self.assertEqual(page.h1, 1)
+        self.assertIn("Inmueble de prueba TRE-001", page.title)
+        listing = [d for d in map(json.loads, page.json_ld) if d.get("@type") == "RealEstateListing"]
+        self.assertEqual(len(listing), 1)
+        self.assertEqual(listing[0]["offers"]["price"], 485000)
+        self.assertEqual(listing[0]["about"]["@type"], "House")
+        self.assertIn("es-contacto.html?ref=TRE-001&asunto=visita#formulario", page.links)
+        for link in page.links:
+            target = local_target(link)
+            if target and target[0]:
+                self.assertTrue(os.path.isfile(os.path.join(self.dir, target[0])), link)
+        listing_page = self.page("es-inmuebles.html")
+        self.assertIn("es-inmueble-tre-001.html", listing_page.links)
+
+    def test_energy_certificate_is_always_shown(self):
+        with open(os.path.join(self.dir, "es-inmueble-tre-001.html"), encoding="utf-8") as fh:
+            self.assertIn("Calificación: D", fh.read())
+        with open(os.path.join(self.dir, "es-inmueble-tre-002.html"), encoding="utf-8") as fh:
+            self.assertIn("Certificado en trámite", fh.read())
+
+
 class SeoFilesTest(unittest.TestCase):
     def test_sitemap_lists_every_indexable_page(self):
         with open(os.path.join(SITE_DIR, "sitemap.xml"), encoding="utf-8") as fh:

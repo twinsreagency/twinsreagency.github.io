@@ -336,6 +336,28 @@ test("el formulario se rellena con la referencia del inmueble solo si es válida
     await close();
 });
 
+test("la ficha de un inmueble: datos, visita con la referencia y compartir, sin desbordes", async () => {
+    for (const width of [320, 768, 1280]) {
+        const { page, errors, close } = await open("es-inmueble-tre-001.html", { width, fixture: true });
+        await page.waitForLoadState("load");
+        assert.deepEqual(errors, []);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width, `desborde a ${width} px`);
+        assert.equal(await page.locator(".energy__step.is-current").textContent(), "D");
+        await close();
+    }
+    const { page, close } = await open("es-inmueble-tre-001.html", { fixture: true });
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.evaluate(() => { Object.defineProperty(navigator, "share", { value: undefined }); });
+    await page.click(".listing__share");
+    await page.waitForTimeout(200);
+    assert.match(await page.textContent(".listing__status"), /Enlace copiado/);
+    await page.click(".listing__actions .btn--primary");
+    await page.waitForLoadState("load");
+    assert.equal(await page.inputValue("#contacto-referencia"), "TRE-001");
+    assert.equal(await page.inputValue("#contacto-asunto"), "visita");
+    await close();
+});
+
 test("la alerta de búsqueda recoge los criterios del filtro y valida la localidad", async () => {
     const { page, close } = await open("es-inmuebles.html", { fixture: true });
     await page.selectOption("#filtro-tipo", "casa");
