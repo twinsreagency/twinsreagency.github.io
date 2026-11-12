@@ -468,23 +468,39 @@ test("ninguna página se desborda horizontalmente en móvil, tableta ni escritor
     }
 });
 
-test("la cabecera flota como cápsula al desplazar y se oscurece sobre la sección oscura", async () => {
-    const { page, errors, close } = await open("index.html");
-    const header = page.locator(".site-header");
-    await page.evaluate(() => window.scrollTo(0, 300));
-    await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-scrolled"));
-    assert.equal(await header.evaluate((h) => h.classList.contains("is-on-dark")), false);
-    /* La galería del blog es una sección oscura (azul marino). */
-    await page.evaluate(() => {
-        const s = document.querySelector(".gallery.dusk");
-        window.scrollTo(0, s.offsetTop + 120);
-    });
-    await page.waitForFunction(() => document.querySelector(".site-header").classList.contains("is-on-dark"));
-    /* El menú del móvil sigue ocupando toda la pantalla aunque la cabecera sea una cápsula. */
+test("en escritorio el menú es una barra lateral fija; en el móvil, un cajón que se cierra al tocar fuera", async () => {
+    const { page, errors, close } = await open("es-servicios.html");
+    const rail = async () => page.locator(".site-header").boundingBox();
+    let box = await rail();
+    assert.equal(Math.round(box.x), 0);
+    assert.equal(Math.round(box.y), 0);
+    assert.equal(Math.round(box.height), 900, "ocupa toda la altura");
+    assert.ok(box.width > 200 && box.width < 320, `ancho de la barra (${box.width})`);
+    /* El contenido empieza a la derecha de la barra y la barra no se mueve al desplazar. */
+    const left = await page.evaluate(() => document.getElementById("contenido").getBoundingClientRect().left);
+    assert.ok(left >= box.width - 1, `contenido a la derecha (${left})`);
+    await page.evaluate(() => window.scrollTo(0, 1500));
+    box = await rail();
+    assert.equal(Math.round(box.y), 0);
+    /* La página actual se marca, con su icono. */
+    const current = page.locator(".nav__link[aria-current='page']");
+    assert.match(await current.textContent(), /Servicios/);
+    assert.equal(await current.locator("svg.icon").count(), 1);
+
+    /* Móvil: barra superior y cajón lateral. */
     await page.setViewportSize({ width: 390, height: 844 });
+    box = await rail();
+    assert.ok(box.height < 80, `barra superior (${box.height})`);
     await page.click(".nav-toggle");
-    const nav = await page.locator("#menu-principal").boundingBox();
-    assert.equal(Math.round(nav.width), 390);
+    await page.waitForFunction(() => {
+        const r = document.getElementById("menu-principal").getBoundingClientRect();
+        return Math.round(r.left) === 0;
+    });
+    const drawer = await page.locator("#menu-principal").boundingBox();
+    assert.ok(drawer.width > 250 && drawer.width < 390, `ancho del cajón (${drawer.width})`);
+    /* Un toque sobre el velo, fuera del cajón, lo cierra. */
+    await page.mouse.click(375, 600);
+    assert.equal(await page.getAttribute(".nav-toggle", "aria-expanded"), "false");
     assert.deepEqual(errors, []);
     await close();
 });
@@ -829,6 +845,39 @@ test("las zonas enlazan a su página y las preguntas frecuentes se despliegan", 
     assert.ok(await first.locator(".faq__answer").isVisible());
     await page.goto(url(zones[0]));
     assert.match(await page.textContent("h1"), /Igualada/);
+    assert.deepEqual(errors, []);
+    await close();
+});
+
+test("la portada va pantalla a pantalla y los puntos laterales marcan la pantalla actual", async () => {
+    const { page, errors, close } = await open("index.html");
+    const ids = await page.$$eval(".screen", (nodes) => nodes.map((n) => n.id));
+    assert.ok(ids.length >= 8, ids.join());
+    assert.deepEqual(await page.$$eval(".screens-nav a", (a) => a.map((x) => x.getAttribute("href").slice(1))), ids);
+    assert.match(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType), /^y/);
+    /* Cada pantalla mide al menos lo que la ventana. */
+    const short = await page.$$eval(".screen", (nodes) => nodes.filter((n) => n.offsetHeight < innerHeight - 1).map((n) => n.id));
+    assert.deepEqual(short, []);
+    assert.equal(await page.getAttribute(".screens-nav a[href='#inicio']", "aria-current"), "true");
+
+    /* Al llegar a la calculadora, su punto se marca y el contador cambia. */
+    const index = ids.indexOf("calculadora") + 1;
+    await page.evaluate(() => {
+        document.documentElement.style.scrollBehavior = "auto";
+        document.getElementById("calculadora").scrollIntoView();
+    });
+    await page.waitForFunction(() => document.querySelector(".screens-nav a[href='#calculadora']").getAttribute("aria-current") === "true");
+    assert.equal(await page.getAttribute(".screens-nav a[href='#inicio']", "aria-current"), null);
+    assert.equal(await page.textContent("[data-screen-now]"), String(index).padStart(2, "0"));
+
+    /* Un punto lleva a su pantalla. */
+    await page.click(".screens-nav a[href='#preguntas']");
+    await page.waitForFunction(() => Math.abs(document.getElementById("preguntas").getBoundingClientRect().top) < 2);
+
+    /* En el móvil, sin puntos y sin encaje forzado. */
+    await page.setViewportSize({ width: 390, height: 844 });
+    assert.equal(await page.isVisible(".screens-nav"), false);
+    assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType), "none");
     assert.deepEqual(errors, []);
     await close();
 });
