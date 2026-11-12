@@ -778,7 +778,7 @@ def head(ctx, title, description, noindex=False, extra=""):
     <title>{esc(full_title)}</title>
     <meta name="description" content="{esc(description)}">
     <meta name="robots" content="{robots}">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f2ede4">
     <meta name="color-scheme" content="light dark">
     <meta name="format-detection" content="telephone=no">
     <meta property="og:type" content="{og_type}">
@@ -793,7 +793,7 @@ def head(ctx, title, description, noindex=False, extra=""):
     <link rel="apple-touch-icon" href="{ctx.asset('apple-touch-icon.png')}">
     <link rel="manifest" href="{ctx.asset('site.webmanifest')}">
     <link rel="preload" href="{ctx.asset('fonts/inter-latin.woff2')}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{ctx.asset('fonts/manrope-latin.woff2')}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{ctx.asset('fonts/playfair-display-600-latin.woff2')}" as="font" type="font/woff2" crossorigin>
     <script src="{ctx.asset(versioned('theme.js'))}"></script>
     <link rel="stylesheet" href="{ctx.asset(versioned('styles.min.css'))}">
     <script src="{ctx.asset(versioned('main.min.js'))}" defer></script>{extra}
@@ -2778,8 +2778,8 @@ def build_manifest():
         "start_url": "./",
         "scope": "./",
         "display": "browser",
-        "background_color": "#ffffff",
-        "theme_color": "#0f2a44",
+        "background_color": "#f2ede4",
+        "theme_color": "#f2ede4",
         "icons": [{"src": f"icon-{size}.png", "sizes": f"{size}x{size}", "type": "image/png"} for size in (192, 512)],
     }
     with open(os.path.join(SITE_DIR, "site.webmanifest"), "w", encoding="utf-8") as fh:
