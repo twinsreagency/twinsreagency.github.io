@@ -6,7 +6,7 @@ C = {
     "locale": "es_ES",
     "label": "Español",
     "abbr": "ES",
-    "slugs": {"zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
+    "slugs": {"inmueble": "inmueble", "zona": "inmobiliaria", "index": "inicio", "propiedades": "inmuebles", "servicios": "servicios", "nosotros": "nosotros", "blog": "blog", "contacto": "contacto", "aviso-legal": "aviso-legal", "privacidad": "privacidad", "cookies": "cookies"},
 
     "ui": {
         "skip": "Saltar al contenido principal",
@@ -113,6 +113,44 @@ C = {
     # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia:
     #     "TRE-001": ("Piso luminoso con terraza", "Igualada · Centro", "Novedad"),
     "properties": {},
+
+    # Ficha de cada inmueble (una página por inmueble y por idioma).
+    "listing": {
+        "view": "Ver inmueble",
+        "title": "{title} en {town}",
+        "description": "{operation}: {kind} en {town} de {area} m², {beds} y {baths}. Ref. {ref}. Consulte fotos, características y certificado energético.",
+        "gallery_aria": "Fotografías del inmueble",
+        "photo_alt": "{title}, fotografía {n} de {total}",
+        "no_photos": "Fotografías disponibles próximamente",
+        "facts_title": "Características principales",
+        "type": "Tipo de inmueble",
+        "area": "Superficie construida",
+        "year": "Año de construcción",
+        "floor": "Planta",
+        "description_title": "Descripción",
+        "extras_title": "Equipamiento",
+        "extras": {"ascensor": "Ascensor", "terraza": "Terraza", "balcon": "Balcón", "parking": "Plaza de aparcamiento",
+                   "trastero": "Trastero", "piscina": "Piscina", "jardin": "Jardín", "aire": "Aire acondicionado",
+                   "calefaccion": "Calefacción", "amueblado": "Amueblado", "exterior": "Exterior", "accesible": "Acceso adaptado"},
+        "energy_title": "Certificado de eficiencia energética",
+        "energy_scale": "Escala de calificación energética, de A (más eficiente) a G (menos eficiente)",
+        "energy_rating": "Calificación: {rating}",
+        "energy_pending": "Certificado en trámite",
+        "aside_title": "¿Le interesa este inmueble?",
+        "aside_text": "Le atendemos con cita previa, de forma presencial o por videollamada.",
+        "visit": "Solicitar una visita",
+        "info": "Pedir más información",
+        "share": "Compartir",
+        "share_done": "Enlace copiado al portapapeles.",
+        "share_text": "{title}, en Twins Real Estate",
+        "rent_note": "Precio mensual del alquiler, sin gastos ni suministros.",
+        "related_title": "Otros inmuebles que pueden interesarle",
+        "back": "Ver todos los inmuebles",
+    },
+
+    # Descripción de cada inmueble (párrafos), por referencia; opcional:
+    #     "TRE-001": ["Primer párrafo…", "Segundo párrafo…"],
+    "property_descriptions": {},
 
     "commitments": [
         ("Información verificada", "Revisamos la nota simple, las cargas y el certificado energético antes de publicar cada inmueble."),

@@ -2581,6 +2581,331 @@ html.is-theme-switch::view-transition-new(root) {
     margin-top: 1.25rem;
 }
 
+/* Foto real en la tarjeta (si el inmueble tiene fotos) */
+.property__media--photo picture,
+.property__media--photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.property__media--photo img {
+    object-fit: cover;
+    transition: transform 0.8s var(--ease);
+}
+
+.property:hover .property__media--photo img {
+    transform: scale(1.04);
+}
+
+.property__media--photo .property__ref {
+    padding: 0.2rem 0.6rem;
+    background: var(--chip-2);
+    border-radius: var(--pill);
+    color: var(--text);
+}
+
+.property__title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.property__title a:hover {
+    color: var(--accent);
+}
+
+/* Ficha de inmueble ------------------------------------------------------- */
+.listing {
+    padding: calc(var(--header-h, 72px) + 2rem) 0 4rem;
+}
+
+.listing .breadcrumb {
+    margin-bottom: 1.5rem;
+}
+
+.listing__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-bottom: 1.75rem;
+}
+
+.listing__ref {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+}
+
+.listing__badge {
+    position: static;
+}
+
+.listing__title {
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+}
+
+.listing__head .property__location {
+    margin-bottom: 0;
+}
+
+.listing__features {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+    font-size: 0.95rem;
+}
+
+/* Galería: una foto grande y, si hay más, desplazamiento lateral con imán */
+.listing__gallery {
+    margin-bottom: 2rem;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.listing__gallery:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+}
+
+.listing__gallery ul {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+}
+
+.listing__gallery--many ul {
+    grid-auto-columns: 88%;
+}
+
+.listing__photo {
+    scroll-snap-align: start;
+    aspect-ratio: 3 / 2;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--media-b);
+}
+
+.listing__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (min-width: 861px) {
+    .listing__gallery--many ul {
+        grid-auto-columns: 62%;
+    }
+
+    .listing__photo {
+        aspect-ratio: 16 / 10;
+    }
+
+    .listing__gallery:not(.listing__gallery--many) .listing__photo {
+        aspect-ratio: 21 / 9;
+    }
+}
+
+.listing__gallery--empty .property__media {
+    aspect-ratio: 3 / 1;
+}
+
+@media (max-width: 720px) {
+    .listing__gallery--empty .property__media {
+        aspect-ratio: 16 / 9;
+    }
+}
+
+.listing__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    gap: 2rem;
+    align-items: start;
+}
+
+.listing__main {
+    display: grid;
+    gap: 1.25rem;
+    min-width: 0;
+}
+
+.listing__block {
+    padding: 1.75rem;
+}
+
+.listing__h2 {
+    margin-bottom: 1.1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+}
+
+.listing__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem 1.5rem;
+}
+
+.listing__facts dt {
+    margin-bottom: 0.2rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+}
+
+.listing__facts dd {
+    margin: 0;
+    font-weight: 500;
+}
+
+.listing__extras {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 0.6rem 1.5rem;
+}
+
+/* Escala del certificado energético: la letra del inmueble, resaltada en dorado */
+.energy {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+}
+
+.energy__step {
+    display: grid;
+    place-items: center;
+    min-height: 40px;
+    border: 1px solid var(--stroke);
+    border-radius: 10px;
+    background: var(--glass);
+    font-weight: 600;
+    color: var(--text-2);
+}
+
+.energy__step.is-current {
+    background: var(--gold-grad);
+    border-color: var(--gold);
+    color: #120e08;
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px var(--gold-glow);
+}
+
+.energy__status {
+    font-size: 0.9rem;
+    color: var(--text-2);
+}
+
+/* Panel de contacto, fijo al desplazarse en escritorio */
+.listing__aside {
+    position: sticky;
+    top: calc(var(--header-h, 72px) + 1.5rem);
+}
+
+.listing__panel {
+    padding: 1.75rem;
+}
+
+.listing__price {
+    font-size: 2rem;
+}
+
+.listing__note {
+    margin-bottom: 1.25rem;
+    font-size: 0.88rem;
+    color: var(--text-2);
+}
+
+.listing__panel .listing__h2 {
+    padding-top: 1.25rem;
+    margin-bottom: 0.4rem;
+    border-top: 1px solid var(--stroke);
+}
+
+.listing__actions {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.listing__actions .btn {
+    white-space: normal;
+    text-align: center;
+}
+
+.listing__tools {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 0.9rem;
+}
+
+.listing__share {
+    flex: 1;
+}
+
+.listing__fav {
+    position: static;
+    flex: none;
+    width: 46px;
+    height: 46px;
+}
+
+.listing__status {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--accent);
+}
+
+.listing__status:empty {
+    display: none;
+}
+
+.listing__more {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+@media (max-width: 960px) {
+    .listing__layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .listing__aside {
+        position: static;
+        order: -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .listing__block,
+    .listing__panel {
+        padding: 1.25rem;
+    }
+
+    .energy {
+        gap: 0.2rem;
+    }
+
+    .listing__gallery--many ul {
+        grid-auto-columns: 92%;
+    }
+}
+
 /* Tarjetas de servicio y valores */
 .feature {
     display: flex;

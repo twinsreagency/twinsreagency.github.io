@@ -186,6 +186,14 @@ SEARCH_VALUES = {
 # op: "venta" o "alquiler"; type: uno de SEARCH_VALUES["tipo"]; zone: clave de TOWNS;
 # icon: "home", "building", "penthouse", "villa", "tree" o "loft". Su título,
 # ubicación y etiqueta van en «properties» de los tres archivos de textos.
+#
+# Cada inmueble tiene además su ficha propia («es-inmueble-tre-001.html»…). Datos
+# opcionales que la completan:
+#     energy="E",            # letra del certificado energético (A-G); sin ella: «en trámite»
+#     year=1998, floor="3.ª",
+#     extras=["ascensor", "terraza", "parking"],   # claves de «listing» → «extras»
+#     photos=[("tre-001-1", 1600, 1067), ...],     # preparadas con «python3 _fotos.py foto.jpg tre-001-1»
+# Su descripción (párrafos) va en «property_descriptions» de los tres archivos de textos.
 PROPERTIES = []
 
 # Localidades donde trabajamos, con su nombre oficial (igual en los tres idiomas). La
@@ -290,6 +298,8 @@ def filename(lang, page):
         slug = "blog-" + lang["posts"][name[len("blog/"):]]["slug"]
     elif name.startswith("zona/"):  # página de una localidad de TOWNS
         slug = lang["slugs"]["zona"] + "-" + name[len("zona/"):]
+    elif name.startswith("inmueble/"):  # ficha de un inmueble de PROPERTIES
+        slug = lang["slugs"]["inmueble"] + "-" + name[len("inmueble/"):]
     else:
         slug = lang["slugs"][name]
     if lang["code"] == "es" and name == "index":
@@ -393,7 +403,7 @@ def field_options(L, name):
 # --------------------------------------------------------------------------
 # Plantilla común
 # --------------------------------------------------------------------------
-def head(ctx, title, description, noindex=False, extra=""):
+def head(ctx, title, description, noindex=False, extra="", image=None):
     L = ctx.L
     # La marca se añade al final del título salvo que lo haga superar los 60 caracteres
     # que suelen mostrar los buscadores (p. ej. en los títulos largos del blog).
@@ -409,7 +419,14 @@ def head(ctx, title, description, noindex=False, extra=""):
         alternates = "".join(links)
     og_type = "article" if ctx.current.startswith("blog/") else "website"
     og_image = ""
-    if SITE_URL:
+    if SITE_URL and image:  # foto propia de la página (p. ej. la primera de un inmueble)
+        name, width, height, alt = image
+        og_image = (f'\n    <meta property="og:image" content="{url(name)}">'
+                    '\n    <meta property="og:image:type" content="image/jpeg">'
+                    f'\n    <meta property="og:image:width" content="{width}">'
+                    f'\n    <meta property="og:image:height" content="{height}">'
+                    f'\n    <meta property="og:image:alt" content="{esc(alt)}">')
+    elif SITE_URL:
         og_image = (f'\n    <meta property="og:image" content="{url(OG_IMAGE)}">'
                     '\n    <meta property="og:image:type" content="image/jpeg">'
                     '\n    <meta property="og:image:width" content="1200">'
@@ -614,8 +631,9 @@ def site_footer(ctx):
 """
 
 
-def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
-    """crumbs: lista de (texto, página) tras «Inicio»; el último es la página actual."""
+def breadcrumb(ctx, crumbs, indent="            "):
+    """Ruta de navegación y sus datos estructurados. crumbs: lista de (texto, página)
+    tras «Inicio»; el último es la página actual."""
     ui = ctx.L["ui"]
     trail = [f'<li><a href="{ctx.page("index.html")}">{ui["home"]}</a></li>']
     for label, target in crumbs[:-1]:
@@ -630,15 +648,20 @@ def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
             "@type": "BreadcrumbList",
             "itemListElement": [{"@type": "ListItem", "position": i, "name": name, "item": url(file)}
                                 for i, (name, file) in enumerate(items, start=1)],
-        }).replace("\n    ", "\n            ")
+        }).replace("\n    ", "\n" + indent)
+    return f"""
+{indent}<nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
+{indent}    <ol>{''.join(trail)}</ol>
+{indent}</nav>{ld}"""
+
+
+def page_hero(ctx, title, text, crumbs, extra="", obj="rings"):
+    """crumbs: lista de (texto, página) tras «Inicio»; el último es la página actual."""
     text_html = f'\n            <p class="page-hero__text">{text}</p>' if text else ""
     return f"""
     <section class="page-hero" data-scroll="view">
         <div class="page-hero__panes" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="container">{object_3d(obj)}
-            <nav class="breadcrumb" aria-label="{esc(ui['breadcrumb_aria'])}">
-                <ol>{''.join(trail)}</ol>
-            </nav>{ld}{extra}
+        <div class="container">{object_3d(obj)}{breadcrumb(ctx, crumbs)}{extra}
             <h1 class="page-hero__title">{title}</h1>{text_html}
         </div>
     </section>
@@ -663,8 +686,8 @@ def cta(ctx, title, text, secondary=None):
 """
 
 
-def write(ctx, title, description, active, body, extra_head="", noindex=False):
-    doc = (head(ctx, title, description, noindex, extra_head) + site_header(ctx, active) +
+def write(ctx, title, description, active, body, extra_head="", noindex=False, image=None):
+    doc = (head(ctx, title, description, noindex, extra_head, image) + site_header(ctx, active) +
            f'\n    <main id="contenido" tabindex="-1">{body}\n    </main>\n' + site_footer(ctx))
     with open(os.path.join(SITE_DIR, ctx.file), "w", encoding="utf-8") as fh:
         fh.write(doc)
@@ -694,16 +717,32 @@ def search_fields(ctx, prefix, names=None, indent=20):
     return "".join(out)
 
 
+def listing_page(p):
+    """Nombre lógico de la ficha de un inmueble («inmueble/tre-001.html»)."""
+    return f"inmueble/{p['ref'].lower()}.html"
+
+
+def photo(ctx, name, width, height, alt, eager=False, sizes=None):
+    """Foto de fotos/ (preparada con _fotos.py) en WebP, con JPEG como alternativa."""
+    loading = 'fetchpriority="high" decoding="async"' if eager else 'loading="lazy" decoding="async"'
+    return (f'<picture><source srcset="{ctx.asset(f"fotos/{name}.webp")}" type="image/webp">'
+            f'<img src="{ctx.asset(f"fotos/{name}.jpg")}" alt="{esc(alt)}" width="{width}" height="{height}" {loading}></picture>')
+
+
 def property_card(ctx, p):
     L, P = ctx.L, ctx.L["prop"]
     title, location, badge = L["properties"][p["ref"]]
     badge_html = f'<span class="property__badge">{badge}</span>' if badge else ""
     suffix = f' <small>{P["per_month"]}</small>' if p["op"] == "alquiler" else ""
     operation = P["rent"] if p["op"] == "alquiler" else P["sale"]
+    href = ctx.page(listing_page(p))
+    photos = p.get("photos") or []
+    media = photo(ctx, *photos[0], alt="") if photos else icon(p["icon"])
+    media_cls = "property__media property__media--photo" if photos else "property__media"
     return f"""
                 <article class="card property reveal tilt" data-operacion="{p['op']}" data-tipo="{p['type']}" data-zona="{p['zone']}" data-precio="{p['price']}" data-dormitorios="{p['beds']}">
-                    <div class="property__media">
-                        {icon(p['icon'])}
+                    <div class="{media_cls}">
+                        {media}
                         {badge_html}
                         <button class="fav-btn" type="button" data-ref="{p['ref']}" aria-pressed="false" aria-label="{esc(P['fav'].format(title))}">{icon('heart')}</button>
                         <span class="property__ref">{P['ref']} {p['ref']}</span>
@@ -711,14 +750,14 @@ def property_card(ctx, p):
                     <div class="property__body">
                         <p class="property__operation">{operation}</p>
                         <p class="property__price">{price(L, p['price'])}{suffix}</p>
-                        <h3 class="property__title">{title}</h3>
+                        <h3 class="property__title"><a href="{href}">{title}</a></h3>
                         <p class="property__location">{icon('map-pin')}{location}</p>
                         <ul class="property__features" aria-label="{esc(P['features_aria'])}">
                             <li>{icon('bed')}{count(p['beds'], P['bed'])}</li>
                             <li>{icon('bath')}{count(p['baths'], P['bath'])}</li>
                             <li>{icon('area')}{p['area']} m²</li>
                         </ul>
-                        <a class="link-arrow property__cta" href="{ctx.page('contacto.html')}?ref={p['ref']}#formulario">{P['request']} {icon('arrow-right')}<span class="visually-hidden"> {ctx.L['ui']['about']} {esc(title)}</span></a>
+                        <a class="link-arrow property__cta" href="{href}">{L['listing']['view']} {icon('arrow-right')}<span class="visually-hidden"> {ctx.L['ui']['about']} {esc(title)}</span></a>
                     </div>
                 </article>"""
 
@@ -1652,6 +1691,207 @@ def build_towns(L):
         write(ctx, f(T["title"]), f(T["description"]), "", body, extra_head=ld)
 
 
+ENERGY = "ABCDEFG"
+SCHEMA_TYPES = {"piso": "Apartment", "atico": "Apartment", "duplex": "Apartment", "estudio": "Apartment",
+                "casa": "House", "rustica": "House"}
+
+
+def check_property(p, L):
+    """Avisa de datos de un inmueble que la ficha no podría mostrar bien."""
+    ref = p["ref"]
+    if p.get("energy") and p["energy"] not in ENERGY:
+        raise SystemExit(f"{ref}: certificado energético «{p['energy']}» no válido (use A-G)")
+    for extra in p.get("extras", []):
+        if extra not in L["listing"]["extras"]:
+            raise SystemExit(f"{ref}: equipamiento «{extra}» desconocido (ver «listing» → «extras»)")
+    for name, *_ in p.get("photos", []):
+        for ext in ("webp", "jpg"):
+            if not os.path.exists(os.path.join(SITE_DIR, "fotos", f"{name}.{ext}")):
+                raise SystemExit(f"{ref}: falta fotos/{name}.{ext} (prepárela con _fotos.py)")
+
+
+def energy_block(ctx, p):
+    """Certificado energético: obligatorio en los anuncios de venta y alquiler."""
+    T = ctx.L["listing"]
+    rating = p.get("energy")
+    steps = "".join(
+        f'<li class="energy__step{" is-current" if letter == rating else ""}">{letter}</li>'
+        for letter in ENERGY)
+    status = T["energy_rating"].format(rating=rating) if rating else T["energy_pending"]
+    return f"""
+                    <section class="listing__block card" aria-labelledby="energia-title">
+                        <h2 class="listing__h2" id="energia-title">{T['energy_title']}</h2>
+                        <ol class="energy" aria-label="{esc(T['energy_scale'])}">{steps}</ol>
+                        <p class="energy__status">{status}</p>
+                    </section>"""
+
+
+def listing_gallery(ctx, p, title):
+    T = ctx.L["listing"]
+    photos = p.get("photos") or []
+    if not photos:
+        return f"""
+                <div class="listing__gallery listing__gallery--empty" role="img" aria-label="{esc(T['no_photos'])}">
+                    <div class="property__media">{icon(p['icon'])}</div>
+                </div>"""
+    total = len(photos)
+    items = "".join(
+        f'\n                        <li class="listing__photo">{photo(ctx, name, w, h, T["photo_alt"].format(title=title, n=n, total=total), eager=n == 1)}</li>'
+        for n, (name, w, h) in enumerate(photos, start=1))
+    many = " listing__gallery--many" if total > 1 else ""
+    return f"""
+                <div class="listing__gallery{many}" role="region" aria-label="{esc(T['gallery_aria'])}" tabindex="0">
+                    <ul>{items}
+                    </ul>
+                </div>"""
+
+
+def build_listings(L):
+    """Ficha de cada inmueble: galería, precio, características, descripción, equipamiento,
+    certificado energético, botones de visita y de compartir, e inmuebles relacionados."""
+    T, P = L["listing"], L["prop"]
+    kinds = dict(zip(SEARCH_VALUES["tipo"], L["search"]["options"]["tipo"]))
+    for p in PROPERTIES:
+        check_property(p, L)
+        ctx = Ctx(L, listing_page(p))
+        title, location, badge = L["properties"][p["ref"]]
+        town = place_name(p["zone"])
+        rent = p["op"] == "alquiler"
+        operation = P["rent"] if rent else P["sale"]
+        kind = kinds[p["type"]]
+        beds, baths = count(p["beds"], P["bed"]), count(p["baths"], P["bath"])
+        page_title = T["title"].format(title=title, town=town)
+        description = T["description"].format(operation=operation, kind=kind.lower(), town=town, area=p["area"],
+                                              beds=beds, baths=baths, ref=p["ref"])
+        suffix = f' <small>{P["per_month"]}</small>' if rent else ""
+        badge_html = f'<span class="property__badge listing__badge">{badge}</span>' if badge else ""
+
+        facts = [(T["type"], kind), (P["bed"][1].capitalize(), str(p["beds"])), (P["bath"][1].capitalize(), str(p["baths"])),
+                 (T["area"], f"{p['area']} m²")]
+        if p.get("year"):
+            facts.append((T["year"], str(p["year"])))
+        if p.get("floor"):
+            facts.append((T["floor"], esc(str(p["floor"]))))
+        facts.append((P["ref"], p["ref"]))
+        facts_html = "".join(f'\n                            <div><dt>{k}</dt><dd>{v}</dd></div>' for k, v in facts)
+
+        paras = L["property_descriptions"].get(p["ref"], [])
+        desc_html = ""
+        if paras:
+            body = "".join(f"\n                            <p>{x}</p>" for x in paras)
+            desc_html = f"""
+                    <section class="listing__block card" aria-labelledby="descripcion-title">
+                        <h2 class="listing__h2" id="descripcion-title">{T['description_title']}</h2>
+                        <div class="prose-block">{body}
+                        </div>
+                    </section>"""
+        extras_html = ""
+        if p.get("extras"):
+            items = "".join(f"\n                            <li>{icon('check')}{T['extras'][e]}</li>" for e in p["extras"])
+            extras_html = f"""
+                    <section class="listing__block card" aria-labelledby="equipamiento-title">
+                        <h2 class="listing__h2" id="equipamiento-title">{T['extras_title']}</h2>
+                        <ul class="check-list listing__extras">{items}
+                        </ul>
+                    </section>"""
+
+        contact = ctx.page("contacto.html")
+        note = T["rent_note"] if rent else L["propiedades"]["prices_note"]
+        share_url = url(ctx.file) if SITE_URL else ctx.file
+        aside = f"""
+                <aside class="listing__aside" aria-labelledby="interes-title">
+                    <div class="card listing__panel">
+                        <p class="property__operation">{operation}</p>
+                        <p class="property__price listing__price">{price(L, p['price'])}{suffix}</p>
+                        <p class="listing__note">{note}</p>
+                        <h2 class="listing__h2" id="interes-title">{T['aside_title']}</h2>
+                        <p class="listing__note">{T['aside_text']}</p>
+                        <div class="listing__actions">
+                            <a class="btn btn--primary" href="{contact}?ref={p['ref']}&amp;asunto=visita#formulario">{T['visit']} {ARROW}</a>
+                            <a class="btn btn--outline" href="{contact}?ref={p['ref']}#formulario">{T['info']}</a>
+                        </div>
+                        <div class="listing__tools">
+                            <button class="btn btn--glass listing__share" type="button" data-share-url="{esc(share_url)}" data-share-title="{esc(T['share_text'].format(title=title))}" data-share-done="{esc(T['share_done'])}">{icon('arrow-up-right')}{T['share']}</button>
+                            <button class="fav-btn listing__fav" type="button" data-ref="{p['ref']}" aria-pressed="false" aria-label="{esc(P['fav'].format(title))}">{icon('heart')}</button>
+                        </div>
+                        <p class="listing__status" role="status" aria-live="polite"></p>
+                    </div>
+                </aside>"""
+
+        related = [o for o in PROPERTIES if o is not p and o["op"] == p["op"]]
+        related.sort(key=lambda o: (o["zone"] != p["zone"], abs(o["price"] - p["price"])))
+        related_html = ""
+        if related:
+            cards = "".join(property_card(ctx, o) for o in related[:3])
+            related_html = f"""
+        <section class="section section--alt" aria-labelledby="relacionados-title">
+            <div class="container">{section_header(None, T['related_title'], 'relacionados-title')}
+                <div class="grid grid--3">{cards}
+                </div>
+                <p class="listing__more"><a class="btn btn--outline" href="{ctx.page('propiedades.html')}">{T['back']} {ARROW}</a></p>
+            </div>
+        </section>
+"""
+
+        photos = p.get("photos") or []
+        images = [url(f"fotos/{name}.jpg") for name, *_ in photos] if SITE_URL else []
+        offer = {"@type": "Offer", "price": p["price"], "priceCurrency": "EUR",
+                 "businessFunction": "http://purl.org/goodrelations/v1#" + ("LeaseOut" if rent else "Sell"),
+                 "availability": "https://schema.org/InStock"}
+        if rent:
+            offer["priceSpecification"] = {"@type": "UnitPriceSpecification", "price": p["price"],
+                                           "priceCurrency": "EUR", "unitCode": "MON"}
+        place = {"@type": SCHEMA_TYPES.get(p["type"], "Accommodation"), "name": title,
+                 "numberOfRooms": p["beds"], "numberOfBathroomsTotal": p["baths"],
+                 "floorSize": {"@type": "QuantitativeValue", "value": p["area"], "unitCode": "MTK"},
+                 "address": {"@type": "PostalAddress", "addressLocality": town, "addressRegion": "Catalunya", "addressCountry": "ES"}}
+        if p.get("year"):
+            place["yearBuilt"] = p["year"]
+        ld = json_ld({
+            "@context": "https://schema.org",
+            "@type": "RealEstateListing",
+            "name": page_title,
+            "description": description,
+            "identifier": p["ref"],
+            "inLanguage": L["lang"],
+            **({"url": url(ctx.file)} if SITE_URL else {}),
+            **({"image": images} if images else {}),
+            "offers": {**offer, "seller": {"@type": "RealEstateAgent", "name": "Twins Real Estate", "email": EMAIL}},
+            "about": place,
+        })
+        crumbs = [(L["ui"]["nav"]["propiedades.html"], "propiedades.html"), (title, ctx.current)]
+        body = f"""
+        <section class="listing" aria-labelledby="ficha-title">
+            <div class="container">{breadcrumb(ctx, crumbs, indent="                ")}
+                <header class="listing__head">
+                    <div>
+                        <p class="property__ref listing__ref">{P['ref']} {p['ref']}{badge_html}</p>
+                        <h1 class="listing__title" id="ficha-title">{title}</h1>
+                        <p class="property__location">{icon('map-pin')}{location}</p>
+                    </div>
+                    <ul class="property__features listing__features" aria-label="{esc(P['features_aria'])}">
+                        <li>{icon('bed')}{beds}</li>
+                        <li>{icon('bath')}{baths}</li>
+                        <li>{icon('area')}{p['area']} m²</li>
+                    </ul>
+                </header>{listing_gallery(ctx, p, title)}
+                <div class="listing__layout">
+                <div class="listing__main">
+                    <section class="listing__block card" aria-labelledby="datos-title">
+                        <h2 class="listing__h2" id="datos-title">{T['facts_title']}</h2>
+                        <dl class="listing__facts">{facts_html}
+                        </dl>
+                    </section>{desc_html}{extras_html}{energy_block(ctx, p)}
+                </div>{aside}
+                </div>
+            </div>
+        </section>
+{related_html}{commitments_strip(ctx)}"""
+        image = (f"fotos/{photos[0][0]}.jpg", photos[0][1], photos[0][2],
+                 T["photo_alt"].format(title=title, n=1, total=len(photos))) if photos else None
+        write(ctx, page_title, description, "propiedades.html", body, extra_head=ld, image=image)
+
+
 def build_contact(L):
     ctx = Ctx(L, "contacto.html")
     T, ui = L["contacto"], L["ui"]
@@ -1849,7 +2089,7 @@ def build_legacy_redirects(L):
 def logical_pages(L):
     """Todas las páginas indexables de un idioma, con su nombre lógico."""
     return (PAGES + list(L["legal"]) + [f"blog/{slug}.html" for slug, *_ in POSTS]
-            + [f"zona/{slug}.html" for slug in TOWNS])
+            + [f"zona/{slug}.html" for slug in TOWNS] + [listing_page(p) for p in PROPERTIES])
 
 
 def build_sitemap():
@@ -1951,6 +2191,7 @@ def main():
         build_contact(lang)
         build_legal(lang)
         build_towns(lang)
+        build_listings(lang)
     build_404(LANGS[0])
     build_legacy_redirects(LANGS[0])
     build_sitemap()

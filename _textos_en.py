@@ -6,7 +6,7 @@ C = {
     "locale": "en_GB",
     "label": "English",
     "abbr": "EN",
-    "slugs": {"zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
+    "slugs": {"inmueble": "property", "zona": "estate-agent", "index": "home", "propiedades": "properties", "servicios": "services", "nosotros": "about", "blog": "blog",
               "contacto": "contact", "aviso-legal": "legal-notice", "privacidad": "privacy", "cookies": "cookies"},
 
     "ui": {
@@ -113,6 +113,44 @@ C = {
 
     # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
     "properties": {},
+
+    # Listing page for each property (one page per property and language).
+    "listing": {
+        "view": "View property",
+        "title": "{title} in {town}",
+        "description": "{operation}: {kind} in {town}, {area} m², {beds} and {baths}. Ref. {ref}. See photographs, features and the energy certificate.",
+        "gallery_aria": "Photographs of the property",
+        "photo_alt": "{title}, photograph {n} of {total}",
+        "no_photos": "Photographs available shortly",
+        "facts_title": "Key features",
+        "type": "Property type",
+        "area": "Built area",
+        "year": "Year built",
+        "floor": "Floor",
+        "description_title": "Description",
+        "extras_title": "Amenities",
+        "extras": {"ascensor": "Lift", "terraza": "Terrace", "balcon": "Balcony", "parking": "Parking space",
+                   "trastero": "Storage room", "piscina": "Swimming pool", "jardin": "Garden", "aire": "Air conditioning",
+                   "calefaccion": "Heating", "amueblado": "Furnished", "exterior": "Exterior-facing", "accesible": "Step-free access"},
+        "energy_title": "Energy performance certificate",
+        "energy_scale": "Energy rating scale, from A (most efficient) to G (least efficient)",
+        "energy_rating": "Rating: {rating}",
+        "energy_pending": "Certificate in progress",
+        "aside_title": "Interested in this property?",
+        "aside_text": "We see clients by appointment, in person or by video call.",
+        "visit": "Request a viewing",
+        "info": "Ask for more information",
+        "share": "Share",
+        "share_done": "Link copied to the clipboard.",
+        "share_text": "{title}, at Twins Real Estate",
+        "rent_note": "Monthly rent, excluding expenses and utilities.",
+        "related_title": "Other properties you may like",
+        "back": "View all properties",
+    },
+
+    # Description of each property (paragraphs), by reference; optional:
+    #     "TRE-001": ["First paragraph…", "Second paragraph…"],
+    "property_descriptions": {},
 
     "commitments": [
         ("Verified information", "We review the land registry extract, any charges and the energy certificate before listing each property."),

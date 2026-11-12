@@ -6,7 +6,7 @@ C = {
     "locale": "ca_ES",
     "label": "Català",
     "abbr": "CA",
-    "slugs": {"zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
+    "slugs": {"inmueble": "immoble", "zona": "immobiliaria", "index": "inici", "propiedades": "immobles", "servicios": "serveis", "nosotros": "qui-som", "blog": "blog", "contacto": "contacte", "aviso-legal": "avis-legal", "privacidad": "privacitat", "cookies": "galetes"},
 
     "ui": {
         "skip": "Salta al contingut principal",
@@ -112,6 +112,44 @@ C = {
 
     # Título, ubicación y etiqueta (o None) de cada inmueble de PROPERTIES (_build.py), por referencia.
     "properties": {},
+
+    # Fitxa de cada immoble (una pàgina per immoble i per idioma).
+    "listing": {
+        "view": "Veure l’immoble",
+        "title": "{title} a {town}",
+        "description": "{operation}: {kind} a {town} de {area} m², {beds} i {baths}. Ref. {ref}. Consulteu fotos, característiques i certificat energètic.",
+        "gallery_aria": "Fotografies de l’immoble",
+        "photo_alt": "{title}, fotografia {n} de {total}",
+        "no_photos": "Fotografies disponibles properament",
+        "facts_title": "Característiques principals",
+        "type": "Tipus d’immoble",
+        "area": "Superfície construïda",
+        "year": "Any de construcció",
+        "floor": "Planta",
+        "description_title": "Descripció",
+        "extras_title": "Equipament",
+        "extras": {"ascensor": "Ascensor", "terraza": "Terrassa", "balcon": "Balcó", "parking": "Plaça d’aparcament",
+                   "trastero": "Traster", "piscina": "Piscina", "jardin": "Jardí", "aire": "Aire condicionat",
+                   "calefaccion": "Calefacció", "amueblado": "Moblat", "exterior": "Exterior", "accesible": "Accés adaptat"},
+        "energy_title": "Certificat d’eficiència energètica",
+        "energy_scale": "Escala de qualificació energètica, de la A (més eficient) a la G (menys eficient)",
+        "energy_rating": "Qualificació: {rating}",
+        "energy_pending": "Certificat en tràmit",
+        "aside_title": "Us interessa aquest immoble?",
+        "aside_text": "Us atenem amb cita prèvia, de manera presencial o per videotrucada.",
+        "visit": "Sol·licitar una visita",
+        "info": "Demanar més informació",
+        "share": "Compartir",
+        "share_done": "Enllaç copiat al porta-retalls.",
+        "share_text": "{title}, a Twins Real Estate",
+        "rent_note": "Preu mensual del lloguer, sense despeses ni subministraments.",
+        "related_title": "Altres immobles que us poden interessar",
+        "back": "Veure tots els immobles",
+    },
+
+    # Descripció de cada immoble (paràgrafs), per referència; opcional:
+    #     "TRE-001": ["Primer paràgraf…", "Segon paràgraf…"],
+    "property_descriptions": {},
 
     "commitments": [
         ("Informació verificada", "Revisem la nota simple, les càrregues i el certificat energètic abans de publicar cada immoble."),
