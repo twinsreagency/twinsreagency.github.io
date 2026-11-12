@@ -134,6 +134,7 @@ C = {
 
     # Fitxa de cada immoble (_inmuebles/*.json).
     "detail": {
+        "page_title": "{type} a {town} · {ref}",
         "description": "{operation}: {type} a {town}. {beds}, {baths} i {area} m². {price}. Ref. {ref}.",
         "gallery_aria": "Fotos de l’immoble",
         "photo_alt": "{title}: foto {n} de {total}",
@@ -227,7 +228,7 @@ C = {
 
     "town_page": {
         "title": "Vendre o comprar habitatge a {town}",
-        "description": "Twins Real Estate us ajuda a vendre, comprar o llogar habitatge a {town}: valoració gratuïta, alerta de cerca i acompanyament fins a la signatura.",
+        "description": "Twins Real Estate us ajuda a vendre, comprar o llogar habitatge a {town}: valoració gratuïta i alerta de cerca.",
         "h1": "Vendre o comprar habitatge a {town}",
         "text": "Us acompanyem en la venda, la compra i el lloguer d’immobles a {town}, amb un assessorament proper, rigorós i transparent.",
         "crumb": "Zones",
@@ -337,7 +338,7 @@ C = {
 
     "propiedades": {
         "title": "Immobles en venda i lloguer",
-        "description": "Pisos, àtics, cases i xalets en venda i lloguer. Consulteu la cartera de Twins Real Estate i filtreu per zona, tipus d’immoble, preu i nombre de dormitoris.",
+        "description": "Pisos, àtics, cases i xalets en venda i lloguer. Consulteu la cartera de Twins Real Estate i filtreu per zona, tipus, preu i dormitoris.",
         "h1": "Immobles en venda i lloguer",
         "text": "Consulteu la nostra cartera d’habitatges i utilitzeu els filtres per trobar l’immoble que millor s’adapta a les vostres necessitats.",
         "list_title": "Llistat d’immobles",

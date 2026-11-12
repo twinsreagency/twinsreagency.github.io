@@ -3,7 +3,7 @@
 Fotos de los inmuebles (las que se suben desde el panel a _fotos/):
     python3 _fotos.py --inmuebles
 
-    Para cada foto y plano de _inmuebles/*.json crea versiones de 480, 960 y 1600 px de
+    Para cada foto y plano de _inmuebles/*.json crea versiones de 480, 800, 1200 y 1600 px de
     ancho en AVIF, WebP y JPEG en fotos/inmuebles/, con un nombre que cambia si cambia la
     foto. Anota sus medidas en _fotos/indice.json, que es lo que usa _build.py, y borra
     las versiones que ya no usa ningún inmueble. También quita a los originales los
@@ -26,7 +26,7 @@ from PIL import Image, ImageOps
 MAX_WIDTH = 1600
 SITE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-WIDTHS = (480, 960, 1600)
+WIDTHS = (480, 800, 1200, 1600)
 MAX_ORIGINAL = 2560
 FORMATS = (
     ("avif", "AVIF", {"quality": 55}),
@@ -90,10 +90,15 @@ def clean_original(path):
     print(f"Original limpiado: {os.path.relpath(path, SITE_DIR)}")
 
 
+def target_widths(width):
+    """Anchos que se generan para una foto de este ancho (nunca se amplía)."""
+    return sorted({w for w in WIDTHS if w < width} | {min(width, WIDTHS[-1])})
+
+
 def make_versions(path, digest):
     with Image.open(path) as original:
         image = ImageOps.exif_transpose(original).convert("RGB")
-    widths = sorted({w for w in WIDTHS if w < image.width} | {min(image.width, WIDTHS[-1])})
+    widths = target_widths(image.width)
     base = f"{OUT_DIR}/{digest}"
     for width in widths:
         size = (width, round(image.height * width / image.width))
@@ -104,9 +109,14 @@ def make_versions(path, digest):
             "base": base, "formats": {ext: widths for ext, _, _ in FORMATS}}
 
 
-def versions_exist(entry):
-    return all(os.path.isfile(os.path.join(SITE_DIR, f"{entry['base']}-{w}.{ext}"))
-               for ext, widths in entry["formats"].items() for w in widths)
+def versions_ok(entry, path):
+    """Las versiones están hechas con los anchos y formatos actuales y existen todas."""
+    with Image.open(path) as image:
+        width = ImageOps.exif_transpose(image).width
+    expected = {ext: target_widths(width) for ext, _, _ in FORMATS}
+    return entry["formats"] == expected and all(
+        os.path.isfile(os.path.join(SITE_DIR, f"{entry['base']}-{w}.{ext}"))
+        for ext, widths in entry["formats"].items() for w in widths)
 
 
 def process_properties():
@@ -125,7 +135,7 @@ def process_properties():
         clean_original(path)
         digest = file_hash(path)
         entry = old.get(key)
-        if not (entry and entry["hash"] == digest and versions_exist(entry)):
+        if not (entry and entry["hash"] == digest and versions_ok(entry, path)):
             entry = make_versions(path, digest)
             created += 1
         index[key] = entry

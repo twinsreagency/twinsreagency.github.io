@@ -19,7 +19,9 @@ from html.parser import HTMLParser
 from urllib.parse import unquote, urlparse
 
 sys.dont_write_bytecode = True
-SITE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# TWINS_SITE: probar otra copia generada del sitio (p. ej. la de _tests/fixture.py, con
+# inmuebles de prueba), para comprobar que las fichas también cumplen todas las reglas.
+SITE_DIR = os.environ.get("TWINS_SITE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, SITE_DIR)
 
 import _build  # noqa: E402
@@ -237,6 +239,20 @@ class ContentTest(unittest.TestCase):
         finally:
             _build.PHONE, _build.WHATSAPP = saved
 
+    def test_descriptions_still_fit_with_listings_and_long_town_names(self):
+        """Las descripciones que dependen de los datos (listado con inmuebles, páginas por
+        localidad y fichas) también caben, aunque hoy no se generen."""
+        long_town = "Santa Margarida de Montbui i la Pobla"  # 37 caracteres
+        for L in _build.LANGS:
+            self.assertLessEqual(len(L["propiedades"]["description"]), 160, L["code"])
+            town = L["town_page"]["description"].replace("{town}", long_town)
+            self.assertTrue(70 <= len(town) <= 160, f"{L['code']}: {len(town)}")
+            D, P = L["detail"], L["prop"]
+            listing = D["description"].format(operation=P["sale"], type=max(L["search"]["options"]["tipo"], key=len),
+                                              town=long_town, beds=count_sample(P["bed"]), baths=count_sample(P["bath"]),
+                                              area=12345, price=_build.price(L, 12_500_000), ref="TRE-001")
+            self.assertTrue(70 <= len(listing) <= 160, f"{L['code']}: {len(listing)} {listing}")
+
     def test_titles_fit_in_search_results(self):
         long = {n: p.title for n, p in CONTENT.items() if len(p.title) > 60}
         self.assertEqual(long, {})
@@ -342,6 +358,8 @@ class DataTest(unittest.TestCase):
         self.assertRejected("falta «titulo_es»", titulo_es="")
         self.assertRejected("fuera de rango", lat=52.5)
         self.assertRejected("60 caracteres", titulo_en="A" * 61)
+        p = self.load(titulo_ca="Pis cèntric")
+        self.assertEqual(p["title_translated"], {"es": True, "ca": True, "en": False})
         self.assertRejected("no existe la foto", fotos=["/_fotos/no-existe.jpg"])
 
     def test_photos_need_their_optimized_versions(self):
@@ -474,19 +492,23 @@ class PhotosTest(unittest.TestCase):
                 self.assertEqual(max(cleaned.size), 2560)
             with open(os.path.join(copy, "_fotos", "indice.json"), encoding="utf-8") as fh:
                 entry = json.load(fh)["/_fotos/salon.jpg"]
-            self.assertEqual(entry["formats"], {"avif": [480, 960, 1600], "webp": [480, 960, 1600], "jpg": [480, 960, 1600]})
+            self.assertEqual(entry["formats"], {f: [480, 800, 1200, 1600] for f in ("avif", "webp", "jpg")})
             self.assertEqual((entry["width"], entry["height"]), (1600, 1067))
             with open(os.path.join(copy, "es-inmueble-tre-010.html"), encoding="utf-8") as fh:
                 page = fh.read()
             self.assertIn('<source type="image/avif"', page)
             self.assertIn('fetchpriority="high"', page)
-            self.assertIn(f"{entry['base']}-960.webp 960w", page)
+            self.assertIn(f"{entry['base']}-800.webp 800w", page)
             # Una segunda pasada no rehace nada y quitar la foto borra sus versiones.
             out = subprocess.run([sys.executable, "_fotos.py", "--inmuebles"], cwd=copy, check=True, capture_output=True, text=True, env=env)
             self.assertIn("0 nuevas", out.stdout)
             os.remove(os.path.join(copy, "_inmuebles", "TRE-010.json"))
             subprocess.run([sys.executable, "_fotos.py", "--inmuebles"], cwd=copy, check=True, capture_output=True, env=env)
             self.assertEqual(os.listdir(os.path.join(copy, "fotos", "inmuebles")), [])
+
+
+def count_sample(forms):
+    return _build.count(10, forms)
 
 
 def published_files():

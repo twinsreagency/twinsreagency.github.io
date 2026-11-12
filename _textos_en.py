@@ -135,6 +135,7 @@ C = {
 
     # Page of each property (_inmuebles/*.json).
     "detail": {
+        "page_title": "{type} in {town} · {ref}",
         "description": "{operation}: {type} in {town}. {beds}, {baths} and {area} m². {price}. Ref. {ref}.",
         "gallery_aria": "Property photos",
         "photo_alt": "{title}: photo {n} of {total}",
@@ -228,7 +229,7 @@ C = {
 
     "town_page": {
         "title": "Selling or buying a home in {town}",
-        "description": "Twins Real Estate helps you sell, buy or let a home in {town}: a free valuation, property alerts and support through to completion.",
+        "description": "Twins Real Estate helps you sell, buy or let a home in {town}: a free valuation and property alerts.",
         "h1": "Selling or buying a home in {town}",
         "text": "We support you in selling, buying and letting property in {town}, with personal, rigorous and transparent advice.",
         "crumb": "Areas",
@@ -338,7 +339,7 @@ C = {
 
     "propiedades": {
         "title": "Properties for sale and rent",
-        "description": "Flats, penthouses, houses and villas for sale and rent. Browse the Twins Real Estate portfolio and filter by area, property type, price and number of bedrooms.",
+        "description": "Flats, penthouses, houses and villas for sale and rent. Browse the Twins Real Estate portfolio and filter by area, type, price and bedrooms.",
         "h1": "Properties for sale and rent",
         "text": "Browse our portfolio and use the filters to find the property that best suits your needs.",
         "list_title": "Property listings",

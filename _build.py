@@ -407,6 +407,7 @@ def load_property(data, where, index):
     if date and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", date):
         raise SystemExit(f"{where}: fecha «{date}» no válida (AAAA-MM-DD)")
     title = localized(data, "titulo", where, required=True)
+    translated = {L["code"]: bool(str(data.get(f"titulo_{L['code']}") or "").strip()) for L in LANGS}
     if max(len(t) for t in title.values()) > 60:
         raise SystemExit(f"{where}: el título no debe pasar de 60 caracteres (es el título de la página en los buscadores)")
     photos = [photo(index, src, where) for src in (data.get("fotos") or [])]
@@ -424,7 +425,7 @@ def load_property(data, where, index):
         energy=dict(rating=energy, emissions=emissions,
                     consumption_value=decimal(data.get("energia_consumo_valor"), f"{where} (consumo)", 0, 2000),
                     emissions_value=decimal(data.get("energia_emisiones_valor"), f"{where} (emisiones)", 0, 1000)),
-        title=title,
+        title=title, title_translated=translated,
         description=localized(data, "descripcion", where),
         badge=localized(data, "etiqueta", where),
         photos=photos, plan=plan,
@@ -453,6 +454,10 @@ def load_properties():
         p = load_property(data, f"_inmuebles/{name}", index)
         if p["ref"] in refs:
             raise SystemExit(f"_inmuebles/{name}: la referencia {p['ref']} ya la tiene otro inmueble")
+        for other in found:
+            if other["title"]["es"].casefold() == p["title"]["es"].casefold():
+                raise SystemExit(f"_inmuebles/{name}: el título «{p['title']['es']}» ya lo tiene {other['ref']}; "
+                                 "cada ficha necesita un título propio (añada la calle, el barrio o un detalle)")
         refs.add(p["ref"])
         found.append(p)
     # Los más recientes primero (orden «Novedades» del listado).
@@ -2298,7 +2303,13 @@ def build_property_pages(L):
             fmt = "avif" if first["formats"].get("avif") else ("webp" if first["formats"].get("webp") else "jpg")
             extra += (f'\n    <link rel="preload" as="image" type="image/{"jpeg" if fmt == "jpg" else fmt}" '
                       f'imagesrcset="{srcset(ctx, first, fmt)}" imagesizes="(max-width: 900px) 92vw, 1100px" fetchpriority="high">')
-        write(ctx, title, description, "propiedades.html", body, extra_head=extra)
+        # Sin título traducido, la página no repite el castellano: «Pis a Igualada · TRE-001».
+        page_title = title
+        if not p["title_translated"][L["code"]]:
+            page_title = D["page_title"].format(type=type_label(L, p), town=p["town"], ref=p["ref"])
+            if len(page_title) > 60:
+                page_title = f"{p['town']} · {p['ref']}"
+        write(ctx, page_title, description, "propiedades.html", body, extra_head=extra)
 
 
 def contact_phone_cards(ctx):

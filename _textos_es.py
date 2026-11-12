@@ -134,6 +134,7 @@ C = {
 
     # Ficha de cada inmueble (_inmuebles/*.json).
     "detail": {
+        "page_title": "{type} en {town} · {ref}",
         "description": "{operation}: {type} en {town}. {beds}, {baths} y {area} m². {price}. Ref. {ref}.",
         "gallery_aria": "Fotos del inmueble",
         "photo_alt": "{title}: foto {n} de {total}",
@@ -229,7 +230,7 @@ C = {
     # nombre de la localidad. El texto propio de cada una va en «towns», por clave de TOWNS.
     "town_page": {
         "title": "Vender o comprar vivienda en {town}",
-        "description": "Twins Real Estate le ayuda a vender, comprar o alquilar vivienda en {town}: valoración gratuita, alerta de búsqueda y acompañamiento hasta la firma.",
+        "description": "Twins Real Estate le ayuda a vender, comprar o alquilar vivienda en {town}: valoración gratuita y alerta de búsqueda.",
         "h1": "Vender o comprar vivienda en {town}",
         "text": "Le acompañamos en la venta, la compra y el alquiler de inmuebles en {town}, con un asesoramiento cercano, riguroso y transparente.",
         "crumb": "Zonas",
@@ -340,7 +341,7 @@ C = {
 
     "propiedades": {
         "title": "Inmuebles en venta y alquiler",
-        "description": "Pisos, áticos, casas y chalets en venta y alquiler. Consulte la cartera de Twins Real Estate y filtre por zona, tipo de inmueble, precio y número de dormitorios.",
+        "description": "Pisos, áticos, casas y chalets en venta y alquiler. Consulte la cartera de Twins Real Estate y filtre por zona, tipo, precio y dormitorios.",
         "h1": "Inmuebles en venta y alquiler",
         "text": "Consulte nuestra cartera de viviendas y utilice los filtros para encontrar el inmueble que mejor se adapta a sus necesidades.",
         "list_title": "Listado de inmuebles",
