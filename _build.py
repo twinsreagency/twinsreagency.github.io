@@ -627,6 +627,21 @@ def esc(text):
 ORGANIZATION_ID = f"{SITE_URL}/#organizacion"
 
 
+def agency_place():
+    """Dirección y horario de la agencia en los datos estructurados (portada y localidades)."""
+    return {
+        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "postalCode": POSTAL_CODE,
+                    "addressRegion": "Catalunya", "addressCountry": "ES"},
+        # El mismo horario que la página de contacto (hours_html), en el formato que prefiere Google.
+        "openingHoursSpecification": [
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+             "opens": "09:00", "closes": "18:00"},
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "14:00"},
+        ],
+        **({"telephone": PHONE} if PHONE else {}),
+    }
+
+
 def organization():
     """La agencia como autora y editora de los artículos, con su dirección y su logotipo."""
     data = {"@type": "Organization", "name": "Twins Real Estate"}
@@ -1677,17 +1692,9 @@ def build_index(L):
         "name": "Twins Real Estate",
         "slogan": T["slogan"],
         "email": EMAIL,
-        **({"telephone": PHONE} if PHONE else {}),
         "sameAs": [INSTAGRAM_URL] + ([AGENCY["google_business"]] if AGENCY["google_business"] else []),
         **({"url": url("index.html"), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
-        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "postalCode": POSTAL_CODE,
-                    "addressRegion": "Catalunya", "addressCountry": "ES"},
-        # El mismo horario que la página de contacto (hours_html), en el formato que prefiere Google.
-        "openingHoursSpecification": [
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-             "opens": "09:00", "closes": "18:00"},
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "14:00"},
-        ],
+        **agency_place(),
         "knowsLanguage": [lang["lang"] for lang in LANGS],
     }
     # WebSite: el nombre del sitio que muestran los buscadores junto a la dirección.
@@ -2056,7 +2063,7 @@ def build_towns(L):
             "description": f(T["description"]),
             "email": EMAIL,
             **({"url": url(filename(L, "index.html")), "image": url(OG_IMAGE)} if SITE_URL else {}),
-            "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
+            **agency_place(),
             "areaServed": {"@type": "City", "name": town},
             "knowsLanguage": [lang["lang"] for lang in LANGS],
         })
