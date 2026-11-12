@@ -119,6 +119,20 @@ C = {
         "ref": "Ref.",
     },
 
+    # Trust blocks: shown only with real data (_datos/, panel).
+    "trust": {
+        "reviews_eyebrow": "Reviews",
+        "reviews_title": "What our clients say",
+        "stars": "{n} out of 5 stars",
+        "source": "Review published on {source}",
+        "all_reviews": "See all reviews on Google",
+        "cases_eyebrow": "Success stories",
+        "cases_title": "Transactions we have handled",
+        "since": "The year we began helping our clients",
+        "aicat": "Agent registered in the Register of Real Estate Agents of Catalonia, no. {n}.",
+        "google": "Reviews on Google",
+    },
+
     # Page of each property (_inmuebles/*.json).
     "detail": {
         "description": "{operation}: {type} in {town}. {beds}, {baths} and {area} m². {price}. Ref. {ref}.",

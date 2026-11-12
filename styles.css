@@ -5219,3 +5219,53 @@ html[data-motion="reduced"]::view-transition-new(root) {
         font-size: 1.8rem;
     }
 }
+
+/* Opiniones reales de clientes (panel) ------------------------------------ */
+.review {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0;
+    padding: 1.75rem;
+}
+
+.review__stars {
+    display: flex;
+    gap: 0.2rem;
+    color: var(--accent);
+}
+
+.review__stars .icon {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+}
+
+.review__text {
+    flex: 1;
+    margin: 0;
+    font-size: 1.02rem;
+    line-height: 1.65;
+    color: var(--prose);
+}
+
+.review__author {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.95rem;
+}
+
+.review__source {
+    font-size: 0.82rem;
+    color: var(--text-2);
+}
+
+.review__source a {
+    color: var(--accent);
+}
+
+.footer-aicat {
+    display: block;
+    margin-top: 0.35rem;
+}

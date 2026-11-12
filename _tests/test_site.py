@@ -364,6 +364,31 @@ class DataTest(unittest.TestCase):
             finally:
                 _build.SITE_DIR = saved
 
+    def test_trust_blocks_show_only_real_data(self):
+        L = _build._textos_es.C
+        ctx = _build.Ctx(L, "index.html")
+        self.assertEqual(_build.trust_section(ctx), "")
+        saved = (list(_build.REVIEWS), list(_build.CASES), dict(_build.AGENCY), dict(_build.OWNER))
+        try:
+            _build.REVIEWS[:] = _build.load_reviews([{"autor": "Joan P.", "texto": "Molt bé <script>x</script>", "fuente": "Google",
+                                                      "estrellas": 5, "idioma": "ca", "enlace": "https://g.co/x", "fecha": "2026-10-01"}])
+            _build.CASES[:] = _build.load_cases([{"titulo_es": "Venta en 30 días", "texto_es": "Piso vendido.", "localidad": "Igualada"}])
+            _build.AGENCY.update(desde=2015, google_business="https://g.page/twins")
+            _build.OWNER["registro_agentes"] = "AICAT 1234"
+            html_trust = _build.trust_section(ctx)
+            self.assertIn('aria-label="5 de 5 estrellas"', html_trust)
+            self.assertIn('lang="ca"', html_trust)
+            self.assertIn("Molt bé &lt;script&gt;", html_trust)
+            self.assertIn('href="https://g.page/twins" target="_blank" rel="noopener noreferrer"', html_trust)
+            self.assertIn("Venta en 30 días", html_trust)
+            self.assertIn("2015", _build.figures(ctx))
+            self.assertIn("n.º AICAT 1234", _build.aicat_note(ctx))
+            self.assertIn("Opiniones en Google", _build.google_item(ctx))
+        finally:
+            _build.REVIEWS[:], _build.CASES[:] = saved[0], saved[1]
+            _build.AGENCY.clear(); _build.AGENCY.update(saved[2])
+            _build.OWNER.clear(); _build.OWNER.update(saved[3])
+
     def test_agency_and_trust_data_files(self):
         for name in ("agencia.json", "confianza.json"):
             with open(os.path.join(SITE_DIR, "_datos", name), encoding="utf-8") as fh:

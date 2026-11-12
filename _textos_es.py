@@ -118,6 +118,20 @@ C = {
         "ref": "Ref.",
     },
 
+    # Bloques de confianza: solo aparecen con datos reales (_datos/, panel).
+    "trust": {
+        "reviews_eyebrow": "Opiniones",
+        "reviews_title": "Lo que dicen nuestros clientes",
+        "stars": "{n} de 5 estrellas",
+        "source": "Opinión publicada en {source}",
+        "all_reviews": "Ver todas las opiniones en Google",
+        "cases_eyebrow": "Casos de éxito",
+        "cases_title": "Operaciones que hemos acompañado",
+        "since": "Año en que empezamos a acompañar a nuestros clientes",
+        "aicat": "Agente inscrito en el Registro de Agentes Inmobiliarios de Cataluña con el n.º {n}.",
+        "google": "Opiniones en Google",
+    },
+
     # Ficha de cada inmueble (_inmuebles/*.json).
     "detail": {
         "description": "{operation}: {type} en {town}. {beds}, {baths} y {area} m². {price}. Ref. {ref}.",

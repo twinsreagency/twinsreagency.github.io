@@ -896,6 +896,18 @@ def phone_items(ctx):
     return "".join(out)
 
 
+def google_item(ctx):
+    if not AGENCY["google_business"]:
+        return ""
+    return (f'\n                        <li>{icon("star")}<a href="{esc(AGENCY["google_business"])}" target="_blank" '
+            f'rel="noopener noreferrer">{ctx.L["trust"]["google"]}<span class="visually-hidden"> {ctx.L["ui"]["new_tab"]}</span></a></li>')
+
+
+def aicat_note(ctx):
+    number = OWNER["registro_agentes"]
+    return f' <span class="footer-aicat">{esc(ctx.L["trust"]["aicat"].format(n=number))}</span>' if number else ""
+
+
 def site_footer(ctx):
     L, ui = ctx.L, ctx.L["ui"]
     nav_links = "".join(f'\n                        <li><a href="{ctx.page(n)}">{ui["nav"][n]}</a></li>' for n in PAGES)
@@ -931,13 +943,13 @@ def site_footer(ctx):
 {phone_items(ctx)}
                         <li>{icon('mail')}<a href="mailto:{EMAIL}">{EMAIL}</a></li>
                         <li>{icon('instagram')}<a href="{INSTAGRAM_URL}" target="_blank" rel="noopener noreferrer">{INSTAGRAM_HANDLE}<span class="visually-hidden"> {ui['new_tab']}</span></a></li>
-                        <li>{icon('clock')}<span>{ui['hours_html']}</span></li>
+                        <li>{icon('clock')}<span>{ui['hours_html']}</span></li>{google_item(ctx)}
                     </ul>
                 </div>
             </div>
 {footer_areas(ctx)}
             <div class="footer-bottom">
-                <p>© <span data-year>2026</span> Twins Real Estate. {ui['rights']}</p>
+                <p>© <span data-year>2026</span> Twins Real Estate. {ui['rights']}{aicat_note(ctx)}</p>
                 <nav class="footer-legal" aria-label="{esc(ui['legal_aria'])}">{legal_links}
                 </nav>
             </div>
@@ -1192,8 +1204,16 @@ def service_panels(ctx):
 
 
 def figures(ctx):
-    """Cifras grandes en cursiva (datos reales de la agencia); main.js las cuenta hacia arriba."""
-    items = "".join(f"""
+    """Cifras grandes en cursiva (datos reales de la agencia); main.js las cuenta hacia arriba.
+    Con el año de inicio de la actividad (panel), se añade delante, sin contador."""
+    since = ""
+    if AGENCY["desde"]:
+        since = f"""
+                        <div class="figure">
+                            <dt class="figure__value"><span class="figure__num">{AGENCY['desde']}</span></dt>
+                            <dd class="figure__label">{ctx.L['trust']['since']}</dd>
+                        </div>"""
+    items = since + "".join(f"""
                         <div class="figure">
                             <dt class="figure__value">{prefix}<span class="figure__num" data-count="{number}">{number}</span>{suffix}</dt>
                             <dd class="figure__label">{label}</dd>
@@ -1201,6 +1221,57 @@ def figures(ctx):
     return f"""
                     <dl class="figures">{items}
                     </dl>"""
+
+
+def trust_section(ctx):
+    """Opiniones reales con su fuente y casos de éxito (panel). Sin datos, no aparece."""
+    if not (REVIEWS or CASES):
+        return ""
+    T, code = ctx.L["trust"], ctx.L["code"]
+    out = []
+    if REVIEWS:
+        cards = []
+        for r in REVIEWS:
+            stars = ""
+            if r["stars"]:
+                stars = (f'\n                        <p class="review__stars" role="img" aria-label="{esc(T["stars"].format(n=r["stars"]))}">'
+                         + icon("star") * r["stars"] + "</p>")
+            source = esc(r["source"])
+            if r["link"]:
+                source = (f'<a href="{esc(r["link"])}" target="_blank" rel="noopener noreferrer">{source}'
+                          f'<span class="visually-hidden"> {ctx.L["ui"]["new_tab"]}</span></a>')
+            date = f' · <time datetime="{esc(r["date"])}">{esc(r["date"])}</time>' if r["date"] else ""
+            cards.append(f"""
+                    <figure class="card review reveal">{stars}
+                        <blockquote class="review__text" lang="{r['lang']}"><p>{esc(r['text'])}</p></blockquote>
+                        <figcaption class="review__author"><strong>{esc(r['author'])}</strong>
+                            <span class="review__source">{T['source'].format(source=source)}{date}</span></figcaption>
+                    </figure>""")
+        more = ""
+        if AGENCY["google_business"]:
+            more = f"""
+                <div class="section-footer">
+                    <a class="btn btn--outline" href="{esc(AGENCY['google_business'])}" target="_blank" rel="noopener noreferrer">{T['all_reviews']} {icon('arrow-up-right')}<span class="visually-hidden"> {ctx.L['ui']['new_tab']}</span></a>
+                </div>"""
+        out.append(f"""
+        <section class="section reviews" aria-labelledby="opiniones-title">
+            <div class="container">{section_header(T['reviews_eyebrow'], T['reviews_title'], 'opiniones-title')}
+                <div class="grid grid--3">{''.join(cards)}
+                </div>{more}
+            </div>
+        </section>""")
+    if CASES:
+        cards = "".join(feature_card("award", esc(c["title"][code]), esc(c["text"][code]),
+                                     f'\n                    <p class="feature__more">{icon("map-pin")}{esc(c["town"])}</p>' if c["town"] else "")
+                        for c in CASES)
+        out.append(f"""
+        <section class="section section--alt" aria-labelledby="casos-title">
+            <div class="container">{section_header(T['cases_eyebrow'], T['cases_title'], 'casos-title')}
+                <div class="grid grid--3">{cards}
+                </div>
+            </div>
+        </section>""")
+    return "".join(out) + "\n"
 
 
 def blog_gallery(ctx):
@@ -1607,7 +1678,7 @@ def build_index(L):
         "slogan": T["slogan"],
         "email": EMAIL,
         **({"telephone": PHONE} if PHONE else {}),
-        "sameAs": [INSTAGRAM_URL],
+        "sameAs": [INSTAGRAM_URL] + ([AGENCY["google_business"]] if AGENCY["google_business"] else []),
         **({"url": url("index.html"), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
         "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "postalCode": POSTAL_CODE,
                     "addressRegion": "Catalunya", "addressCountry": "ES"},
@@ -1686,7 +1757,7 @@ def build_index(L):
                 </div>
             </div>
         </section>
-{service_panels(ctx)}{blog_gallery(ctx)}{sell_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
+{service_panels(ctx)}{blog_gallery(ctx)}{sell_section(ctx)}{trust_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'])}"""
     write(ctx, T["title"], T["description"], "index.html", body,
           extra_head=ld)
 
@@ -1819,7 +1890,7 @@ def build_about(L):
                 </div>
             </div>
         </section>
-{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'], (ctx.page('propiedades.html'), T['cta_secondary']))}"""
+{trust_section(ctx)}{commitments_strip(ctx)}{cta(ctx, T['cta_title'], T['cta_text'], (ctx.page('propiedades.html'), T['cta_secondary']))}"""
     write(ctx, T["title"], T["description"], "nosotros.html", body)
 
 
@@ -2090,12 +2161,12 @@ def property_gallery(ctx, p, title):
                     <button class="gallery__btn" type="button" data-gallery-next aria-label="{esc(ctx.L['ui']['next'])}" aria-controls="fotos-{p['ref']}">{icon('arrow-right')}</button>
                 </div>"""
     return f"""
-        <section class="gallery gallery--photos listing-gallery" aria-label="{esc(D['gallery_aria'])}">
+        <div class="gallery gallery--photos listing-gallery">
             <div class="gallery__track" id="fotos-{p['ref']}" role="region" aria-label="{esc(D['gallery_aria'])}" tabindex="0">{slides}
             </div>
             <div class="container">{nav}
             </div>
-        </section>"""
+        </div>"""
 
 
 def build_property_pages(L):
