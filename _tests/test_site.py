@@ -186,6 +186,18 @@ class ContentTest(unittest.TestCase):
             _build.OWNER.clear()
             _build.OWNER.update(saved)
 
+    def test_forms_post_to_the_form_service_when_configured(self):
+        """Sin servicio, los formularios abren el correo; con él, envían por HTTPS (sin el
+        aviso de contenido mixto de un action="mailto:" y útiles también sin JavaScript)."""
+        self.assertEqual(_build.form_action(), f'action="mailto:{_build.EMAIL}" method="post" enctype="text/plain"')
+        saved = _build.form_endpoint
+        try:
+            _build.form_endpoint = lambda: "https://formspree.io/f/abcdefgh"
+            self.assertEqual(_build.form_action(), 'action="https://formspree.io/f/abcdefgh" method="post"')
+            self.assertIn("form-action 'self' mailto: https://formspree.io", _build.csp())
+        finally:
+            _build.form_endpoint = saved
+
     def test_titles_fit_in_search_results(self):
         long = {n: p.title for n, p in CONTENT.items() if len(p.title) > 60}
         self.assertEqual(long, {})

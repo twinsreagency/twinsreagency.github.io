@@ -88,6 +88,16 @@ def form_endpoint():
         raise SystemExit("CONFIG.endpoint debe ser una dirección https://")
     return endpoint
 
+def form_action():
+    """Destino de los formularios sin JavaScript: el servicio de formularios por HTTPS si
+    está configurado o, si no, el programa de correo. Con JavaScript, main.js valida los
+    campos y envía los datos él mismo (o prepara el correo)."""
+    endpoint = form_endpoint()
+    if endpoint:
+        return f'action="{html.escape(endpoint, quote=True)}" method="post"'
+    return f'action="mailto:{EMAIL}" method="post" enctype="text/plain"'
+
+
 def csp(meta=True):
     """Política de seguridad de contenidos: solo recursos del propio sitio, sin código
     en línea. Se publica como <meta> en cada página (GitHub Pages no permite enviar
@@ -1014,7 +1024,7 @@ def alert_section(ctx):
                 <div class="card form-card reveal">
                     <h3 class="form-card__title">{T['form_title']}</h3>
                     <p class="form-card__lead">{C['form_lead']}</p>
-                    <form class="lead-form" id="formulario-alerta" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                    <form class="lead-form" id="formulario-alerta" {form_action()} novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
                         <div class="form-grid">
                             <div class="field field--full">
                                 <label for="alerta-localidad">{T['localidad']}</label>
@@ -1094,7 +1104,7 @@ def valuation_section(ctx):
                 <div class="card form-card reveal">
                     <h3 class="form-card__title">{T['form_title']}</h3>
                     <p class="form-card__lead">{C['form_lead']}</p>
-                    <form class="lead-form" id="formulario-valoracion" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
+                    <form class="lead-form" id="formulario-valoracion" {form_action()} novalidate data-mail-subject="{esc(T['mail_subject'])}" data-subject-field="localidad">
                         <div class="form-grid">
                             <div class="field">
                                 <label for="valoracion-localidad">{lab['localidad']}</label>
@@ -1731,7 +1741,7 @@ def build_contact(L):
                 <div class="card form-card reveal" id="formulario">
                     <h2 class="form-card__title">{T['form_title']}</h2>
                     <p class="form-card__lead">{T['form_lead']}</p>
-                    <form class="lead-form" id="formulario-contacto" action="mailto:{EMAIL}" method="post" enctype="text/plain" novalidate>
+                    <form class="lead-form" id="formulario-contacto" {form_action()} novalidate>
                         <div class="form-grid">
                             <div class="field">
                                 <label for="contacto-nombre">{lab['nombre']}</label>
