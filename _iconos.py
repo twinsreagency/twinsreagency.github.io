@@ -18,7 +18,7 @@ import sys
 from PIL import Image
 
 SITE_DIR = os.path.dirname(os.path.abspath(__file__))
-BACKGROUND = (242, 237, 228, 255)  # #f2ede4, el fondo claro de la web (theme-color)
+BACKGROUND = (255, 255, 255, 255)  # blanco, el fondo claro de la web
 SIZES = {"apple-touch-icon.png": 180, "favicon-96.png": 96, "icon-192.png": 192, "icon-512.png": 512}
 
 
