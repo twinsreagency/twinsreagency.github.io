@@ -64,6 +64,7 @@ OWNER = {
 OG_IMAGE = "og-image.jpg"  # imagen para compartir en redes (1200 × 630); se genera con _og/make.js
 # Agencia en línea con base en Igualada (sin oficina abierta al público).
 LOCALITY = "Igualada"
+POSTAL_CODE = "08700"
 INSTAGRAM_URL = "https://www.instagram.com/twins.real.estate.agency/"
 INSTAGRAM_HANDLE = "@twins.real.estate.agency"
 
@@ -342,6 +343,19 @@ def resolve(ctx, text):
 # --------------------------------------------------------------------------
 def esc(text):
     return html.escape(text, quote=True)
+
+
+# Identificador de la agencia en los datos estructurados (se define en la portada).
+ORGANIZATION_ID = f"{SITE_URL}/#organizacion"
+
+
+def organization():
+    """La agencia como autora y editora de los artículos, con su dirección y su logotipo."""
+    data = {"@type": "Organization", "name": "Twins Real Estate"}
+    if SITE_URL:
+        data.update({"@id": ORGANIZATION_ID, "url": url("index.html"),
+                     "logo": {"@type": "ImageObject", "url": url("logo-icon.png"), "width": 151, "height": 200}})
+    return data
 
 
 def json_ld(data):
@@ -1247,18 +1261,28 @@ def build_index(L):
     ctx = Ctx(L, "index.html")
     T, ui = L["index"], L["ui"]
     checks = "".join(f'\n                        <li>{icon("check")}{text}</li>' for text in T["about_checks"])
-    ld = json_ld({
-        "@context": "https://schema.org",
+    agency = {
         "@type": "RealEstateAgent",
+        **({"@id": ORGANIZATION_ID} if SITE_URL else {}),
         "name": "Twins Real Estate",
         "slogan": T["slogan"],
         "email": EMAIL,
         "sameAs": [INSTAGRAM_URL],
-        **({"url": url(ctx.file), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
-        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "addressRegion": "Catalunya", "addressCountry": "ES"},
-        "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-14:00"],
+        **({"url": url("index.html"), "logo": url("logo-icon.png"), "image": url(OG_IMAGE)} if SITE_URL else {}),
+        "address": {"@type": "PostalAddress", "addressLocality": LOCALITY, "postalCode": POSTAL_CODE,
+                    "addressRegion": "Catalunya", "addressCountry": "ES"},
+        # El mismo horario que la página de contacto (hours_html), en el formato que prefiere Google.
+        "openingHoursSpecification": [
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+             "opens": "09:00", "closes": "18:00"},
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "14:00"},
+        ],
         "knowsLanguage": [lang["lang"] for lang in LANGS],
-    })
+    }
+    # WebSite: el nombre del sitio que muestran los buscadores junto a la dirección.
+    website = {"@type": "WebSite", "name": "Twins Real Estate", "inLanguage": L["lang"],
+               **({"url": url(ctx.file), "publisher": {"@id": ORGANIZATION_ID}} if SITE_URL else {})}
+    ld = json_ld({"@context": "https://schema.org", "@graph": [agency, website]})
 
     portfolio = home_portfolio(ctx)
     if PROPERTIES:
@@ -1547,8 +1571,8 @@ def build_blog(L):
             **({"image": url(OG_IMAGE)} if SITE_URL else {}),
             "inLanguage": L["lang"],
             **({"url": url(ctx.file), "mainEntityOfPage": url(ctx.file)} if SITE_URL else {}),
-            "author": {"@type": "Organization", "name": "Twins Real Estate"},
-            "publisher": {"@type": "Organization", "name": "Twins Real Estate"},
+            "author": organization(),
+            "publisher": organization(),
         })
         meta = "\n            " + post_meta(ctx, slug, date, minutes, with_category=True)
         if slug in OWNER_POSTS:  # artículos para propietarios: llevan a la valoración gratuita

@@ -227,6 +227,16 @@ class ContentTest(unittest.TestCase):
                 self.assertEqual(data["@context"], "https://schema.org", name)
                 self.assertNotIn("</", block, name)
 
+    def test_home_pages_describe_the_agency_and_the_website(self):
+        """Cada portada declara la agencia (RealEstateAgent) y el sitio (WebSite), enlazados."""
+        for lang in _build.LANGS:
+            page = PAGES[_build.filename(lang, "index.html")]
+            graph = [node for block in page.json_ld for node in json.loads(block).get("@graph", [])]
+            types = {node["@type"]: node for node in graph}
+            self.assertEqual(set(types), {"RealEstateAgent", "WebSite"}, lang["lang"])
+            self.assertEqual(types["WebSite"]["publisher"]["@id"], types["RealEstateAgent"]["@id"])
+            self.assertEqual(types["WebSite"]["url"], page.canonical)
+
 
 def published_files():
     """Archivos que publica GitHub Pages (Jekyll): todo salvo lo que empieza por «_» o «.»,
